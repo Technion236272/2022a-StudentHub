@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studenthub/ScreenTags.dart';
 import 'package:studenthub/events_page.dart';
 
 void main() {
@@ -79,16 +80,36 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-                onPressed: pushEventPage,
-                child: const Text("Event Page")
-            )
+                onPressed:() { pushEventPage(GlobalStringText.tagEntertainment); },
+                child: const Text("Entertainment Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagFood); },
+                child: const Text("Food Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagCarPool); },
+                child: const Text("CarPool Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagStudyBuddy); },
+                child: const Text("StudyBuddy Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagMaterial); },
+                child: const Text("Material Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagAcademicSupport); },
+                child: const Text("AcademicSupport Page")
+            ),
           ],
         ),
       ),
     );
   }
 
-  void pushEventPage() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage()));
+  void pushEventPage(String cat) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: cat,)));
   }
 }
