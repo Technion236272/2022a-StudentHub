@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'Auth.dart';
 import 'package:provider/provider.dart';
 
+import 'CatogryHomePage.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreen createState() => _LoginScreen();
@@ -185,7 +187,7 @@ class _LoginScreen extends State<LoginScreen> {
                       backgroundColor: Color(0xFF9189F3),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                    Navigator.pop(context);
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CategoryPageScreen()));
                   }
 
 

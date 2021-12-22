@@ -76,18 +76,19 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20))),
-                  padding: const EdgeInsets.only(left: 21.0 , right: 21.0 , bottom: 0.0 , top : 15.0),
+                  padding: const EdgeInsets.only(left: 21.0 , right: 21.0 , bottom: 0.0 , top : 0.0),
 
-                  child: Form(
-                      key: _key,
-                      child: ListView(
+                  child: Center(child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
 
                          Container(margin:const EdgeInsets.only(top: 0.0),
                              child : Column(
                              children: [Align(
+                               alignment: Alignment.topCenter,
                                child: Row(
-                                 mainAxisAlignment: MainAxisAlignment.start,
+                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                 crossAxisAlignment: CrossAxisAlignment.start,
                                  children: <Widget>[
 
                                    GestureDetector(
@@ -108,8 +109,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                                    GestureDetector(
                                        child: Container(
-                                           width: 150,
-                                           height: 150,
+                                           width: 120,
+                                           height: 120,
                                            decoration: BoxDecoration(
                                              borderRadius: BorderRadius.all(Radius.circular(20)),
                                              color: Colors.transparent,
@@ -140,13 +141,10 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                ),
                              )]
                          )),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: CategoryFields(),
-                          )
+                          CategoryFields(),
                         ],
-                      )),
-
+                      ),
+                  )
                 ),
               )
             ],
@@ -175,21 +173,21 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
     );
   }
 
-  List<Widget> CategoryFields() {
-    return <Widget>[
-      Column(
+  Widget CategoryFields() {
+    return Center(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
 
 
 
-          Align(
-            child: Row(
+          Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.DeepPinkColorFirst,
@@ -204,8 +202,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 SizedBox(width: 20),
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightYellowColorFirst,
@@ -219,16 +217,13 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                     }),
               ],
             ),
-          ),
-          SizedBox(height: 20),
-          Align(
-            child: Row(
+          Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightBlueColorFirst,
@@ -242,8 +237,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 SizedBox(width: 20),
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightGreenColorFirst,
@@ -257,16 +252,13 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                     }),
               ],
             ),
-          ),
-          SizedBox(height: 20),
-          Align(
-            child: Row(
+          Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightOarngeColorFirst,
@@ -281,8 +273,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 SizedBox(width: 20),
                 GestureDetector(
                     child: Container(
-                        width: 165,
-                        height: 146,
+                        width: 160,
+                        height: 141,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightRedColorFirst,
@@ -296,9 +288,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                     }),
               ],
             ),
-          ),
         ],
-      ),
-    ];
+      ));
   }
 }
