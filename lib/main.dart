@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'HomePage.dart';
 import 'Auth.dart';
+import 'package:studenthub/ScreenTags.dart';
+import 'package:studenthub/events_page.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp( App());
