@@ -34,6 +34,8 @@ dependencies:
   connectivity: ^3.0.6
   shared_preferences: ^2.0.11
   simple_animations: ^4.0.1
+  firebase_core: ^1.8.0
+
 
 
 
@@ -67,6 +69,12 @@ flutter:
     - family: Acumin Pro SemiCondensed
       fonts:
         - asset: fonts/Acumin-Pro-SemiCond-Medium.woff.ttf
+
+    - family: Quicksand
+      fonts:
+        - asset: fonts/Quicksand-VariableFont_wght.ttf
+        - asset: fonts/Quicksand-Bold.ttf
+          style: italic
 
   uses-material-design: true
   assets:
