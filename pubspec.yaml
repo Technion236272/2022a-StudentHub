@@ -34,6 +34,11 @@ dependencies:
   connectivity: ^3.0.6
   shared_preferences: ^2.0.11
   simple_animations: ^4.0.1
+  firebase_core: ^1.8.0
+  cloud_firestore: 
+  firebase_storage: 
+  firebase_auth: 
+  provider: ^6.0.0
 
 
 
