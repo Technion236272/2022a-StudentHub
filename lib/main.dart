@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:studenthub/ScreenTags.dart';
+import 'package:studenthub/events_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,27 +50,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -95,21 +79,37 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            ElevatedButton(
+                onPressed:() { pushEventPage(GlobalStringText.tagEntertainment); },
+                child: const Text("Entertainment Page")
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagFood); },
+                child: const Text("Food Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagCarPool); },
+                child: const Text("CarPool Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagStudyBuddy); },
+                child: const Text("StudyBuddy Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagMaterial); },
+                child: const Text("Material Page")
+            ),
+            ElevatedButton(
+                onPressed: () { pushEventPage(GlobalStringText.tagAcademicSupport); },
+                child: const Text("AcademicSupport Page")
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  void pushEventPage(String cat) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: cat,)));
   }
 }
