@@ -102,4 +102,10 @@ class GlobalStringText {
   static String tagChatMessage = "ChatMessage";
   static String tagMyPost = "MyPost";
   static String tagMyPostDetails = "MyPostDetails";
+  static const String tagEntertainment = "Entertainment";
+  static const String tagMaterial = "Material";
+  static const String tagStudyBuddy = "StudyBuddy";
+  static const String tagFood = "Food";
+  static const String tagCarPool = "CarPool";
+  static const String tagAcademicSupport = "AcademicSupport";
 }

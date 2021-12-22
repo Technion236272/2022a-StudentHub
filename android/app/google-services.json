@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "117402051373",
+    "project_id": "studenthub-d589b",
+    "storage_bucket": "studenthub-d589b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117402051373:android:9386a9f5221357715c69a4",
+        "android_client_info": {
+          "package_name": "com.technion.android.studenthub.studenthub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "117402051373-8gbkgjqrnbd2d0po6s910qiuucs3fiuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByufv6f74jnGzqIzP86vg4KUhpum9bM5c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "117402051373-8gbkgjqrnbd2d0po6s910qiuucs3fiuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
