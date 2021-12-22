@@ -73,6 +73,12 @@ flutter:
       fonts:
         - asset: fonts/Acumin-Pro-SemiCond-Medium.woff.ttf
 
+    - family: Quicksand
+      fonts:
+        - asset: fonts/Quicksand-VariableFont_wght.ttf
+        - asset: fonts/Quicksand-Bold.ttf
+          style: italic
+
   uses-material-design: true
   assets:
     - images/
