@@ -9,7 +9,7 @@
 
 ## LogIn screen
 
-## All of this screen is generic , which means it is the same screen but it shows the user fields on condition from what path he came from : 
+## All of this screen is generic(uses visibility and inhertance classes) , which means it is the same screen but it shows the user , the required fields/icons/texts on condition from what path he came from : 
 -----------------------------------------------------------------------------------------------------------
 ## Categories HomePage Screen
 
