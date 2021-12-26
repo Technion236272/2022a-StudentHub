@@ -10,6 +10,7 @@ class HomePage extends StatelessWidget {
     // TODO: implement build
     return Scaffold(
       resizeToAvoidBottomInset: false,
+
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
