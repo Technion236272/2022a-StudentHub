@@ -22,5 +22,11 @@ Our application provides essential social and academic services to solve these p
 
 * All users will be verified upon registration by presenting their student ID.
 * Event Reminder .
-* 'My Activities' tab which contains upcoming events and starred tickets.
+* 'Faviorite Tickets' tab which contains upcoming events and starred tickets.
+* 'My Tickets' tab which contains created tickets.
+
+
+### Table of Contents
+1. [Application structure](docs/applicationstracture.md)
+2. [Firebase structure](docs/FirebaseStructure.md)
 
