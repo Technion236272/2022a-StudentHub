@@ -27,7 +27,7 @@ class _LoginScreen extends State<LoginScreen> {
           SafeArea(
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.2,
+                height: MediaQuery.of(context).size.height * 0.15,
                 color: Color(0xFF8C88F9),
                 child: Column(
                   children: <Widget>[
@@ -55,7 +55,7 @@ class _LoginScreen extends State<LoginScreen> {
               )),
           Flexible(
               child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
+            height: MediaQuery.of(context).size.height * 0.85,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
