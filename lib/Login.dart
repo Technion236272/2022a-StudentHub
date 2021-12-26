@@ -8,10 +8,11 @@ import 'CatogryHomePage.dart';
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreen createState() => _LoginScreen();
+  
 }
 
 class _LoginScreen extends State<LoginScreen> {
-  
+
   final _email_controller = TextEditingController();
   final _password_controller = TextEditingController();
   var _obsecure_flag = true;
