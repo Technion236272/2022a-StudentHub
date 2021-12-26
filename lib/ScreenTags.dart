@@ -45,6 +45,9 @@ class GlobalStringText {
   static Color ThirdpurpleColor =  Color(0xff756CF1);
   static Color ForthpurpleColor =  Color(0xff7268F0);
   static Color FifthpurpleColor =  Color(0xff6D63EA);
+  static Color purpleColor =  Color(0xff6769EC);
+  static Color backPurple =  Color(0xff3b3cb2);
+
 
   static Color WhiteColorHiMessage =  Color(0xffF5F5F5);
 
@@ -58,16 +61,23 @@ class GlobalStringText {
   static String ImagesTitle = "images/Title.png";
   static String ImagesCourseNum= "images/courseNum.png";
   static String ImagesEvent= "images/event.png";
-  static String ImagesEnertiamentCat = "images/entCat.png";
-  static String ImagesStudyBudCat = "images/studdybudCat.png";
-  static String ImagesTravelCat = "images/TravelCat.png";
+
+  static String ImagesEnertiamentCat = "images/icons8-comedy-64.png";
+  static String ImagesStudyBudCat = "images/icons8-book-and-pencil-64.png";
+  static String ImagesTravelCat = "images/icons8-car-64.png";
   static String ImageWaving = "images/waving-hand-emoji-svg-11549875522a4ojenddj3.png";
   static String ImageWavingTest = "images/32px-Twemoji12_1f44b.svg.png";
+  static String ImageHomeButton = "images/Home.png";
+  static String ImageInboxButton = "images/icons8-inbox-64.png";
+  static String ImageFavButton = "images/icons8-favorite-64.png";
+  static String ImageSend = "images/icons8-sent.png";
+  static String ImageMsg = "images/icons8-messaging-96.png";
 
 
-  static String ImagesFoodCat = "images/foodcat.png";
-  static String ImagesAcadSupportCat = "images/acaCat.png";
-  static String ImagesMaterialCat = "images/matCatogry.png";
+
+  static String ImagesFoodCat = "images/icons8-restaurant-64.png";
+  static String ImagesAcadSupportCat = "images/icons8-helping-hand-64.png";
+  static String ImagesMaterialCat = "images/icons8-library-64.png";
   static String ImagesServices = "images/services.png";
   static String ImagesTickets = "images/tickets.png";
   static String ImagesProfile = "images/profile.png";
