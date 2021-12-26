@@ -27,6 +27,6 @@ Our application provides essential social and academic services to solve these p
 
 
 ### Table of Contents
-1. [Application structure](docs/applicationstracture.md)
+1. [Application structure](docs/AppStructure.md)
 2. [Firebase structure](docs/FirebaseStructure.md)
 
