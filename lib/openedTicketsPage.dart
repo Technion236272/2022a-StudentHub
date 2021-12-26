@@ -134,8 +134,10 @@ Widget getOpenedTickets() {
   return ListView.separated(
     separatorBuilder: (BuildContext context, int index) => const Divider(),
     itemBuilder: (context, i) {
-      return Ticket("title","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","14:30",Colors.blue,"22.02.2022",true);
+      return Ticket("title","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","22.02.2022 , 14:30",Colors.blue,"22.02.2022", '7she', isOpenedTicket: true);
     },
     itemCount: 10,
   );
 }
+
+
