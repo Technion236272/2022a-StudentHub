@@ -195,3 +195,5 @@ Widget getfavoriteTickets() {
     itemCount: 10,separatorBuilder: (BuildContext context, int index) => const Divider(),
   );
 }
+
+
