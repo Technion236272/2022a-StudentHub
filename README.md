@@ -26,7 +26,10 @@ Our application provides essential social and academic services to solve these p
 * 'My Tickets' tab which contains created tickets.
 
 
+
+
 ### Table of Contents
 1. [Application structure](docs/AppStructure.md)
 2. [Firebase structure](docs/FirebaseStructure.md)
+3. [Setup](docs/Setup.md)
 
