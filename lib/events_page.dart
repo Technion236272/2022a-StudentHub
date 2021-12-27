@@ -12,6 +12,9 @@ import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
 import 'package:studenthub/GenericPageCreation.dart';
 import 'GenericPageCreation.dart';
+import 'package:intl/intl.dart';
+import 'main.dart';
+import 'notificationHelper.dart';
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -948,6 +951,12 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
+    if(_isSaved == false)
+      {
+        var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
+
+        scheduleNotification(notifsPlugin,DateTime.now().toString(),widget._title,"you have event soon!",datetime.subtract(Duration(minutes: 10)));
+      }
     setState(() {
       _isSaved = !_isSaved;
     });
