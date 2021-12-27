@@ -97,6 +97,7 @@ class _EventsPageState extends State<EventsPage> {
 
     return Container(
       child: Scaffold(
+
         floatingActionButton: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.end,
