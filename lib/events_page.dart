@@ -1,10 +1,16 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:studenthub/ScreenTags.dart';
-
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:badges/badges.dart';
+import 'package:studenthub/CatogryHomePage.dart';
+import 'package:studenthub/GenericPageCreation.dart';
 import 'GenericPageCreation.dart';
 
 class EventsPage extends StatefulWidget {
@@ -20,6 +26,10 @@ class _EventsPageState extends State<EventsPage> {
   bool _isVisible = true;
   late final ScrollController _hideFapController = ScrollController();
   late var tickets;
+  int selectedIndex = 5;
+  int badge = 0;
+  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  double gap = 10;
 
   @override
   void initState() {
@@ -84,29 +94,54 @@ class _EventsPageState extends State<EventsPage> {
       ],
     );
 
+
     return Container(
       child: Scaffold(
-          floatingActionButton: AnimatedOpacity(
-            opacity: _isVisible ? 1 : 0,
-            duration: const Duration(milliseconds: 500),
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(
-                        builder: (context) => NewPostScreen(widget.category)))
-                    .then((value) {
-                  tickets = getTickets();
-                  setState(() {});
-                });
-              },
-              child: const Icon(
-                Icons.post_add_rounded,
-                color: Colors.black,
-                size: 40,
+
+        floatingActionButton: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+        AnimatedOpacity(
+        opacity: _isVisible ? 1 : 0,
+          duration: const Duration(milliseconds: 500),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+            padding: const EdgeInsets.only(left:20),
+            child: SizedBox(
+                width: 70,
+                height: 70,
+                child: FittedBox(child:FloatingActionButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewPostScreen(widget.category)));
+                    },
+                    child:Tab(
+                      icon: Container(
+                        child:  Image(
+                          image: AssetImage(
+                            GlobalStringText.ImagesAddTicket,
+                          ),
+                          fit: BoxFit.contain,
+                        ),
+                        height: 60,
+                        width: 60,
+                      ),
+
+                    ),
+                    backgroundColor: GlobalStringText.whiteColor
+                ),)
+            ),),),
+            SizedBox(height: 10.0,),
+            AnimatedOpacity(
+              opacity: _isVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                padding: const EdgeInsets.only(left:20),
+                child: buildBottomNavigationBar(),
+              ),),
+                ],
               ),
-              backgroundColor: Colors.deepPurpleAccent,
-            ),
-          ),
           appBar: const SearchAppBar(),
           backgroundColor: Colors.transparent,
           body: Container(
@@ -122,14 +157,31 @@ class _EventsPageState extends State<EventsPage> {
                   )
                 ]),
             child: mainCol,
-          )),
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [Colors.white, Colors.deepPurpleAccent])),
+          ),
+        ),
+      decoration: BoxDecoration(
+        // spice up the button with a radius
+        borderRadius: const BorderRadius.all(
+          Radius.circular(10),
+        ),
+        gradient: LinearGradient(
+          // gradient starts from left
+            begin: Alignment.topRight,
+            // gradient ends at right
+            end: Alignment.bottomLeft,
+            // set all your colors
+            colors: [
+              GlobalStringText.FirstpurpleColor,
+              GlobalStringText.SecondpurpleColor,
+              GlobalStringText.ThirdpurpleColor,
+              GlobalStringText.ForthpurpleColor,
+              GlobalStringText.FifthpurpleColor,
+
+            ]),
+      ),
     );
   }
+
 
   Future<List<Ticket>> getTickets() async {
     var tickets = <Ticket>[];
@@ -267,31 +319,145 @@ class _EventsPageState extends State<EventsPage> {
     return tickets;
   }
 
+  Widget buildBottomNavigationBar() {
+    return Material(
+    color: Colors.transparent,
+    elevation: 0,
+
+    child: SafeArea(
+      top: true,
+      child: Container(
+
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+        decoration: BoxDecoration(
+          color: GlobalStringText.whiteColor,
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: -10,
+              blurRadius: 60,
+              color: Colors.black.withOpacity(.4),
+              offset: Offset(0, 25),
+            )
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
+          child: GNav(
+
+            tabs: [
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.pink,
+                iconColor: Colors.black,
+                textColor: Colors.pink,
+                backgroundColor: Colors.pink.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.heart,
+                leading: selectedIndex == 1 || badge == 0
+                    ? null
+                    : Badge(
+                  badgeColor: Colors.red.shade100,
+                  elevation: 0,
+                  position: BadgePosition.topEnd(top: -12, end: -12),
+                  badgeContent: Text(
+                    badge.toString(),
+                    style: TextStyle(color: Colors.red.shade900),
+                  ),
+                  child: Icon(
+                    LineIcons.heart,
+                    color: selectedIndex == 1
+                        ? Colors.pink
+                        : Colors.black,
+                  ),
+                ),
+                text: 'Favorite tickets',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.purple,
+                iconColor: Colors.black,
+                textColor: Colors.purple,
+                backgroundColor: Colors.purple.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.home,
+                text: 'HomePage',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.amber[600],
+                iconColor: Colors.black,
+                textColor: Colors.amber[600],
+                backgroundColor: Colors.amber[600]!.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.inbox,
+                text: 'Inbox',
+              ),
+
+            ],
+            selectedIndex: selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                switch(index)
+                {
+                // just update the navigator i putted random navigation for the purpose of testing...
+                // waiting for yousef to do the pages
+                  case 0 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const EventsPage(
+                            category: GlobalStringText.tagEntertainment)));
+                    break;
+                  case 1 :
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CategoryPageScreen()));
+                    break;
+
+                  case 2 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const EventsPage(
+                            category: GlobalStringText.tagCarPool
+                        )));
+                    break;
+                }
+
+
+              });
+
+            },
+          ),
+        ),
+      ),
+    ),);
+  }
+
+
   Color getCategoryColor() {
     switch (widget.category) {
       case GlobalStringText.tagEntertainment:
         {
-          return Colors.deepOrangeAccent;
+          return GlobalStringText.DeepPinkColorFirst;
         }
       case GlobalStringText.tagFood:
         {
-          return Colors.redAccent;
+          return GlobalStringText.LightBlueColorFirst;
         }
       case GlobalStringText.tagStudyBuddy:
         {
-          return Colors.orangeAccent;
+          return GlobalStringText.LightOarngeColorFirst;
         }
       case GlobalStringText.tagMaterial:
         {
-          return Colors.blue;
+          return GlobalStringText.LightRedColorFirst;
         }
       case GlobalStringText.tagCarPool:
         {
-          return Colors.yellow;
+          return GlobalStringText.LightYellowColorFirst;
         }
       case GlobalStringText.tagAcademicSupport:
         {
-          return Colors.lightGreen;
+          return GlobalStringText.LightGreenColorFirst;
         }
       default:
         {
@@ -548,7 +714,7 @@ class _TicketState extends State<Ticket> {
         Text(
           widget._title,
           maxLines: 1,
-          style: const TextStyle(fontSize: 25, color: Colors.white),
+          style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
         ),
         IconButton(
             onPressed: love,
@@ -641,14 +807,14 @@ class _TicketState extends State<Ticket> {
         children: [
           titleSave,
           Text(widget._desc,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.fade,
-              style: const TextStyle(fontSize: 17, color: Colors.white)),
+              style:  TextStyle(fontSize: 17, color: GlobalStringText.textFieldGrayColor )),
           Container(
             child: Align(
               alignment: Alignment.bottomRight,
               child: Text(widget._time,
-                  style: TextStyle(fontSize: 20, color: Colors.white)),
+                style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 25, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),),
             ),
             margin: const EdgeInsets.only(top: 10),
           )
@@ -661,18 +827,9 @@ class _TicketState extends State<Ticket> {
         margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white.withOpacity(0.1), widget._color],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-            ),
-            borderRadius: BorderRadius.circular(30.0),
-            boxShadow: [
-              BoxShadow(
-                color: widget._color,
-                blurRadius: 3.0,
-              )
-            ]),
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+            color: widget._color,
+        ),
         child: childTicket,
       ),
       onTap: expand,

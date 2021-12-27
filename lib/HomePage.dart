@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'Login.dart';
 import 'SignUp.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -14,7 +15,37 @@ class HomePage extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(50)),
+            Padding(padding: EdgeInsets.all(10)),
+            Align(child :IconButton(
+
+                icon: const Icon(Icons.info_outline),
+                tooltip: "About",
+                onPressed: (() async {
+                  showAboutDialog(
+                      context: context,
+                      applicationName: 'StudentHub',
+                      applicationVersion: '1.0.0',
+                      applicationLegalese:
+                      '©️ 2021 Google logo\n©️ 2021 Facebook logo',
+                      children: <Widget>[
+                        InkWell(
+                            child: const Text('Privacy Policy'),
+                            onTap: () async {
+                              var url =
+                                  'https://gist.github.com/mostafanaax69/2660aef1bef581031866cb5997a03169';
+                              await launch(url);
+                            }),
+                        InkWell(
+                            child: const Text('Terms & Conditions'),
+                            onTap: () async {
+                              var url =
+                                  'https://gist.github.com/mostafanaax69/871b4152b09a2e9c40091f5b58b04d5b';
+                              await launch(url);
+
+                            }),
+                      ]);
+                })) , alignment: Alignment.bottomLeft),
+
             new Image.asset(
               'images/bot.png',
               height: 152,
