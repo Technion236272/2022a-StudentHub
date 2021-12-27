@@ -2,9 +2,9 @@
 
 ## Requirments :
 
-*Android Studio IDE 
-*Git Bash
-*GitHub GUI(for easy use)
+* Android Studio IDE 
+* Git Bash
+* GitHub GUI(for easy use)
 
 -----------------------------------------------------------------------------------------------------------
 
