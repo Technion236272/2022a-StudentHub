@@ -1,3 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:studenthub/Auth.dart';
+
 import 'ScreenTags.dart';
 import 'package:connectivity/connectivity.dart';
 import 'dart:core';
@@ -5,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 //---------------------------------------CLASSES--------------------------------------------------//
 class Food {
@@ -12,6 +17,8 @@ class Food {
   late String name;
 
   Food(this.id, this.name);
+
+  String getName() => name;
 
   static List<Food> getFoodTypes() {
     return <Food>[
@@ -35,6 +42,8 @@ class Event {
 
   Event(this.id, this.name);
 
+  String getName() => name;
+
   static List<Event> getEventTypes() {
     return <Event>[
       Event(
@@ -53,9 +62,9 @@ class Event {
 
 //-----------------------------------------------------------------------------------------//
 class NewPostScreen extends StatefulWidget {
-  static String tag = GlobalStringText.tagNewPostScreen;
+  String category;
 
-  NewPostScreen({Key? key}) : super(key: key);
+  NewPostScreen(this.category, {Key? key}) : super(key: key);
 
   @override
   _NewPostScreenState createState() {
@@ -70,6 +79,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   TextEditingController TitleController = TextEditingController();
   TextEditingController LocationController = TextEditingController();
+  TextEditingController DestinationController = TextEditingController();
   TextEditingController TimeController = TextEditingController();
   TextEditingController DescriptionController = TextEditingController();
   TextEditingController EventTypeController = TextEditingController();
@@ -232,23 +242,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
           children: [
             Align(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Image.asset(GlobalStringText.ImagesAddTicket),
-                ],
-              ),
-              alignment: Alignment.centerRight,
-            ),
-            Align(
-              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Image.asset(GlobalStringText.ImagesTitle),
+                  IconButton(onPressed: () {
+                    pushTicket();
+                  }, icon: Image.asset(GlobalStringText.ImagesAddTicket), iconSize: 60, padding: EdgeInsets.zero,),
                 ],
               ),
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.centerRight,
             ),
             const SizedBox(height: 5.0),
             TextFormField(
@@ -360,7 +363,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
       const SizedBox(height: 5.0),
       Visibility(
-          visible: false,
+          visible: widget.category == GlobalStringText.tagMaterial || widget.category == GlobalStringText.tagStudyBuddy || widget.category == GlobalStringText.tagAcademicSupport,
           child: Column(
             children: [
               Align(
@@ -408,7 +411,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           )),
 
       Visibility(
-          visible: true,
+          visible: widget.category == GlobalStringText.tagFood,
           child: Column(
             children: [
               Align(
@@ -454,7 +457,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           )),
 
       Visibility(
-          visible: false,
+          visible: widget.category == GlobalStringText.tagEntertainment,
           child: Column(
             children: [
               Align(
@@ -505,6 +508,53 @@ class _NewPostScreenState extends State<NewPostScreen> {
               ),
             ],
           )),
+      Visibility(
+          visible: widget.category == GlobalStringText.tagCarPool,
+          child: Column(
+            children: [
+              Align(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Image.asset(GlobalStringText.ImagesLocation),
+                  ],
+                ),
+                alignment: Alignment.centerLeft,
+              ),
+              const SizedBox(height: 5.0),
+              TextFormField(
+                focusNode: myFocusNodeCourse,
+                controller: DestinationController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: GlobalStringText.textFieldColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      width: 0,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  hintText: 'example Hamarganet st,Nesher',
+                  hintStyle: TextStyle(
+                      fontSize: 12.0,
+                      fontFamily: GlobalStringText.FontTextFormField,
+                      color: GlobalStringText.textFieldGrayColor),
+                  //helperText: 'Keep it short, this is just a demo.',
+                  labelText: 'Pick destination',
+                  labelStyle: TextStyle(
+                      fontSize: 14.0,
+                      color: GlobalStringText.textFieldGrayColor,
+                      fontFamily: GlobalStringText.FontTextFormField,
+                      fontWeight: FontWeight.w300),
+
+                  prefixText: ' ',
+                  //suffixStyle: const TextStyle(color: Colors.green)
+                ),
+              ),
+            ],
+          )),
 
       const SizedBox(height: 5.0),
 
@@ -547,5 +597,80 @@ class _NewPostScreenState extends State<NewPostScreen> {
         color: Colors.white,
       ),
     ];
+  }
+
+  void pushTicket() {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider.of<AuthRepository>(context, listen: false).user;
+    switch(widget.category) {
+      case GlobalStringText.tagFood: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Time' : TimeController.text,
+          'Type' : _selectedFood.getName(),
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("Food").add(data);
+      } break;
+      case GlobalStringText.tagEntertainment: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Time' : TimeController.text,
+          'Type' : _selectedEvent.getName(),
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("Entertainment").add(data);
+      } break;
+      case GlobalStringText.tagCarPool: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Destination' : DestinationController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("CarPool").add(data);
+      } break;
+      case GlobalStringText.tagAcademicSupport: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("AcademicSupport").add(data);
+      } break;
+      case GlobalStringText.tagStudyBuddy: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("StudyBuddy").add(data);
+      } break;
+      case GlobalStringText.tagMaterial: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.email,
+        };
+        _firestore.collection("Material").add(data);
+      } break;
+      default: {}
+    }
+    Navigator.of(context).pop();
   }
 }
