@@ -1,8 +1,11 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:studenthub/ScreenTags.dart';
+
+import 'GenericPageCreation.dart';
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -16,6 +19,7 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   bool _isVisible = true;
   late final ScrollController _hideFapController = ScrollController();
+  late var tickets;
 
   @override
   void initState() {
@@ -38,25 +42,45 @@ class _EventsPageState extends State<EventsPage> {
         }
       }
     });
+    tickets = getTickets();
   }
 
   @override
   Widget build(BuildContext context) {
-    var tickets = getTickets();
-
     var mainCol = Column(
       children: [
         Visibility(
-          maintainAnimation: true,
-          maintainState: true,
-          visible: _isVisible,
-          child: AnimatedOpacity(
-            opacity: _isVisible ? 1 : 0,
-            duration: const Duration(milliseconds: 500),
-            child: getCategoryIcon(),
-        )),
+            maintainAnimation: true,
+            maintainState: true,
+            visible: _isVisible,
+            child: AnimatedOpacity(
+              opacity: _isVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: getCategoryIcon(),
+            )),
         getCategoryTitle(),
-        Expanded(child: tickets)
+        Expanded(
+            child: FutureBuilder(
+                future: tickets,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      {
+                        return const Center(child: Text("Loading"));
+                      }
+                    default:
+                      {
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error ${snapshot.error}"));
+                        } else {
+                          return ListView(
+                            children: snapshot.data as List<Widget>,
+                            controller: _hideFapController,
+                          );
+                        }
+                      }
+                  }
+                }))
       ],
     );
 
@@ -66,13 +90,21 @@ class _EventsPageState extends State<EventsPage> {
             opacity: _isVisible ? 1 : 0,
             duration: const Duration(milliseconds: 500),
             child: FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (context) => NewPostScreen(widget.category)))
+                    .then((value) {
+                  tickets = getTickets();
+                  setState(() {});
+                });
+              },
               child: const Icon(
                 Icons.post_add_rounded,
                 color: Colors.black,
                 size: 40,
               ),
-              backgroundColor: Colors.amberAccent,
+              backgroundColor: Colors.deepPurpleAccent,
             ),
           ),
           appBar: const SearchAppBar(),
@@ -99,18 +131,140 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget getTickets() {
-    return ListView.builder(
-      itemBuilder: (context, i) {
-        return Ticket(
-            "_title",
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "14:30",
-            getCategoryColor());
-      },
-      itemCount: 10,
-      controller: _hideFapController,
-    );
+  Future<List<Ticket>> getTickets() async {
+    var tickets = <Ticket>[];
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final Color catColor = getCategoryColor();
+    switch (widget.category) {
+      case GlobalStringText.tagFood:
+        {
+          await _firestore.collection("Food").get().then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                type: data['Type'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      case GlobalStringText.tagEntertainment:
+        {
+          await _firestore.collection("Entertainment").get().then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                type: data['Type'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      case GlobalStringText.tagCarPool:
+        {
+          await _firestore.collection("CarPool").get().then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                dest: data['Destination'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      case GlobalStringText.tagAcademicSupport:
+        {
+          await _firestore
+              .collection("AcademicSupport")
+              .get()
+              .then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                course: data['CourseNum'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      case GlobalStringText.tagStudyBuddy:
+        {
+          await _firestore.collection("StudyBuddy").get().then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                course: data['CourseNum'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      case GlobalStringText.tagMaterial:
+        {
+          await _firestore.collection("Material").get().then((collection) {
+            collection.docs.forEach((element) {
+              var data = element.data();
+              var ticket = Ticket(
+                data['Title'],
+                data['Description'],
+                data['Time'],
+                catColor,
+                data['Location'],
+                data['Owner'],
+                course: data['CourseNum'],
+              );
+              tickets.add(ticket);
+            });
+          });
+        }
+        break;
+      default:
+        {
+          tickets.add(Ticket(
+              "_title",
+              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "14:30",
+              getCategoryColor(),
+              '',
+              ''));
+        }
+    }
+    return tickets;
   }
 
   Color getCategoryColor() {
@@ -162,7 +316,7 @@ class _EventsPageState extends State<EventsPage> {
       case GlobalStringText.tagFood:
         {
           return const Text(
-            "Foood",
+            "Food",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.deepPurpleAccent,
@@ -366,9 +520,16 @@ class Ticket extends StatefulWidget {
   final String _time;
   final String _title;
   final String _desc;
+  final String _location;
   final Color _color;
+  final String _owner;
+  var dest;
+  var type;
+  var course;
 
-  const Ticket(this._title, this._desc, this._time, this._color, {Key? key})
+  Ticket(this._title, this._desc, this._time, this._color, this._location,
+      this._owner,
+      {Key? key, this.dest, this.type, this.course})
       : super(key: key);
 
   @override
@@ -404,29 +565,52 @@ class _TicketState extends State<Ticket> {
     );
     Column childTicket;
     if (_isExpanded) {
+      String extra_info = '';
+      String extra_info_data = '';
+      if (widget.dest != null) {
+        extra_info = "Destination : ";
+        extra_info_data = widget.dest;
+      } else if (widget.course != null) {
+        extra_info = "Course Number : ";
+        extra_info_data = widget.course;
+      } else if (widget.type != null) {
+        extra_info = "Type : ";
+        extra_info_data = widget.type;
+      }
       childTicket = Column(
         children: [
           titleSave,
           Text(widget._desc,
               style: const TextStyle(fontSize: 17, color: Colors.white)),
           Row(
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "Ticket Owner : ",
                 style: TextStyle(fontSize: 19, color: Colors.amberAccent),
               ),
-              Text("<TICKET OWNER>",
+              Text(widget._owner,
                   style: TextStyle(fontSize: 17, color: Colors.white))
             ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,
           ),
           Row(
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "Location : ",
                 style: TextStyle(fontSize: 19, color: Colors.amberAccent),
               ),
-              Text("<LOCATION>",
+              Text(widget._location,
+                  style: TextStyle(fontSize: 17, color: Colors.white))
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          ),
+          Row(
+            children: [
+              const Text(
+                "Time : ",
+                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
+              ),
+              Text(widget._time,
                   style: TextStyle(fontSize: 17, color: Colors.white))
             ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -434,10 +618,10 @@ class _TicketState extends State<Ticket> {
           Row(
             children: [
               Text(
-                "Time : ",
-                style: const TextStyle(fontSize: 19, color: Colors.amberAccent),
+                extra_info,
+                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
               ),
-              Text(widget._time,
+              Text(extra_info_data,
                   style: TextStyle(fontSize: 17, color: Colors.white))
             ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,

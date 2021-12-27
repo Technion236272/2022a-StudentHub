@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'events_page.dart';
+
 class CategoryPageScreen extends StatefulWidget {
   static String tag = GlobalStringText.tagNewPostScreen;
 
@@ -197,7 +199,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagEntertainment,)));
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -213,7 +215,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagCarPool,)));
                     }),
               ],
             ),
@@ -232,7 +234,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagFood,)));
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -248,7 +250,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagAcademicSupport,)));
                     }),
               ],
             ),
@@ -268,7 +270,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagStudyBuddy,)));
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -284,7 +286,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               fit: BoxFit.scaleDown),
                         )),
                     onTap: () {
-                      null;
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(category: GlobalStringText.tagMaterial,)));
                     }),
               ],
             ),
