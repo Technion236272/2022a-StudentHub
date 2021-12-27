@@ -10,8 +10,9 @@ import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studenthub/MaintainceScreen.dart';
-
+import 'FavoritesPage.dart';
 import 'events_page.dart';
+import 'openedTicketsPage.dart';
 
 class CategoryPageScreen extends StatefulWidget {
   const CategoryPageScreen({Key? key}) : super(key: key);
@@ -136,7 +137,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      MaintaincePage()));
+                                                      OpenedTicketsPage()));
                                         }),
                                     GestureDetector(
                                         child: Container(
@@ -176,7 +177,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      MaintaincePage()));
+                                                      FavoritesPage()));
                                         }),
                                   ],
                                 ),
@@ -296,9 +297,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 // waiting for yousef to do the pages
                   case 0 :
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            EventsPage(
-                                category: GlobalStringText.tagEntertainment)));
+                        builder: (context) => FavoritesPage()));
                     break;
                   case 1 :
                     Navigator.of(context).push(MaterialPageRoute(
@@ -355,8 +354,6 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                             ],
                           ),
                         ),
-
-
                         width: 160,
                         height: 141,
                         decoration: BoxDecoration(

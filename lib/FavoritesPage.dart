@@ -131,9 +131,8 @@ class _FavoritesPage extends State<FavoritesPage> {
 class favoriteTicket extends StatefulWidget {
   final String _time;
   final String _title;
-  final String _date;
 
-  const favoriteTicket(this._title, this._time, this._date, {Key? key})
+  const favoriteTicket(this._title, this._time,  {Key? key})
       : super(key: key);
 
   @override
@@ -169,7 +168,7 @@ class _favoriteTicketState extends State<favoriteTicket> {
             height: 10,
           ),
           Text(
-            "Event at " + widget._time + " , " + widget._date,
+            "Event at " + widget._time ,
             style: TextStyle(fontSize: 20),
           ),
           SizedBox(
@@ -190,7 +189,7 @@ class _favoriteTicketState extends State<favoriteTicket> {
 Widget getfavoriteTickets() {
   return ListView.separated(
     itemBuilder: (context, i) {
-      return favoriteTicket("_title", "14:30", "14.02.2022");
+      return favoriteTicket("_title", "14:30");
     },
     itemCount: 10,separatorBuilder: (BuildContext context, int index) => const Divider(),
   );
