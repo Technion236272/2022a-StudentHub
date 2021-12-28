@@ -75,7 +75,6 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                             color: GlobalStringText.WhiteColorHiMessage,
                           ),)
                       ),
-                        SizedBox(width: 7.0,),
                         IconButton(
                         onPressed: () async {
                           await user.signOut();
@@ -83,7 +82,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         },
                         icon: Image.asset("images/logout.png"),
                         iconSize: 40,
-                      ),],),
+                      ),],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,),
                       alignment: Alignment.centerLeft, //this ok??
                     ),
                     Align(
