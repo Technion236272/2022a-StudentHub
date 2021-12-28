@@ -37,72 +37,84 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
         children: <Widget>[
           SafeArea(
               child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.2,
-            color: Color(0xFF8C88F9),
-            child: Column(
-              children: <Widget>[
-                Row(
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.2,
+                color: Color(0xFF8C88F9),
+                child: Column(
                   children: <Widget>[
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        )),
-                    new Spacer(),
-                    IconButton(
-                      onPressed: () async {
-                        await user.signOut();
-                        Navigator.popUntil(context, (route) => route.isFirst);
-
-                      },
-                      icon: Image.asset("images/logout.png"),
-                      iconSize: 40,
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            )),
+                        new Spacer(),
+                        IconButton(
+                          onPressed: () async {
+                            await user.signOut();
+                            Navigator.popUntil(context, (route) =>
+                            route.isFirst);
+                          },
+                          icon: Image.asset("images/logout.png"),
+                          iconSize: 40,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Container(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                    Container(
+                      child: Column(
                         children: <Widget>[
-                          Text("Hi Yair",
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand-Bold.ttf',
-                                color: Colors.white,
-                              )),
+                          Row(
+                            children: <Widget>[
+                              Text("Hi Yair",
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand-Bold.ttf',
+                                    color: Colors.white,
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                "Welcome Back!",
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Quicksand-Bold.ttf',
+                                  color: Colors.white,
+                                ),
+                              ),
+                              new Image.asset(GlobalStringText.ImageWavingTest)
+                            ],
+                          )
                         ],
                       ),
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            "Welcome Back!",
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Quicksand-Bold.ttf',
-                              color: Colors.white,
-                            ),
-                          ),
-                          new Image.asset(GlobalStringText.ImageWavingTest)
-                        ],
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 15),
-                )
-              ],
-            ),
-          )),
+                      margin: EdgeInsets.only(left: 15),
+                    )
+                  ],
+                ),
+              )),
           Flexible(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.8,
-              width: MediaQuery.of(context).size.width,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.8,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20.0),
@@ -152,10 +164,10 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                                       child: Text("Error ${snapshot.error}"));
                                 } else {
                                   final List<Ticket> tickets =
-                                      snapshot.data as List<Ticket>;
+                                  snapshot.data as List<Ticket>;
                                   return ListView.separated(
                                     separatorBuilder: (_, __) =>
-                                        const Divider(),
+                                    const Divider(),
                                     itemBuilder: (_, i) => tickets[i],
                                     itemCount: tickets.length,
                                   );
@@ -175,123 +187,143 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
       ),
     );
   }
-}
 
-///
-Future<List<Ticket>> getOpenedTickets(BuildContext context) async {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final User? user = Provider.of<AuthRepository>(context, listen: false).user;
-  var tickets = <Ticket>[];
+  void updateList() {
+    tickets = getOpenedTickets(context);
+    setState(() {
 
-  await _firestore
-      .collection("${user?.uid} tickets")
-      .get()
-      .then((collection) async {
-    for (var element in collection.docs) {
-      try {
-        await element.data()['ref'].get().then((value) {
-          if (value == null) return;
-          var data = value.data();
-          switch (element.data()['category']) {
-            case GlobalStringText.tagFood:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  type: data['Type'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            case GlobalStringText.tagEntertainment:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  type: data['Type'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            case GlobalStringText.tagCarPool:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  dest: data['Destination'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            case GlobalStringText.tagAcademicSupport:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            case GlobalStringText.tagStudyBuddy:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            case GlobalStringText.tagMaterial:
-              {
-                var ticket = Ticket(
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  Colors.white,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  isOpenedTicket: true,
-                );
-                tickets.add(ticket);
-              }
-              break;
-            default:
-              {
-                tickets.add(
-                    Ticket("_title", "_desc", "14:30", Colors.white, '', ''));
-              }
-          }
-        });
-      } catch (e) {}
-    }
-  });
-  return tickets;
+    });
+  }
+
+  Future<List<Ticket>> getOpenedTickets(BuildContext context) async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider
+        .of<AuthRepository>(context, listen: false)
+        .user;
+    var tickets = <Ticket>[];
+
+    await _firestore
+        .collection("${user?.uid} tickets")
+        .get()
+        .then((collection) async {
+      for (var element in collection.docs) {
+        try {
+          await element.data()['ref'].get().then((value) {
+            if (value == null) return;
+            var data = value.data();
+            switch (element.data()['category']) {
+              case GlobalStringText.tagFood:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    type: data['Type'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              case GlobalStringText.tagEntertainment:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    type: data['Type'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              case GlobalStringText.tagCarPool:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    dest: data['Destination'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              case GlobalStringText.tagAcademicSupport:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    course: data['CourseNum'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              case GlobalStringText.tagStudyBuddy:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    course: data['CourseNum'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              case GlobalStringText.tagMaterial:
+                {
+                  var ticket = Ticket(
+                    data['Title'],
+                    data['Description'],
+                    data['Time'],
+                    Colors.white,
+                    data['Location'],
+                    data['Owner'],
+                    course: data['CourseNum'],
+                    isOpenedTicket: true,
+                    ref: element.data()['ref'],
+                    update: updateList,
+                  );
+                  tickets.add(ticket);
+                }
+                break;
+              default:
+                {
+                  tickets.add(
+                      Ticket("_title", "_desc", "14:30", Colors.white, '', ''));
+                }
+            }
+          });
+        } catch (e) {}
+      }
+    });
+    return tickets;
+  }
 }

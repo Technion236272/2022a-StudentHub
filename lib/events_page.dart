@@ -704,6 +704,8 @@ class MyPainter extends CustomPainter {
   }
 }
 
+typedef Void2VoidFunc = void Function();
+
 class Ticket extends StatefulWidget {
   static int id = 0;
   final String _time;
@@ -718,10 +720,11 @@ class Ticket extends StatefulWidget {
   String? course;
   bool? isOpenedTicket;
   bool? isLoved;
+  Void2VoidFunc? update;
 
   Ticket(this._title, this._desc, this._time, this._color, this._location,
       this._owner,
-      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved})
+      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved, this.update})
       : super(key: key);
 
   @override
@@ -776,9 +779,9 @@ class _TicketState extends State<Ticket> {
         Spacer(),
         IconButton(
           icon: Image.asset("images/edit.png"),
-          onPressed: () {},
+          onPressed: editOpened,
         ),
-        IconButton(onPressed: () {}, icon: Image.asset("images/del.png"))
+        IconButton(onPressed: deleteOpened, icon: Image.asset("images/del.png"))
       ],
     );
     Widget childTicket;
@@ -1059,6 +1062,16 @@ class _TicketState extends State<Ticket> {
     setState(() {
       _isSaved = !_isSaved;
     });
+  }
+
+  void editOpened() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => MaintaincePage()));
+  }
+
+  void deleteOpened() {
+    (widget.ref as DocumentReference).delete();
+    widget.update!();
   }
 
   void expand() {
