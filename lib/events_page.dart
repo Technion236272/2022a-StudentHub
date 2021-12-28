@@ -100,71 +100,74 @@ class _EventsPageState extends State<EventsPage> {
                 }))
       ],
     );
-    
     return Container(
       child: Scaffold(
-
         floatingActionButton: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-        AnimatedOpacity(
-        opacity: _isVisible ? 1 : 0,
-          duration: const Duration(milliseconds: 500),
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-            padding: const EdgeInsets.only(left:20),
-            child: SizedBox(
-                width: 70,
-                height: 70,
-                child: FittedBox(child:FloatingActionButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewPostScreen(widget.category)));
-                    },
-                    child:Tab(
-                      icon: Container(
-                        child:  Image(
-                          image: AssetImage(
-                            GlobalStringText.ImagesAddTicket,
+            AnimatedOpacity(
+              opacity: _isVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                padding: const EdgeInsets.only(left: 20),
+                child: SizedBox(
+                    width: 70,
+                    height: 70,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    NewPostScreen(widget.category)));
+                          },
+                          child: Tab(
+                            icon: Container(
+                              child: Image(
+                                image: AssetImage(
+                                  GlobalStringText.ImagesAddTicket,
+                                ),
+                                fit: BoxFit.contain,
+                              ),
+                              height: 60,
+                              width: 60,
+                            ),
                           ),
-                          fit: BoxFit.contain,
-                        ),
-                        height: 60,
-                        width: 60,
-                      ),
-
-                    ),
-                    backgroundColor: GlobalStringText.whiteColor
-                ),)
-            ),),),
-            SizedBox(height: 10.0,),
+                          backgroundColor: GlobalStringText.whiteColor),
+                    )),
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
             AnimatedOpacity(
               opacity: _isVisible ? 1 : 0,
               duration: const Duration(milliseconds: 500),
               child: Container(
                 margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                padding: const EdgeInsets.only(left:20),
+                padding: const EdgeInsets.only(left: 20),
                 child: buildBottomNavigationBar(),
-              ),),
-                ],
               ),
-          appBar: const SearchAppBar(),
-          backgroundColor: Colors.transparent,
-          body: Container(
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.deepPurple,
-                    blurRadius: 3.0,
-                  )
-                ]),
-            child: mainCol,
-          ),
+            ),
+          ],
         ),
+        appBar: const SearchAppBar(),
+        backgroundColor: Colors.transparent,
+        body: Container(
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.deepPurple,
+                  blurRadius: 3.0,
+                )
+              ]),
+          child: mainCol,
+        ),
+      ),
       decoration: BoxDecoration(
         // spice up the button with a radius
         borderRadius: const BorderRadius.all(
@@ -325,117 +328,108 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget buildBottomNavigationBar() {
     return Material(
-    color: Colors.transparent,
-    elevation: 0,
-
-    child: SafeArea(
-      top: true,
-      child: Container(
-
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-        decoration: BoxDecoration(
-          color: GlobalStringText.whiteColor,
-          borderRadius: BorderRadius.all(Radius.circular(50)),
-          boxShadow: [
-            BoxShadow(
-              spreadRadius: -10,
-              blurRadius: 60,
-              color: Colors.black.withOpacity(.4),
-              offset: Offset(0, 25),
-            )
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
-          child: GNav(
-
-            tabs: [
-              GButton(
-                gap: gap,
-                iconActiveColor: Colors.pink,
-                iconColor: Colors.black,
-                textColor: Colors.pink,
-                backgroundColor: Colors.pink.withOpacity(.2),
-                iconSize: 24,
-                padding: padding,
-                icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
-                text: 'Favorite tickets',
-              ),
-              GButton(
-                gap: gap,
-                iconActiveColor: Colors.purple,
-                iconColor: Colors.black,
-                textColor: Colors.purple,
-                backgroundColor: Colors.purple.withOpacity(.2),
-                iconSize: 24,
-                padding: padding,
-                icon: LineIcons.home,
-                text: 'HomePage',
-              ),
-              GButton(
-                gap: gap,
-                iconActiveColor: Colors.amber[600],
-                iconColor: Colors.black,
-                textColor: Colors.amber[600],
-                backgroundColor: Colors.amber[600]!.withOpacity(.2),
-                iconSize: 24,
-                padding: padding,
-                icon: LineIcons.inbox,
-                text: 'Inbox',
-              ),
-
+      color: Colors.transparent,
+      elevation: 0,
+      child: SafeArea(
+        top: true,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+          decoration: BoxDecoration(
+            color: GlobalStringText.whiteColor,
+            borderRadius: BorderRadius.all(Radius.circular(50)),
+            boxShadow: [
+              BoxShadow(
+                spreadRadius: -10,
+                blurRadius: 60,
+                color: Colors.black.withOpacity(.4),
+                offset: Offset(0, 25),
+              )
             ],
-            selectedIndex: selectedIndex,
-            onTabChange: (index) {
-              setState(() {
-                switch(index)
-                {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
-                  case 0 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const EventsPage(
-                            category: GlobalStringText.tagEntertainment)));
-                    break;
-                  case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CategoryPageScreen()));
-                    break;
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
+            child: GNav(
+              tabs: [
+                GButton(
+                  gap: gap,
+                  iconActiveColor: Colors.pink,
+                  iconColor: Colors.black,
+                  textColor: Colors.pink,
+                  backgroundColor: Colors.pink.withOpacity(.2),
+                  iconSize: 24,
+                  padding: padding,
+                  icon: LineIcons.heart,
+                  leading: selectedIndex == 1 || badge == 0
+                      ? null
+                      : Badge(
+                          badgeColor: Colors.red.shade100,
+                          elevation: 0,
+                          position: BadgePosition.topEnd(top: -12, end: -12),
+                          badgeContent: Text(
+                            badge.toString(),
+                            style: TextStyle(color: Colors.red.shade900),
+                          ),
+                          child: Icon(
+                            LineIcons.heart,
+                            color:
+                                selectedIndex == 1 ? Colors.pink : Colors.black,
+                          ),
+                        ),
+                  text: 'Favorite tickets',
+                ),
+                GButton(
+                  gap: gap,
+                  iconActiveColor: Colors.purple,
+                  iconColor: Colors.black,
+                  textColor: Colors.purple,
+                  backgroundColor: Colors.purple.withOpacity(.2),
+                  iconSize: 24,
+                  padding: padding,
+                  icon: LineIcons.home,
+                  text: 'HomePage',
+                ),
+                GButton(
+                  gap: gap,
+                  iconActiveColor: Colors.amber[600],
+                  iconColor: Colors.black,
+                  textColor: Colors.amber[600],
+                  backgroundColor: Colors.amber[600]!.withOpacity(.2),
+                  iconSize: 24,
+                  padding: padding,
+                  icon: LineIcons.inbox,
+                  text: 'Inbox',
+                ),
+              ],
+              selectedIndex: selectedIndex,
+              onTabChange: (index) {
+                setState(() {
+                  switch (index) {
+                    // just update the navigator i putted random navigation for the purpose of testing...
+                    // waiting for yousef to do the pages
+                    case 0:
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const EventsPage(
+                              category: GlobalStringText.tagEntertainment)));
+                      break;
+                    case 1:
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => CategoryPageScreen()));
+                      break;
 
-                  case 2 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const EventsPage(
-                            category: GlobalStringText.tagCarPool
-                        )));
-                    break;
-                }
-
-
-              });
-
-            },
+                    case 2:
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const EventsPage(
+                              category: GlobalStringText.tagCarPool)));
+                      break;
+                  }
+                });
+              },
+            ),
           ),
         ),
       ),
-    ),);
+    );
   }
-
 
   Color getCategoryColor() {
     switch (widget.category) {
@@ -719,19 +713,21 @@ class _TicketState extends State<Ticket> {
         Text(
           widget._title,
           maxLines: 1,
-          style:GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          style: GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28,
+              color: GlobalStringText.purpleColor,
+              fontWeight: FontWeight.bold)),
         ),
         IconButton(
             onPressed: love,
             icon: _isSaved
                 ? const Icon(
-                    Icons.favorite,
-                    color: Colors.redAccent,
-                  )
+              Icons.favorite,
+              color: Colors.redAccent,
+            )
                 : const Icon(
-                    Icons.favorite_border_outlined,
-                    color: Colors.white,
-                  ))
+              Icons.favorite_border_outlined,
+              color: Colors.white,
+            ))
       ],
     );
 
@@ -764,214 +760,234 @@ class _TicketState extends State<Ticket> {
         extra_info = "Type : ";
         extra_info_data = widget.type!;
       }
-      if(widget.isOpenedTicket != null && widget.isOpenedTicket == true) {
+      if (widget.isOpenedTicket != null && widget.isOpenedTicket == true) {
         childTicket = Container(
-        margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Color(0xFF7A3E98)),
-        borderRadius: BorderRadius.circular(30.0),
-        ),
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-        openedTicketEdit,
-        SizedBox(
-        height: 10,
-        ),
-        Text(
-        "At " + widget._time,
-    style: TextStyle(fontSize: 20),
-    ),
-    SizedBox(
-    height: 5,
-    ),
-    Text(
-    "Description:",
-    style: TextStyle(fontSize: 19, color: Colors.black),
-    ),
-    Text(widget._desc,
-    style: const TextStyle(
-    fontSize: 17, color: Colors.indigoAccent)),
-    SizedBox(
-    height: 5,
-    ),
-    Row(
-    children: const [
-    Text(
-    "Ticket Owner : ",
-    style:
-    TextStyle(fontSize: 19, color: Colors.black),
-    ),
-    Text("<TICKET OWNER>",
-    style:
-    TextStyle(fontSize: 17, color: Colors.indigoAccent))
-    ],
-    ),   SizedBox(
-    height: 5,
-    ),
-    Row(
-    children: const [
-    Text(
-    "Location : ",
-    style:
-    TextStyle(fontSize: 19, color: Colors.black),
-    ),
-    Text("<LOCATION>",
-    style:
-    TextStyle(fontSize: 17, color: Colors.indigoAccent))
-    ],
-    ),
-    ],
-    ),
-    );
+          margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Color(0xFF7A3E98)),
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              openedTicketEdit,
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                "At " + widget._time,
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                "Description:",
+                style: TextStyle(fontSize: 19, color: Colors.black),
+              ),
+              Text(widget._desc,
+                  style: const TextStyle(
+                      fontSize: 17, color: Colors.indigoAccent)),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: const [
+                  Text(
+                    "Ticket Owner : ",
+                    style: TextStyle(fontSize: 19, color: Colors.black),
+                  ),
+                  Text("<TICKET OWNER>",
+                      style:
+                      TextStyle(fontSize: 17, color: Colors.indigoAccent))
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: const [
+                  Text(
+                    "Location : ",
+                    style: TextStyle(fontSize: 19, color: Colors.black),
+                  ),
+                  Text("<LOCATION>",
+                      style:
+                      TextStyle(fontSize: 17, color: Colors.indigoAccent))
+                ],
+              ),
+            ],
+          ),
+        );
       } else {
-    childTicket = Column(
-    children: [
-      titleSave,
-      SizedBox(height: 3),
-      Row(
-        children: [
-          Text(
-            "Ticket Description : ",
-            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
-          ),
-          Expanded(
-              child: Text(widget._desc,
-                style: TextStyle(fontSize: 17, color: Colors.black),
+        childTicket = Column(
+          children: [
+            titleSave,
+            SizedBox(height: 3),
+            Row(
+              children: [
+                Text(
+                  "Ticket Description : ",
+                  style: GoogleFonts.montserrat(textStyle: TextStyle(
+                      fontSize: 15,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                    child: Text(widget._desc,
+                      style: TextStyle(fontSize: 17, color: Colors.black),
 
-              )),
-        ],
-        crossAxisAlignment: CrossAxisAlignment.start,
-      ),
-      SizedBox(height: 3),
-      Row(
-        children: [
-          Text(
-            "Ticket Owner : ",
-            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
-
-          ),
-          Expanded(child: Text(widget._owner,
-            style: TextStyle(fontSize: 17, color: Colors.black),
-            overflow: TextOverflow.fade,
-            maxLines: 1,
-            softWrap: false,))
-        ],
-      ),
-      SizedBox(height: 3),
-      Row(
-        children: [
-          Text(
-            "Location : ",
-            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
-          ),
-          Text(widget._location,
-              style: TextStyle(fontSize: 17, color: Colors.black))
-        ],
-
-      ),
-      SizedBox(height: 3),
-      Row(
-        children: [
-          Text(
-            "Time : ",
-            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
-          ),
-          Text(widget._time,
-              style: TextStyle(fontSize: 17, color: Colors.black))
-        ],
-      ),
-      SizedBox(height: 3),
-      Row(
-        children: [
-          Text(
-            extra_info,
-            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
-          ),
-          Text(extra_info_data,
-              style: TextStyle(fontSize: 17, color: Colors.black))
-        ],
-
-      ),
-      SizedBox(height: 3),
-      Row(
-        children: [
-          IconButton(onPressed: () {                                          Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (context) =>
-                      MaintaincePage()));}, icon: Image.asset('images/icons8-sent.png')),
-          IconButton(onPressed: () {                                          Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (context) =>
-                      MaintaincePage()));}, icon: Image.asset('images/icons8-messaging-96.png')),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
-      SizedBox(height: 3),
-    ],
-    );
-    }
-
-    } else {
-    if(widget.isOpenedTicket != null && widget.isOpenedTicket as bool == true) {
-    childTicket = Container(
-    margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-    padding: const EdgeInsets.all(16),
-    height: 147,
-    width: 384,
-    decoration: BoxDecoration(
-    color: Colors.white,
-    border: Border.all(color: Color(0xFF7A3E98)),
-    borderRadius: BorderRadius.circular(30.0),
-    ),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-    openedTicketEdit,
-    SizedBox(
-    height: 10,
-    ),
-    Text(
-    "At " + widget._time,
-    style: TextStyle(fontSize: 20),
-    ),
-    ],
-    ),
-    );
-    } else {
-    childTicket = Column(
-        children: [
-          titleSave,
-          Text(widget._desc,
-              maxLines: 2,
-              overflow: TextOverflow.fade,
-              style:  TextStyle(fontSize: 17, color: GlobalStringText.textFieldGrayColor )),
-          Container(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Text(widget._time,
-                style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 25, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),),
+                    )),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.start,
             ),
-            margin: const EdgeInsets.only(top: 10),
-          )
-        ],
-      ); }
+            SizedBox(height: 3),
+            Row(
+              children: [
+                Text(
+                  "Ticket Owner : ",
+                  style: GoogleFonts.montserrat(textStyle: TextStyle(
+                      fontSize: 15,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+
+                ),
+                Expanded(child: Text(widget._owner,
+                  style: TextStyle(fontSize: 17, color: Colors.black),
+                  overflow: TextOverflow.fade,
+                  maxLines: 1,
+                  softWrap: false,))
+              ],
+            ),
+            SizedBox(height: 3),
+            Row(
+              children: [
+                Text(
+                  "Location : ",
+                  style: GoogleFonts.montserrat(textStyle: TextStyle(
+                      fontSize: 15,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+                ),
+                Text(widget._location,
+                    style: TextStyle(fontSize: 17, color: Colors.black))
+              ],
+
+            ),
+            SizedBox(height: 3),
+            Row(
+              children: [
+                Text(
+                  "Time : ",
+                  style: GoogleFonts.montserrat(textStyle: TextStyle(
+                      fontSize: 15,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+                ),
+                Text(widget._time,
+                    style: TextStyle(fontSize: 17, color: Colors.black))
+              ],
+            ),
+            SizedBox(height: 3),
+            Row(
+              children: [
+                Text(
+                  extra_info,
+                  style: GoogleFonts.montserrat(textStyle: TextStyle(
+                      fontSize: 15,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+                ),
+                Text(extra_info_data,
+                    style: TextStyle(fontSize: 17, color: Colors.black))
+              ],
+
+            ),
+            SizedBox(height: 3),
+            Row(
+              children: [
+                IconButton(onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MaintaincePage()));
+                }, icon: Image.asset('images/icons8-sent.png')),
+                IconButton(onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MaintaincePage()));
+                }, icon: Image.asset('images/icons8-messaging-96.png')),
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            SizedBox(height: 3),
+          ],
+        );
+      }
+    } else {
+      if (widget.isOpenedTicket != null &&
+          widget.isOpenedTicket as bool == true) {
+        childTicket = Container(
+          margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+          padding: const EdgeInsets.all(16),
+          height: 147,
+          width: 384,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Color(0xFF7A3E98)),
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              openedTicketEdit,
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                "At " + widget._time,
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+        );
+      } else {
+        childTicket = Column(
+            children: [
+              titleSave,
+              Text(widget._desc,
+                  maxLines: 2,
+                  overflow: TextOverflow.fade,
+                  style: TextStyle(fontSize: 17,
+                      color: GlobalStringText.textFieldGrayColor)),
+              Container(
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(widget._time,
+                      style: GoogleFonts.montserrat(textStyle: TextStyle(
+                          fontSize: 25,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),),))
+            ]);
+      }
     }
-    if(widget.isOpenedTicket != null && widget.isOpenedTicket as bool == true) {
-    return InkWell(
-    child: childTicket,
-    onTap: expand,
-    );
+    if (widget.isOpenedTicket != null &&
+        widget.isOpenedTicket as bool == true) {
+      return InkWell(
+        child: childTicket,
+        onTap: expand,
+      );
     }
     return InkWell(
       child: Container(
         margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(24)),
-            color: widget._color,
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+          color: widget._color,
         ),
         child: childTicket,
       ),
@@ -980,12 +996,16 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
-    if(_isSaved == false)
-      {
-        var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
+    if (_isSaved == false) {
+      var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
 
-        scheduleNotification(notifsPlugin,DateTime.now().toString(),widget._title,"you have event soon!",datetime.subtract(Duration(minutes: 10)));
-      }
+      scheduleNotification(
+          notifsPlugin,
+          DateTime.now().toString(),
+          widget._title,
+          "you have event soon!",
+          datetime.subtract(Duration(minutes: 10)));
+    }
     setState(() {
       _isSaved = !_isSaved;
     });
