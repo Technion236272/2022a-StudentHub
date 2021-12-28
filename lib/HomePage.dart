@@ -17,7 +17,6 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             Padding(padding: EdgeInsets.all(10)),
             Align(child :IconButton(
-
                 icon: const Icon(Icons.info_outline),
                 tooltip: "About",
                 onPressed: (() async {
