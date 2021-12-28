@@ -603,9 +603,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
     ];
   }
 
-  void pushTicket() {
+  Future<void> pushTicket() async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
+    var doc_ref;
     switch(widget.category) {
       case GlobalStringText.tagFood: {
         Map<String, dynamic> data = {
@@ -616,7 +617,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.email,
         };
-        _firestore.collection("Food").add(data);
+        doc_ref = await _firestore.collection("Food").add(data);
       } break;
       case GlobalStringText.tagEntertainment: {
         Map<String, dynamic> data = {
@@ -627,7 +628,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.displayName,
         };
-        _firestore.collection("Entertainment").add(data);
+        doc_ref = await _firestore.collection("Entertainment").add(data);
       } break;
       case GlobalStringText.tagCarPool: {
         Map<String, dynamic> data = {
@@ -638,7 +639,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.email,
         };
-        _firestore.collection("CarPool").add(data);
+        doc_ref = await _firestore.collection("CarPool").add(data);
       } break;
       case GlobalStringText.tagAcademicSupport: {
         Map<String, dynamic> data = {
@@ -649,7 +650,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.email,
         };
-        _firestore.collection("AcademicSupport").add(data);
+        doc_ref = await _firestore.collection("AcademicSupport").add(data);
       } break;
       case GlobalStringText.tagStudyBuddy: {
         Map<String, dynamic> data = {
@@ -660,7 +661,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.email,
         };
-        _firestore.collection("StudyBuddy").add(data);
+        doc_ref = await _firestore.collection("StudyBuddy").add(data);
       } break;
       case GlobalStringText.tagMaterial: {
         Map<String, dynamic> data = {
@@ -671,10 +672,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Description' : DescriptionController.text,
           'Owner' : user?.email,
         };
-        _firestore.collection("Material").add(data);
+        doc_ref = await _firestore.collection("Material").add(data);
       } break;
       default: {}
     }
+    _firestore.collection("${user?.uid} tickets").add({
+      'ref' : doc_ref,
+      'category' : widget.category,
+    });
     Navigator.of(context).pop();
   }
 }
