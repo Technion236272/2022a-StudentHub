@@ -1,16 +1,28 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'CatogryHomePage.dart';
 import 'HomePage.dart';
 import 'Auth.dart';
-import 'package:studenthub/ScreenTags.dart';
-import 'package:studenthub/events_page.dart';
+import 'GenericPageCreation.dart';
+import 'notificationHelper.dart';
+import 'events_page.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void main() {
+final FlutterLocalNotificationsPlugin notifsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+int notification_id = 0;
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp( App());
+  NotificationAppLaunchDetails? notifLaunch =
+      await notifsPlugin.getNotificationAppLaunchDetails();
+  await initNotifications(notifsPlugin);
+
+  runApp(App());
 }
+
 class App extends StatelessWidget {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
@@ -40,10 +52,9 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AuthRepository.instance(),
       child: Consumer<AuthRepository>(
-        builder: (context, auth, _) => MaterialApp(home: HomePage(),)
-      ),
+          builder: (context, auth, _) => MaterialApp(
+                home: HomePage(),
+              )),
     );
   }
 }
-
-

@@ -12,6 +12,9 @@ import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
 import 'package:studenthub/GenericPageCreation.dart';
 import 'GenericPageCreation.dart';
+import 'package:intl/intl.dart';
+import 'main.dart';
+import 'notificationHelper.dart';
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -181,7 +184,6 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
   }
-
 
   Future<List<Ticket>> getTickets() async {
     var tickets = <Ticket>[];
@@ -689,13 +691,14 @@ class Ticket extends StatefulWidget {
   final String _location;
   final Color _color;
   final String _owner;
-  var dest;
-  var type;
-  var course;
+  String? dest;
+  String? type;
+  String? course;
+  bool? isOpenedTicket;
 
   Ticket(this._title, this._desc, this._time, this._color, this._location,
       this._owner,
-      {Key? key, this.dest, this.type, this.course})
+      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket})
       : super(key: key);
 
   @override
@@ -729,81 +732,187 @@ class _TicketState extends State<Ticket> {
                   ))
       ],
     );
-    Column childTicket;
+
+    var openedTicketEdit = Row(
+      children: [
+        Text(
+          widget._title,
+          maxLines: 1,
+          style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
+        ),
+        Spacer(),
+        IconButton(
+          icon: Image.asset("images/edit.png"),
+          onPressed: () {},
+        ),
+        IconButton(onPressed: () {}, icon: Image.asset("images/del.png"))
+      ],
+    );
+    Widget childTicket;
     if (_isExpanded) {
       String extra_info = '';
       String extra_info_data = '';
       if (widget.dest != null) {
         extra_info = "Destination : ";
-        extra_info_data = widget.dest;
+        extra_info_data = widget.dest!;
       } else if (widget.course != null) {
         extra_info = "Course Number : ";
-        extra_info_data = widget.course;
+        extra_info_data = widget.course!;
       } else if (widget.type != null) {
         extra_info = "Type : ";
-        extra_info_data = widget.type;
+        extra_info_data = widget.type!;
       }
-      childTicket = Column(
+      if(widget.isOpenedTicket != null && widget.isOpenedTicket == true) {
+        childTicket = Container(
+        margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Color(0xFF7A3E98)),
+        borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          titleSave,
-          Text(widget._desc,
-              style: const TextStyle(fontSize: 17, color: Colors.white)),
-          Row(
-            children: [
-              const Text(
-                "Ticket Owner : ",
-                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-              ),
-              Text(widget._owner,
-                  style: TextStyle(fontSize: 17, color: Colors.white))
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-          ),
-          Row(
-            children: [
-              const Text(
-                "Location : ",
-                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-              ),
-              Text(widget._location,
-                  style: TextStyle(fontSize: 17, color: Colors.white))
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-          ),
-          Row(
-            children: [
-              const Text(
-                "Time : ",
-                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-              ),
-              Text(widget._time,
-                  style: TextStyle(fontSize: 17, color: Colors.white))
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-          ),
-          Row(
-            children: [
-              Text(
-                extra_info,
-                style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-              ),
-              Text(extra_info_data,
-                  style: TextStyle(fontSize: 17, color: Colors.white))
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-          ),
-          Row(
-            children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
-              IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.send_outlined)),
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
-        ],
-      );
+        openedTicketEdit,
+        SizedBox(
+        height: 10,
+        ),
+        Text(
+        "At " + widget._time,
+    style: TextStyle(fontSize: 20),
+    ),
+    SizedBox(
+    height: 5,
+    ),
+    Text(
+    "Description:",
+    style: TextStyle(fontSize: 19, color: Colors.black),
+    ),
+    Text(widget._desc,
+    style: const TextStyle(
+    fontSize: 17, color: Colors.indigoAccent)),
+    SizedBox(
+    height: 5,
+    ),
+    Row(
+    children: const [
+    Text(
+    "Ticket Owner : ",
+    style:
+    TextStyle(fontSize: 19, color: Colors.black),
+    ),
+    Text("<TICKET OWNER>",
+    style:
+    TextStyle(fontSize: 17, color: Colors.indigoAccent))
+    ],
+    ),   SizedBox(
+    height: 5,
+    ),
+    Row(
+    children: const [
+    Text(
+    "Location : ",
+    style:
+    TextStyle(fontSize: 19, color: Colors.black),
+    ),
+    Text("<LOCATION>",
+    style:
+    TextStyle(fontSize: 17, color: Colors.indigoAccent))
+    ],
+    ),
+    ],
+    ),
+    );
+      } else {
+    childTicket = Column(
+    children: [
+    titleSave,
+    Text(widget._desc,
+    style: const TextStyle(fontSize: 17, color: Colors.white)),
+    Row(
+    children: [
+    const Text(
+    "Ticket Owner : ",
+    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
+    ),
+    Text(widget._owner,
+    style: TextStyle(fontSize: 17, color: Colors.white))
+    ],
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    ),
+    Row(
+    children: [
+    const Text(
+    "Location : ",
+    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
+    ),
+    Text(widget._location,
+    style: TextStyle(fontSize: 17, color: Colors.white))
+    ],
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    ),
+    Row(
+    children: [
+    const Text(
+    "Time : ",
+    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
+    ),
+    Text(widget._time,
+    style: TextStyle(fontSize: 17, color: Colors.white))
+    ],
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    ),
+    Row(
+    children: [
+    Text(
+    extra_info,
+    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
+    ),
+    Text(extra_info_data,
+    style: TextStyle(fontSize: 17, color: Colors.white))
+    ],
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    ),
+    Row(
+    children: [
+    IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
+    IconButton(
+    onPressed: () {}, icon: const Icon(Icons.send_outlined)),
+    ],
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    ),
+    ],
+    );
+    }
     } else {
-      childTicket = Column(
+    if(widget.isOpenedTicket != null && widget.isOpenedTicket as bool == true) {
+    childTicket = Container(
+    margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+    padding: const EdgeInsets.all(16),
+    height: 147,
+    width: 384,
+    decoration: BoxDecoration(
+    color: Colors.white,
+    border: Border.all(color: Color(0xFF7A3E98)),
+    borderRadius: BorderRadius.circular(30.0),
+    ),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+    openedTicketEdit,
+    SizedBox(
+    height: 10,
+    ),
+    Text(
+    "At " + widget._time,
+    style: TextStyle(fontSize: 20),
+    ),
+    ],
+    ),
+    );
+    } else {
+    childTicket = Column(
         children: [
           titleSave,
           Text(widget._desc,
@@ -819,9 +928,14 @@ class _TicketState extends State<Ticket> {
             margin: const EdgeInsets.only(top: 10),
           )
         ],
-      );
+      ); }
     }
-
+    if(widget.isOpenedTicket != null && widget.isOpenedTicket as bool == true) {
+    return InkWell(
+    child: childTicket,
+    onTap: expand,
+    );
+    }
     return InkWell(
       child: Container(
         margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
@@ -837,6 +951,12 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
+    if(_isSaved == false)
+      {
+        var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
+
+        scheduleNotification(notifsPlugin,DateTime.now().toString(),widget._title,"you have event soon!",datetime.subtract(Duration(minutes: 10)));
+      }
     setState(() {
       _isSaved = !_isSaved;
     });
