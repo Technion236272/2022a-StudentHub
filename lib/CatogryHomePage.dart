@@ -10,7 +10,14 @@ import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studenthub/MaintainceScreen.dart';
+
 import 'FavoritesPage.dart';
+
+import 'package:studenthub/Auth.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'events_page.dart';
 import 'openedTicketsPage.dart';
 
@@ -32,9 +39,13 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
   double gap = 10;
   String action = "Home";
 
+
+
   ////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final user = Provider.of<AuthRepository>(context);
     return Container(
       child: Scaffold(
         extendBody: true,
@@ -56,8 +67,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                   children: [
                     Align(
                       child: Text(
-                          "Hi Yair",
-
+                          "Hi " + (user.getName() ?? ""),
                           style: GoogleFonts.quicksand(textStyle: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,

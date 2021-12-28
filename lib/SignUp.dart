@@ -357,7 +357,8 @@ class _SignUpScreen extends State<SignUpScreen> {
                                   valid_email) {
                                 final res = await user.signUp(
                                     _email_controller.text,
-                                    _password_controller.text);
+                                    _password_controller.text,
+                                    _full_name_controller.text);
                                 if (res == Error.NO_ERROR) {
                                   Navigator.of(context).pop();
                                   final snackbar = SnackBar(

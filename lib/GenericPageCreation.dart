@@ -625,7 +625,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Time' : TimeController.text,
           'Type' : _selectedEvent.getName(),
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         _firestore.collection("Entertainment").add(data);
       } break;
