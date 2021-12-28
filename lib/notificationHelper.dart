@@ -49,7 +49,8 @@ Future<void> scheduleNotification(
       String id,
       String title,
       String body,
-      DateTime scheduledTime) async {
+      DateTime scheduledTime,
+      int not_id) async {
   var androidSpecifics = notifs.AndroidNotificationDetails(
     id, // This specifies the ID of the Notification
     'Scheduled notification', // This specifies the name of the notification channel
@@ -59,7 +60,7 @@ Future<void> scheduleNotification(
   var iOSSpecifics = notifs.IOSNotificationDetails();
   var platformChannelSpecifics = notifs.NotificationDetails(
       android: androidSpecifics, iOS: iOSSpecifics);
-  await notifsPlugin.schedule(notification_id++, title, body,
+  await notifsPlugin.schedule(not_id, title, body,
       scheduledTime, platformChannelSpecifics); // This literally schedules the notification
   ///the id is a global int from main check if there is other solution to identify the notification
 
