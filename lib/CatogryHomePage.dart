@@ -62,11 +62,11 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 ),
                 height: 135,
                 // we need to agree on one height for all screens eventually
-                padding: const EdgeInsets.fromLTRB(20, 40, 0, 0),
+                padding: const EdgeInsets.fromLTRB(20, 30, 0, 0),
                 child: Column(
                   children: [
                     Align(
-                      child: Text(
+                      child: Row(children: [Text(
                           "Hi " + (user.getName() ?? ""),
                           style: GoogleFonts.quicksand(textStyle: TextStyle(
                             fontSize: 30,
@@ -75,6 +75,15 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                             color: GlobalStringText.WhiteColorHiMessage,
                           ),)
                       ),
+                        SizedBox(width: 7.0,),
+                        IconButton(
+                        onPressed: () async {
+                          await user.signOut();
+                          Navigator.popUntil(context, (route) => route.isFirst);
+                        },
+                        icon: Image.asset("images/logout.png"),
+                        iconSize: 40,
+                      ),],),
                       alignment: Alignment.centerLeft, //this ok??
                     ),
                     Align(

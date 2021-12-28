@@ -349,11 +349,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
               style: BorderStyle.solid,
             ),
           ),
-          hintText: 'Example 28.12 , 14:00 ',
+          hintText: 'Example 28.12.2021 , 14:00 ',
           hintStyle: TextStyle(
               fontSize: 12.0, color: GlobalStringText.textFieldGrayColor),
           //helperText: 'Keep it short, this is just a demo.',
-          labelText: 'Pick a date and an hour',
+          labelText: 'Pick a date and an hour and stick to the format',
           labelStyle: TextStyle(
               fontSize: 14.0,
               color: GlobalStringText.textFieldGrayColor,

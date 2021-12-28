@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'ScreenTags.dart';
+import 'package:studenthub/Auth.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key}) : super(key: key);
@@ -12,6 +16,8 @@ class FavoritesPage extends StatefulWidget {
 class _FavoritesPage extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final user = Provider.of<AuthRepository>(context);
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -34,7 +40,11 @@ class _FavoritesPage extends State<FavoritesPage> {
                         )),
                     new Spacer(),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await user.signOut();
+                        Navigator.popUntil(context, (route) => route.isFirst);
+
+                      },
                       icon: Image.asset("images/logout.png"),
                       iconSize: 40,
                     )
