@@ -12,9 +12,13 @@ import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
 import 'package:studenthub/GenericPageCreation.dart';
 import 'GenericPageCreation.dart';
+
 import 'package:intl/intl.dart';
 import 'main.dart';
 import 'notificationHelper.dart';
+
+import 'MaintainceScreen.dart';
+
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -827,64 +831,91 @@ class _TicketState extends State<Ticket> {
       } else {
     childTicket = Column(
     children: [
-    titleSave,
-    Text(widget._desc,
-    style: const TextStyle(fontSize: 17, color: Colors.white)),
-    Row(
-    children: [
-    const Text(
-    "Ticket Owner : ",
-    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-    ),
-    Text(widget._owner,
-    style: TextStyle(fontSize: 17, color: Colors.white))
-    ],
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ),
-    Row(
-    children: [
-    const Text(
-    "Location : ",
-    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-    ),
-    Text(widget._location,
-    style: TextStyle(fontSize: 17, color: Colors.white))
-    ],
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ),
-    Row(
-    children: [
-    const Text(
-    "Time : ",
-    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-    ),
-    Text(widget._time,
-    style: TextStyle(fontSize: 17, color: Colors.white))
-    ],
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ),
-    Row(
-    children: [
-    Text(
-    extra_info,
-    style: TextStyle(fontSize: 19, color: Colors.amberAccent),
-    ),
-    Text(extra_info_data,
-    style: TextStyle(fontSize: 17, color: Colors.white))
-    ],
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ),
-    Row(
-    children: [
-    IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
-    IconButton(
-    onPressed: () {}, icon: const Icon(Icons.send_outlined)),
-    ],
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    ),
+      titleSave,
+      SizedBox(height: 3),
+      Row(
+        children: [
+          Text(
+            "Ticket Description : ",
+            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          ),
+          Expanded(
+              child: Text(widget._desc,
+                style: TextStyle(fontSize: 17, color: Colors.black),
+
+              )),
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      SizedBox(height: 3),
+      Row(
+        children: [
+          Text(
+            "Ticket Owner : ",
+            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+
+          ),
+          Expanded(child: Text(widget._owner,
+            style: TextStyle(fontSize: 17, color: Colors.black),
+            overflow: TextOverflow.fade,
+            maxLines: 1,
+            softWrap: false,))
+        ],
+      ),
+      SizedBox(height: 3),
+      Row(
+        children: [
+          Text(
+            "Location : ",
+            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          ),
+          Text(widget._location,
+              style: TextStyle(fontSize: 17, color: Colors.black))
+        ],
+
+      ),
+      SizedBox(height: 3),
+      Row(
+        children: [
+          Text(
+            "Time : ",
+            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          ),
+          Text(widget._time,
+              style: TextStyle(fontSize: 17, color: Colors.black))
+        ],
+      ),
+      SizedBox(height: 3),
+      Row(
+        children: [
+          Text(
+            extra_info,
+            style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          ),
+          Text(extra_info_data,
+              style: TextStyle(fontSize: 17, color: Colors.black))
+        ],
+
+      ),
+      SizedBox(height: 3),
+      Row(
+        children: [
+          IconButton(onPressed: () {                                          Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) =>
+                      MaintaincePage()));}, icon: Image.asset('images/icons8-sent.png')),
+          IconButton(onPressed: () {                                          Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) =>
+                      MaintaincePage()));}, icon: Image.asset('images/icons8-messaging-96.png')),
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
+      SizedBox(height: 3),
     ],
     );
     }
+
     } else {
     if(widget.isOpenedTicket != null && widget.isOpenedTicket as bool == true) {
     childTicket = Container(
@@ -916,7 +947,7 @@ class _TicketState extends State<Ticket> {
         children: [
           titleSave,
           Text(widget._desc,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.fade,
               style:  TextStyle(fontSize: 17, color: GlobalStringText.textFieldGrayColor )),
           Container(
