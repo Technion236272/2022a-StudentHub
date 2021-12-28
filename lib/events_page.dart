@@ -100,8 +100,7 @@ class _EventsPageState extends State<EventsPage> {
                 }))
       ],
     );
-
-
+    
     return Container(
       child: Scaffold(
 
