@@ -173,17 +173,16 @@ class _EventsPageState extends State<EventsPage> {
         ),
         gradient: LinearGradient(
           // gradient starts from left
-            begin: Alignment.topRight,
+            begin: Alignment.centerLeft,
             // gradient ends at right
-            end: Alignment.bottomLeft,
+            end: Alignment.centerRight,
             // set all your colors
             colors: [
-              GlobalStringText.FirstpurpleColor,
-              GlobalStringText.SecondpurpleColor,
-              GlobalStringText.ThirdpurpleColor,
-              GlobalStringText.ForthpurpleColor,
               GlobalStringText.FifthpurpleColor,
-
+              GlobalStringText.ForthpurpleColor,
+              GlobalStringText.ThirdpurpleColor,
+              GlobalStringText.SecondpurpleColor,
+              GlobalStringText.FirstpurpleColor,
             ]),
       ),
     );
@@ -721,7 +720,7 @@ class _TicketState extends State<Ticket> {
         Text(
           widget._title,
           maxLines: 1,
-          style:   GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
+          style:GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28, color: GlobalStringText.purpleColor , fontWeight: FontWeight.bold  )),
         ),
         IconButton(
             onPressed: love,

@@ -181,7 +181,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
         backgroundColor: GlobalStringText.FifthpurpleColor,
         body: Column(
           children: [
-
             Container(
               child: Container(
                 margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
