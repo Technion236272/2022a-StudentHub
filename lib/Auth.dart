@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
@@ -22,12 +23,25 @@ class AuthRepository with ChangeNotifier {
 
   bool get isAuthenticated => status == Status.Authenticated;
 
-  Future<Error?> signUp(String email, String password) async {
+  Future<Error?> signUp(String email, String password, String name) async {
     try {
       _status = Status.Authenticating;
       notifyListeners();
+
+
+
       final new_user = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+
+           User? user = new_user.user;
+          user?.updateDisplayName(name);
+          await user?.reload();
+          user = await _auth.currentUser;
+
+
+
+
+
 
       await new_user.user!.sendEmailVerification();
       return Error.NO_ERROR;
@@ -54,6 +68,8 @@ class AuthRepository with ChangeNotifier {
       _status = Status.Authenticating;
       notifyListeners();
       final user =await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+
       if(user.user!.emailVerified)
            return true;
       else{
@@ -66,6 +82,11 @@ class AuthRepository with ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+
+  String? getName() {
+    return _user?.displayName;
   }
 
   Future signOut() async {

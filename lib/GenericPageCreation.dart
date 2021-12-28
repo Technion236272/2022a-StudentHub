@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:line_icons/line_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:studenthub/Auth.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:badges/badges.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'ScreenTags.dart';
-import 'package:connectivity/connectivity.dart';
 import 'dart:core';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -119,11 +121,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
           value: food,
           child: Text(
             food.name,
-            style: TextStyle(
-                fontSize: 14.0,
-                color: GlobalStringText.textFieldGrayColor,
-                fontFamily: GlobalStringText.FontTextFormField,
-                fontWeight: FontWeight.w300),
+            style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300 )),
+
           ),
         ),
       );
@@ -140,14 +139,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
           value: event,
           child: Text(
             event.name,
-            style: TextStyle(
-              fontSize: 14.0,
-              color: GlobalStringText.textFieldGrayColor,
-              fontFamily: GlobalStringText.FontTextFormField,
-              fontWeight: FontWeight.w300,
+            style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300  )),
             ),
           ),
-        ),
       );
     }
     return items;
@@ -188,6 +182,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
         body: Column(
           children: [
             Container(
+              child: Container(
+                margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: IconButton(
+                  onPressed: () {  Navigator.of(context).pop(); },
+                  icon: Icon(Icons.arrow_back,color: Colors.white,)
+
+                ),
+                alignment: Alignment.topLeft,
+
+              ),
               decoration: BoxDecoration(
                 // spice up the button with a radius
                 borderRadius: const BorderRadius.all(
@@ -345,11 +349,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
               style: BorderStyle.solid,
             ),
           ),
-          hintText: 'Example 28.12 , 14:00 ',
+          hintText: 'Example 28.12.2021 , 14:00 ',
           hintStyle: TextStyle(
               fontSize: 12.0, color: GlobalStringText.textFieldGrayColor),
           //helperText: 'Keep it short, this is just a demo.',
-          labelText: 'Pick a date and an hour',
+          labelText: 'Pick a date and an hour and stick to the format',
           labelStyle: TextStyle(
               fontSize: 14.0,
               color: GlobalStringText.textFieldGrayColor,
@@ -621,7 +625,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Time' : TimeController.text,
           'Type' : _selectedEvent.getName(),
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         _firestore.collection("Entertainment").add(data);
       } break;

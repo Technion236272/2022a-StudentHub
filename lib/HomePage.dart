@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       resizeToAvoidBottomInset: false,
 
@@ -18,7 +17,6 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             Padding(padding: EdgeInsets.all(10)),
             Align(child :IconButton(
-
                 icon: const Icon(Icons.info_outline),
                 tooltip: "About",
                 onPressed: (() async {

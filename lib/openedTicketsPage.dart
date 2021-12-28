@@ -3,6 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'ScreenTags.dart';
 import 'events_page.dart';
+import 'package:studenthub/Auth.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OpenedTicketsPage extends StatefulWidget {
   const OpenedTicketsPage({Key? key}) : super(key: key);
@@ -14,6 +18,8 @@ class OpenedTicketsPage extends StatefulWidget {
 class _OpenedTicketsPage extends State<OpenedTicketsPage> {
   @override
   Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final user = Provider.of<AuthRepository>(context);
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -36,7 +42,11 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                             )),
                         new Spacer(),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await user.signOut();
+                            Navigator.popUntil(context, (route) => route.isFirst);
+
+                          },
                           icon: Image.asset("images/logout.png"),
                           iconSize: 40,
                         )

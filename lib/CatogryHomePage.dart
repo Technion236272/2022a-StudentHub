@@ -10,7 +10,14 @@ import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studenthub/MaintainceScreen.dart';
+
 import 'FavoritesPage.dart';
+
+import 'package:studenthub/Auth.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'events_page.dart';
 import 'openedTicketsPage.dart';
 
@@ -32,9 +39,13 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
   double gap = 10;
   String action = "Home";
 
+
+
   ////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final user = Provider.of<AuthRepository>(context);
     return Container(
       child: Scaffold(
         extendBody: true,
@@ -51,13 +62,12 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 ),
                 height: 135,
                 // we need to agree on one height for all screens eventually
-                padding: const EdgeInsets.fromLTRB(20, 40, 0, 0),
+                padding: const EdgeInsets.fromLTRB(20, 30, 0, 0),
                 child: Column(
                   children: [
                     Align(
-                      child: Text(
-                          "Hi Yair",
-
+                      child: Row(children: [Text(
+                          "Hi " + (user.getName() ?? ""),
                           style: GoogleFonts.quicksand(textStyle: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -65,6 +75,15 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                             color: GlobalStringText.WhiteColorHiMessage,
                           ),)
                       ),
+                        SizedBox(width: 7.0,),
+                        IconButton(
+                        onPressed: () async {
+                          await user.signOut();
+                          Navigator.popUntil(context, (route) => route.isFirst);
+                        },
+                        icon: Image.asset("images/logout.png"),
+                        iconSize: 40,
+                      ),],),
                       alignment: Alignment.centerLeft, //this ok??
                     ),
                     Align(
@@ -199,16 +218,16 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
         ),
         gradient: LinearGradient(
           // gradient starts from left
-            begin: Alignment.topRight,
+            begin: Alignment.centerLeft,
             // gradient ends at right
-            end: Alignment.bottomLeft,
+            end: Alignment.centerRight,
             // set all your colors
             colors: [
-              GlobalStringText.FirstpurpleColor,
-              GlobalStringText.SecondpurpleColor,
-              GlobalStringText.ThirdpurpleColor,
-              GlobalStringText.ForthpurpleColor,
               GlobalStringText.FifthpurpleColor,
+              GlobalStringText.ForthpurpleColor,
+              GlobalStringText.ThirdpurpleColor,
+              GlobalStringText.SecondpurpleColor,
+              GlobalStringText.FirstpurpleColor,
 
             ]),
       ),
