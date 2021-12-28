@@ -124,7 +124,11 @@ class _EventsPageState extends State<EventsPage> {
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
-                                    NewPostScreen(widget.category)));
+                                    NewPostScreen(widget.category))).then((value) {
+                                      setState(() {
+                                        tickets = getTickets();
+                                      });
+                            });
                           },
                           child: Tab(
                             icon: Container(
