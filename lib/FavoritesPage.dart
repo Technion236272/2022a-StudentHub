@@ -67,7 +67,7 @@ class _FavoritesPage extends State<FavoritesPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text("Hi Yair",
+                          Text("Hi ${user.getName()}",
                               style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
