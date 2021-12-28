@@ -615,7 +615,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Time' : TimeController.text,
           'Type' : _selectedFood.getName(),
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         doc_ref = await _firestore.collection("Food").add(data);
       } break;
@@ -637,7 +637,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'Destination' : DestinationController.text,
           'Time' : TimeController.text,
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         doc_ref = await _firestore.collection("CarPool").add(data);
       } break;
@@ -648,7 +648,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'CourseNum' : CourseNumberController.text,
           'Time' : TimeController.text,
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         doc_ref = await _firestore.collection("AcademicSupport").add(data);
       } break;
@@ -659,7 +659,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'CourseNum' : CourseNumberController.text,
           'Time' : TimeController.text,
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         doc_ref = await _firestore.collection("StudyBuddy").add(data);
       } break;
@@ -670,7 +670,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           'CourseNum' : CourseNumberController.text,
           'Time' : TimeController.text,
           'Description' : DescriptionController.text,
-          'Owner' : user?.email,
+          'Owner' : user?.displayName,
         };
         doc_ref = await _firestore.collection("Material").add(data);
       } break;

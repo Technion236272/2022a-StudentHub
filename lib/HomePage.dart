@@ -9,42 +9,48 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: <Widget>[
             Padding(padding: EdgeInsets.all(10)),
-            Align(child :IconButton(
-                icon: const Icon(Icons.info_outline),
-                tooltip: "About",
-                onPressed: (() async {
-                  showAboutDialog(
-                      context: context,
-                      applicationName: 'StudentHub',
-                      applicationVersion: '1.0.0',
-                      applicationLegalese:
-                      '©️ 2021 Google logo\n©️ 2021 Facebook logo',
-                      children: <Widget>[
-                        InkWell(
-                            child: const Text('Privacy Policy'),
-                            onTap: () async {
-                              var url =
-                                  'https://gist.github.com/mostafanaax69/2660aef1bef581031866cb5997a03169';
-                              await launch(url);
-                            }),
-                        InkWell(
-                            child: const Text('Terms & Conditions'),
-                            onTap: () async {
-                              var url =
-                                  'https://gist.github.com/mostafanaax69/871b4152b09a2e9c40091f5b58b04d5b';
-                              await launch(url);
-
-                            }),
-                      ]);
-                })) , alignment: Alignment.bottomLeft),
-
+            Align(
+                child: IconButton(
+                    icon: const Icon(Icons.info_outline),
+                    tooltip: "About",
+                    onPressed: (() async {
+                      showAboutDialog(
+                          context: context,
+                          applicationName: 'StudentHub',
+                          applicationVersion: '1.0.0',
+                          applicationLegalese:
+                              '©️ 2021 Google logo\n©️ 2021 Facebook logo',
+                          children: <Widget>[
+                            InkWell(
+                                child: const Text('Privacy Policy'),
+                                onTap: () async {
+                                  var url =
+                                      'https://gist.github.com/mostafanaax69/2660aef1bef581031866cb5997a03169';
+                                  await launch(url);
+                                }),
+                            InkWell(
+                                child: const Text('Terms & Conditions'),
+                                onTap: () async {
+                                  var url =
+                                      'https://gist.github.com/mostafanaax69/871b4152b09a2e9c40091f5b58b04d5b';
+                                  await launch(url);
+                                }),
+                            InkWell(
+                                child: const Text('Credits'),
+                                onTap: () async {
+                                  var url =
+                                      'https://gist.github.com/mostafanaax69/118ab1cb1cbfa18dcd7ebe0df39b0db4';
+                                  await launch(url);
+                                }),
+                          ]);
+                    })),
+                alignment: Alignment.bottomLeft),
             new Image.asset(
               'images/bot.png',
               height: 152,
@@ -55,14 +61,17 @@ class HomePage extends StatelessWidget {
               style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,fontFamily: 'Montserrat'),
+                  color: Colors.white,
+                  fontFamily: 'Montserrat'),
             ),
             Padding(padding: EdgeInsets.all(5)),
             Text("I'm StudentHub",
                 style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,fontFamily: 'Montserrat',)),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Montserrat',
+                )),
             Text("Content Bot!",
                 style: TextStyle(
                     fontSize: 24,
@@ -73,18 +82,21 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,fontFamily: 'Montserrat' )),
+                    color: Colors.white,
+                    fontFamily: 'Montserrat')),
             Text(" Safety is important ",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,fontFamily: 'Montserrat')),
+                    color: Colors.white,
+                    fontFamily: 'Montserrat')),
             Padding(padding: EdgeInsets.all(10)),
             Text(" Please Sign Up or Log in ",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,fontFamily: 'Montserrat')),
+                    color: Colors.white,
+                    fontFamily: 'Montserrat')),
             Padding(padding: EdgeInsets.all(15)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
