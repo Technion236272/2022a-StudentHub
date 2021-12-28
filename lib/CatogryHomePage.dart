@@ -199,16 +199,16 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
         ),
         gradient: LinearGradient(
           // gradient starts from left
-            begin: Alignment.topRight,
+            begin: Alignment.centerLeft,
             // gradient ends at right
-            end: Alignment.bottomLeft,
+            end: Alignment.centerRight,
             // set all your colors
             colors: [
-              GlobalStringText.FirstpurpleColor,
-              GlobalStringText.SecondpurpleColor,
-              GlobalStringText.ThirdpurpleColor,
-              GlobalStringText.ForthpurpleColor,
               GlobalStringText.FifthpurpleColor,
+              GlobalStringText.ForthpurpleColor,
+              GlobalStringText.ThirdpurpleColor,
+              GlobalStringText.SecondpurpleColor,
+              GlobalStringText.FirstpurpleColor,
 
             ]),
       ),
