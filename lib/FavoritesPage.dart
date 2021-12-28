@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:studenthub/main.dart';
 import 'ScreenTags.dart';
 import 'package:studenthub/Auth.dart';
 import 'package:provider/provider.dart';
@@ -281,6 +282,7 @@ class _favoriteTicketState extends State<favoriteTicket> {
       })
     });
     widget.removeFromList(widget.notification_id);
+    notifsPlugin.cancel(widget.notification_id);
   }
 }
 

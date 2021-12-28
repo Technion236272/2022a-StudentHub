@@ -1054,6 +1054,7 @@ class _TicketState extends State<Ticket> {
           element.reference.delete();
         })
       });
+      notifsPlugin.cancel(notif_id);
     }
     setState(() {
       _isSaved = !_isSaved;
