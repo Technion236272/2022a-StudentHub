@@ -13,7 +13,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 final FlutterLocalNotificationsPlugin notifsPlugin =
     FlutterLocalNotificationsPlugin();
 
-int notification_id = 0;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationAppLaunchDetails? notifLaunch =

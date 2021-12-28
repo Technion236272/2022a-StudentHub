@@ -1,16 +1,19 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 import 'package:studenthub/ScreenTags.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
 import 'package:studenthub/GenericPageCreation.dart';
+import 'Auth.dart';
 import 'GenericPageCreation.dart';
 
 import 'package:intl/intl.dart';
@@ -37,6 +40,7 @@ class _EventsPageState extends State<EventsPage> {
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
+  List user_favorites = [];
 
   @override
   void initState() {
@@ -193,6 +197,14 @@ class _EventsPageState extends State<EventsPage> {
   Future<List<Ticket>> getTickets() async {
     var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider.of<AuthRepository>(context, listen: false).user;
+    await _firestore
+        .collection("${user?.uid} favorites")
+        .get().then((value) => {
+      value.docs.forEach((element) {
+        user_favorites.add(element.data()['ref']);
+      })
+    });
     final Color catColor = getCategoryColor();
     switch (widget.category) {
       case GlobalStringText.tagFood:
@@ -208,6 +220,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 type: data['Type'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -227,6 +241,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 type: data['Type'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -246,6 +262,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 dest: data['Destination'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -268,6 +286,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 course: data['CourseNum'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -287,6 +307,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 course: data['CourseNum'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -306,6 +328,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Location'],
                 data['Owner'],
                 course: data['CourseNum'],
+                ref: element.reference,
+                isLoved: user_favorites.contains(element.reference),
               );
               tickets.add(ticket);
             });
@@ -681,20 +705,23 @@ class MyPainter extends CustomPainter {
 }
 
 class Ticket extends StatefulWidget {
+  static int id = 0;
   final String _time;
   final String _title;
   final String _desc;
   final String _location;
   final Color _color;
   final String _owner;
+  var ref;
   String? dest;
   String? type;
   String? course;
   bool? isOpenedTicket;
+  bool? isLoved;
 
   Ticket(this._title, this._desc, this._time, this._color, this._location,
       this._owner,
-      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket})
+      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved})
       : super(key: key);
 
   @override
@@ -704,6 +731,14 @@ class Ticket extends StatefulWidget {
 class _TicketState extends State<Ticket> {
   bool _isSaved = false;
   bool _isExpanded = false;
+  int notif_id = -1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _isSaved = widget.isLoved ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -996,15 +1031,29 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
+    var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider.of<AuthRepository>(context, listen: false)
+        .user;
     if (_isSaved == false) {
-      var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
-
       scheduleNotification(
           notifsPlugin,
           DateTime.now().toString(),
           widget._title,
           "you have event soon!",
-          datetime.subtract(Duration(minutes: 10)));
+          datetime.subtract(Duration(minutes: 10)),
+          Ticket.id);
+      notif_id = Ticket.id;
+      _firestore.collection("${user?.uid} favorites").add({
+        'ref': widget.ref,
+        'id': Ticket.id++,
+      });
+    } else {
+      _firestore.collection("${user?.uid} favorites").where('id', isEqualTo: notif_id).get().then((collection) => {
+        collection.docs.forEach((element) {
+          element.reference.delete();
+        })
+      });
     }
     setState(() {
       _isSaved = !_isSaved;

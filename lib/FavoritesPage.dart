@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'events_page.dart';
+
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key}) : super(key: key);
 
@@ -14,6 +16,15 @@ class FavoritesPage extends StatefulWidget {
 }
 
 class _FavoritesPage extends State<FavoritesPage> {
+  late Future<List<favoriteTicket>> tickets;
+  late List<favoriteTicket> local_tickets;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tickets = getFavoriteTickets(context);
+  }
   @override
   Widget build(BuildContext context) {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -123,7 +134,32 @@ class _FavoritesPage extends State<FavoritesPage> {
                       ],
                     ),
                     Expanded(
-                      child: getfavoriteTickets(),
+                      child: FutureBuilder(
+                        future: tickets,
+                        builder: (context, snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.waiting:
+                              {
+                                return const Center(child: Text("Loading"));
+                              }
+                            default:
+                              {
+                                if (snapshot.hasError) {
+                                  return Center(child: Text("Error ${snapshot.error}"));
+                                } else {
+                                  local_tickets = snapshot.data as List<favoriteTicket>;
+                                  return ListView.separated(
+                                    itemBuilder: (context, i) {
+                                      return local_tickets[i];
+                                    },
+                                    itemCount: local_tickets.length,
+                                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                  );
+                                }
+                              }
+                          }
+                        },
+                      ),
                     )
                   ],
                 ),
@@ -135,14 +171,50 @@ class _FavoritesPage extends State<FavoritesPage> {
       ),
     );
   }
+
+  void updatelist(int id) {
+    setState(() {
+      local_tickets.removeWhere((element) {
+        return element.notification_id == id;
+      });
+    });
+  }
+
+  Future<List<favoriteTicket>> getFavoriteTickets(BuildContext context) async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider.of<AuthRepository>(context, listen: false).user;
+    var tickets = <favoriteTicket>[];
+
+    await _firestore
+        .collection("${user?.uid} favorites")
+        .get()
+        .then((collection) async {
+      for (var element in collection.docs) {
+        try {
+          await element.data()['ref'].get().then((value) {
+            var data = value.data();
+            tickets.add(
+                favoriteTicket(data['Title'], data['Time'], data['Location'], element.data()['id'], updatelist)
+            );
+          });
+        } catch (e) {}
+      }
+    });
+    return tickets;
+  }
 }
+
+typedef Void2IntFunc = void Function(int);
 
 ///Add the structure of the favorites tickets
 class favoriteTicket extends StatefulWidget {
   final String _time;
   final String _title;
+  final String _location;
+  final int notification_id;
+  final Void2IntFunc removeFromList;
 
-  const favoriteTicket(this._title, this._time,  {Key? key})
+  const favoriteTicket(this._title, this._time, this._location, this.notification_id, this.removeFromList, {Key? key})
       : super(key: key);
 
   @override
@@ -155,8 +227,6 @@ class _favoriteTicketState extends State<favoriteTicket> {
     return Container(
       margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
       padding: const EdgeInsets.all(16),
-      height: 147,
-      width: 384,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Color(0xFF7A3E98)),
@@ -184,25 +254,36 @@ class _favoriteTicketState extends State<favoriteTicket> {
           SizedBox(
             height: 5,
           ),
+          Text(
+            widget._location,
+            style: TextStyle(fontSize: 20),
+          ),
+          SizedBox(
+            height: 5,
+          ),
           Align(
               alignment: Alignment.centerRight,
               child: IconButton(
                 icon: Image.asset("images/delete.png"),
-                onPressed: () {},
+                onPressed: removeFavorite,
               )),
         ],
       ),
     );
   }
+
+  void removeFavorite() {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final User? user = Provider.of<AuthRepository>(context, listen: false).user;
+    _firestore.collection("${user?.uid} favorites").where('id', isEqualTo: widget.notification_id).get().then((collection) => {
+      collection.docs.forEach((element) {
+        element.reference.delete();
+      })
+    });
+    widget.removeFromList(widget.notification_id);
+  }
 }
 
-Widget getfavoriteTickets() {
-  return ListView.separated(
-    itemBuilder: (context, i) {
-      return favoriteTicket("_title", "14:30");
-    },
-    itemCount: 10,separatorBuilder: (BuildContext context, int index) => const Divider(),
-  );
-}
+
 
 
