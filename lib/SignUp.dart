@@ -25,7 +25,7 @@ class _SignUpScreen extends State<SignUpScreen> {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -88,7 +88,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                 ),
                 Flexible(
                     child: SingleChildScrollView(
-                  reverse: true,
+
                   child: Padding(
                     padding: EdgeInsets.only(bottom: bottom),
                     child: Column(

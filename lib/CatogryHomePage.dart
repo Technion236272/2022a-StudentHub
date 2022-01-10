@@ -319,8 +319,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         builder: (context) => FavoritesPage()));
                     break;
                   case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CategoryPageScreen()));
+
                     break;
 
                   case 2 :
@@ -353,6 +352,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                           elevation: 0,
                           color: Colors.transparent,
                           child: Column(
+
                             children: <Widget>[
 
                               Expanded(child: Container(
@@ -373,8 +373,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                             ],
                           ),
                         ),
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.DeepPinkColorFirst,
@@ -390,6 +390,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 SizedBox(width: 20),
                 GestureDetector(
                     child: Container(
+
                         child: Card(
                           elevation: 0,
                           color: Colors.transparent,
@@ -415,8 +416,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         ),
 
 
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightYellowColorFirst,
@@ -463,8 +464,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         ),
 
 
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightBlueColorFirst,
@@ -504,8 +505,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         ),
 
 
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightGreenColorFirst,
@@ -552,8 +553,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         ),
 
 
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightOarngeColorFirst,
@@ -593,8 +594,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         ),
 
 
-                        width: 160,
-                        height: 141,
+                        width: MediaQuery.of(context).size.width*0.41,
+                        height: MediaQuery.of(context).size.height*0.185,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: GlobalStringText.LightRedColorFirst,

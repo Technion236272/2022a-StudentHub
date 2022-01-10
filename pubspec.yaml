@@ -53,6 +53,10 @@ dependencies:
   google_fonts: ^2.1.1
   url_launcher: ^6.0.17
   awesome_notifications: ^0.6.19
+  flutter_datetime_picker: 
+    git:
+      url: https://github.com/Realank/flutter_datetime_picker.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

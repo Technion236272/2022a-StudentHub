@@ -5,13 +5,14 @@ import 'package:studenthub/Auth.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'ScreenTags.dart';
 import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 //---------------------------------------CLASSES--------------------------------------------------//
 class Food {
@@ -79,6 +80,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   
   //var ReciveUserID="";
 
+  DateTime selected_time = DateTime.now();
   TextEditingController TitleController = TextEditingController();
   TextEditingController LocationController = TextEditingController();
   TextEditingController DestinationController = TextEditingController();
@@ -160,6 +162,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
       LocationController = TextEditingController(text: widget.data!['location'] ?? '');
       DestinationController = TextEditingController(text: widget.data!['destination'] ?? '');
       TimeController = TextEditingController(text: widget.data!['time']);
+      selected_time =  DateFormat('d.M.yyyy , HH:mm').parse(TimeController.text);
       DescriptionController = TextEditingController(text: widget.data!['description']);
       EventTypeController = TextEditingController(text: widget.data!['type'] ?? '');
       FoodTypeController = TextEditingController(text: widget.data!['type'] ?? '');
@@ -198,7 +201,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: GlobalStringText.FifthpurpleColor,
         body: Column(
           children: [
@@ -246,15 +248,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
                     key: _key,
-                    child:  SingleChildScrollView(
-                        reverse: true,
+                    child: SingleChildScrollView(
                         child: Padding(
-                          padding: EdgeInsets.only(bottom: bottom),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: TicketFields(),
-                          ),
-                        ))),
+                      padding: EdgeInsets.only(bottom: bottom),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: TicketFields(),
+                      ),
+                    ))),
               ),
             )
           ],
@@ -262,7 +263,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   List<Widget> TicketFields() {
-
     return <Widget>[
 //------------------------------------------------------------------------------------------------------------//
       Container(
@@ -362,7 +362,39 @@ class _NewPostScreenState extends State<NewPostScreen> {
         alignment: Alignment.centerLeft,
       ),
       const SizedBox(height: 5.0),
-      TextFormField(
+      InkWell(
+        onTap: () {
+          DatePicker.showDateTimePicker(context,
+              showTitleActions: true,
+              minTime: DateTime.now(),
+              maxTime: (DateTime(2060, 12, 31, 23, 59)), onChanged: (date) {
+            print('change $date in time zone ' +
+                date.timeZoneOffset.inHours.toString());
+          }, onConfirm: (date) {
+            setState(() {
+              selected_time = date;
+            });
+          });
+        },
+        child: Container(
+          child: Row(
+            children: [Padding(padding: EdgeInsets.all(5)),
+              Text(
+                DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+                style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+              )
+            ],
+            mainAxisAlignment: MainAxisAlignment.start,
+          ),
+          decoration: BoxDecoration(
+              color: Color(0xFFF0F4F8),
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              border: Border.all(color: Colors.black)),
+          height: 50,
+        ),
+      ),
+
+      /* TextFormField(
         focusNode: myFocusNodeTime,
         controller: TimeController,
         decoration: InputDecoration(
@@ -389,7 +421,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           prefixText: ' ',
           //suffixStyle: const TextStyle(color: Colors.green)
         ),
-      ),
+      )*/
 
       const SizedBox(height: 5.0),
       Visibility(
@@ -641,87 +673,102 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
-    String action = widget.data != null? 'edit' : widget.category;
+
+String action = widget.data != null? 'edit' : widget.category;
     switch(action) {
-      case 'edit': {
-        String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
-        (widget.data!['ref'] as DocumentReference).update({
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Time' : TimeController.text,
-          'Type' : type,
-          'Description' : DescriptionController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Destination' : DestinationController.text,
-        });
-      } break;
-      case GlobalStringText.tagFood: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Time' : TimeController.text,
-          'Type' : _selectedFood.getName(),
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Food").add(data);
-      } break;
-      case GlobalStringText.tagEntertainment: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Time' : TimeController.text,
-          'Type' : _selectedEvent.getName(),
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Entertainment").add(data);
-      } break;
-      case GlobalStringText.tagCarPool: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Destination' : DestinationController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("CarPool").add(data);
-      } break;
-      case GlobalStringText.tagAcademicSupport: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("AcademicSupport").add(data);
-      } break;
-      case GlobalStringText.tagStudyBuddy: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("StudyBuddy").add(data);
-      } break;
-      case GlobalStringText.tagMaterial: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Material").add(data);
-      } break;
-      default: {}
+    case 'edit': {
+    String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
+    (widget.data!['ref'] as DocumentReference).update({
+    'Title' : TitleController.text,
+    'Location' : LocationController.text,
+    'Time' : DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+    'Type' : type,
+    'Description' : DescriptionController.text,
+    'CourseNum' : CourseNumberController.text,
+    'Destination' : DestinationController.text,
+    });
+    } break;
+    case GlobalStringText.tagFood:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Type': _selectedFood.getName(),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Food").add(data);
+        }
+        break;
+      case GlobalStringText.tagEntertainment:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Type': _selectedEvent.getName(),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Entertainment").add(data);
+        }
+        break;
+      case GlobalStringText.tagCarPool:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Destination': DestinationController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("CarPool").add(data);
+        }
+        break;
+      case GlobalStringText.tagAcademicSupport:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("AcademicSupport").add(data);
+        }
+        break;
+      case GlobalStringText.tagStudyBuddy:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("StudyBuddy").add(data);
+        }
+        break;
+      case GlobalStringText.tagMaterial:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Material").add(data);
+        }
+        break;
+      default:
+        {}
+
     }
     _firestore.collection("${user?.uid} tickets").add({
       'ref': doc_ref,
