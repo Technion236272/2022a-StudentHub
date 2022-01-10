@@ -77,7 +77,7 @@ class _EventsPageState extends State<EventsPage> {
             child: AnimatedOpacity(
               opacity: _isVisible ? 1 : 0,
               duration: const Duration(milliseconds: 500),
-              child: getCategoryIcon(),
+              child: getCategoryIcon(widget.category),
             )),
         getCategoryTitle(),
         Expanded(
@@ -571,39 +571,6 @@ class _EventsPageState extends State<EventsPage> {
         }
     }
   }
-
-  Widget getCategoryIcon() {
-    switch (widget.category) {
-      case GlobalStringText.tagEntertainment:
-        {
-          return Image.asset('images/icons8-comedy-64.png');
-        }
-      case GlobalStringText.tagFood:
-        {
-          return Image.asset('images/icons8-restaurant-64.png');
-        }
-      case GlobalStringText.tagStudyBuddy:
-        {
-          return Image.asset('images/icons8-book-and-pencil-64.png');
-        }
-      case GlobalStringText.tagMaterial:
-        {
-          return Image.asset('images/icons8-library-64.png');
-        }
-      case GlobalStringText.tagCarPool:
-        {
-          return Image.asset('images/icons8-car-64.png');
-        }
-      case GlobalStringText.tagAcademicSupport:
-        {
-          return Image.asset('images/icons8-helping-hand-64.png');
-        }
-      default:
-        {
-          return Container();
-        }
-    }
-  }
 }
 
 class SearchAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -773,20 +740,20 @@ class _TicketState extends State<Ticket> {
     );
 
     var openedTicketEdit = Row(
-      children: [
-        Expanded(child:Text(
-          widget._title,
-          maxLines: 2,
-          style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
-        )),
-        Spacer(),
-        IconButton(
-          icon: Image.asset("images/edit.png"),
-          onPressed: editOpened,
-        ),
-        IconButton(onPressed: deleteOpened, icon: Image.asset("images/del.png"))
-      ],
-    );
+          children: [
+            Expanded(child:Text(
+              widget._title,
+              maxLines: 2,
+              style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
+            )),
+            Spacer(),
+            IconButton(
+              icon: Image.asset("images/edit.png"),
+              onPressed: editOpened,
+            ),
+            IconButton(onPressed: deleteOpened, icon: Image.asset("images/del.png"))
+          ],
+        );
     Widget childTicket;
     if (_isExpanded) {
       String extra_info = '';
@@ -815,18 +782,7 @@ class _TicketState extends State<Ticket> {
             children: [
               openedTicketEdit,
               SizedBox(
-                height: 10,
-              ),
-              Text(
-                "At " + widget._time,
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(
                 height: 5,
-              ),
-              Text(
-                "Description:",
-                style: TextStyle(fontSize: 19, color: Colors.black),
               ),
               Text(widget._desc,
                   style: const TextStyle(
@@ -834,31 +790,17 @@ class _TicketState extends State<Ticket> {
               SizedBox(
                 height: 5,
               ),
-              Row(
-                children: const [
-                  Text(
-                    "Ticket Owner : ",
-                    style: TextStyle(fontSize: 19, color: Colors.black),
-                  ),
-                  Text("<TICKET OWNER>",
-                      style:
-                      TextStyle(fontSize: 17, color: Colors.indigoAccent))
-                ],
-              ),
               SizedBox(
                 height: 5,
               ),
-              Row(
-                children: const [
-                  Text(
-                    "Location : ",
-                    style: TextStyle(fontSize: 19, color: Colors.black),
-                  ),
-                  Text("<LOCATION>",
-                      style:
-                      TextStyle(fontSize: 17, color: Colors.indigoAccent))
-                ],
+              Text(
+                "At " + widget._time + ' ' + widget._location,
+                style: TextStyle(fontSize: 20),
               ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(icon: getCategoryIcon(widget.category!), onPressed: () {},),
+              )
             ],
           ),
         );
@@ -974,7 +916,7 @@ class _TicketState extends State<Ticket> {
         childTicket = Container(
           margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
           padding: const EdgeInsets.all(16),
-          height: 147,
+          height: 164,
           width: 384,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -992,6 +934,10 @@ class _TicketState extends State<Ticket> {
                 "At " + widget._time,
                 style: TextStyle(fontSize: 20),
               ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(icon: getCategoryIcon(widget.category!), onPressed: () {},),
+              )
             ],
           ),
         );
@@ -1095,5 +1041,38 @@ class _TicketState extends State<Ticket> {
     setState(() {
       _isExpanded = !_isExpanded;
     });
+  }
+}
+
+Widget getCategoryIcon(String category) {
+  switch (category) {
+    case GlobalStringText.tagEntertainment:
+      {
+        return Image.asset('images/icons8-comedy-64.png');
+      }
+    case GlobalStringText.tagFood:
+      {
+        return Image.asset('images/icons8-restaurant-64.png');
+      }
+    case GlobalStringText.tagStudyBuddy:
+      {
+        return Image.asset('images/icons8-book-and-pencil-64.png');
+      }
+    case GlobalStringText.tagMaterial:
+      {
+        return Image.asset('images/icons8-library-64.png');
+      }
+    case GlobalStringText.tagCarPool:
+      {
+        return Image.asset('images/icons8-car-64.png');
+      }
+    case GlobalStringText.tagAcademicSupport:
+      {
+        return Image.asset('images/icons8-helping-hand-64.png');
+      }
+    default:
+      {
+        return Container();
+      }
   }
 }
