@@ -225,6 +225,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }
@@ -242,6 +243,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }
@@ -259,6 +261,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }
@@ -276,6 +279,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }
@@ -293,6 +297,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }
@@ -310,6 +315,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                     isOpenedTicket: true,
                     ref: element.data()['ref'],
                     update: updateList,
+                    category: element.data()['category']
                   );
                   tickets.add(ticket);
                 }

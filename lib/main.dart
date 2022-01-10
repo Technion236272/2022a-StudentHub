@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'CatogryHomePage.dart';
 import 'HomePage.dart';
 import 'Auth.dart';
-import 'GenericPageCreation.dart';
 import 'notificationHelper.dart';
 import 'events_page.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -52,7 +51,7 @@ class MyApp extends StatelessWidget {
       create: (_) => AuthRepository.instance(),
       child: Consumer<AuthRepository>(
           builder: (context, auth, _) => MaterialApp(
-                home: HomePage(),
+                home: CategoryPageScreen(),
               )),
     );
   }

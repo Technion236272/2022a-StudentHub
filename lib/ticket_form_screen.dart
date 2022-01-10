@@ -65,8 +65,9 @@ class Event {
 //-----------------------------------------------------------------------------------------//
 class NewPostScreen extends StatefulWidget {
   String category;
+  Map? data;
 
-  NewPostScreen(this.category, {Key? key}) : super(key: key);
+  NewPostScreen(this.category, {Key? key,  this.data}) : super(key: key);
 
   @override
   _NewPostScreenState createState() {
@@ -75,8 +76,7 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  String ReciveTitle = '';
-
+  
   //var ReciveUserID="";
 
   TextEditingController TitleController = TextEditingController();
@@ -154,6 +154,19 @@ class _NewPostScreenState extends State<NewPostScreen> {
     return items;
   }
 
+  void fillInitFormVals() {
+    if (widget.data != null) {
+      TitleController = TextEditingController(text: widget.data!['title']);
+      LocationController = TextEditingController(text: widget.data!['location'] ?? '');
+      DestinationController = TextEditingController(text: widget.data!['destination'] ?? '');
+      TimeController = TextEditingController(text: widget.data!['time']);
+      DescriptionController = TextEditingController(text: widget.data!['description']);
+      EventTypeController = TextEditingController(text: widget.data!['type'] ?? '');
+      FoodTypeController = TextEditingController(text: widget.data!['type'] ?? '');
+      CourseNumberController = TextEditingController(text: widget.data!['course'] ?? '');
+    }
+  }
+
 //----------------------------------------------------------------------------------------------//
 
   @override
@@ -164,6 +177,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     _selectedFood = _dropdownFoodMenuItems[0].value!;
     _dropdownEventsMenuItems = buildDropdownMenuItems1(_events);
     _selectedEvent = _dropdownEventsMenuItems[0].value!;
+    fillInitFormVals();
     super.initState();
   }
 
@@ -261,14 +275,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Image.asset(GlobalStringText.ImagesTitle),
-                  IconButton(
-                    onPressed: () {
-                      pushTicket();
-                    },
-                    icon: Image.asset(GlobalStringText.ImagesAddTicket),
-                    iconSize: 60,
-                    padding: EdgeInsets.zero,
-                  ),
+                  IconButton(onPressed: () {
+                    pushTicket();
+                  }, icon: Image.asset(widget.data != null? "images/edit.png" : GlobalStringText.ImagesAddTicket), iconSize: 60, padding: EdgeInsets.zero,),
                 ],
               ),
               alignment: Alignment.centerRight,
@@ -294,6 +303,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     fontFamily: GlobalStringText.FontTextFormField,
                     fontWeight: FontWeight.w300),
                 prefixText: ' ',
+
               ),
             ),
           ],
@@ -631,87 +641,87 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
-    switch (widget.category) {
-      case GlobalStringText.tagFood:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'Time': TimeController.text,
-            'Type': _selectedFood.getName(),
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("Food").add(data);
-        }
-        break;
-      case GlobalStringText.tagEntertainment:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'Time': TimeController.text,
-            'Type': _selectedEvent.getName(),
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("Entertainment").add(data);
-        }
-        break;
-      case GlobalStringText.tagCarPool:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'Destination': DestinationController.text,
-            'Time': TimeController.text,
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("CarPool").add(data);
-        }
-        break;
-      case GlobalStringText.tagAcademicSupport:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'CourseNum': CourseNumberController.text,
-            'Time': TimeController.text,
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("AcademicSupport").add(data);
-        }
-        break;
-      case GlobalStringText.tagStudyBuddy:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'CourseNum': CourseNumberController.text,
-            'Time': TimeController.text,
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("StudyBuddy").add(data);
-        }
-        break;
-      case GlobalStringText.tagMaterial:
-        {
-          Map<String, dynamic> data = {
-            'Title': TitleController.text,
-            'Location': LocationController.text,
-            'CourseNum': CourseNumberController.text,
-            'Time': TimeController.text,
-            'Description': DescriptionController.text,
-            'Owner': user?.displayName,
-          };
-          doc_ref = await _firestore.collection("Material").add(data);
-        }
-        break;
-      default:
-        {}
+    String action = widget.data != null? 'edit' : widget.category;
+    switch(action) {
+      case 'edit': {
+        String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
+        (widget.data!['ref'] as DocumentReference).update({
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Time' : TimeController.text,
+          'Type' : type,
+          'Description' : DescriptionController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Destination' : DestinationController.text,
+        });
+      } break;
+      case GlobalStringText.tagFood: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Time' : TimeController.text,
+          'Type' : _selectedFood.getName(),
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("Food").add(data);
+      } break;
+      case GlobalStringText.tagEntertainment: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Time' : TimeController.text,
+          'Type' : _selectedEvent.getName(),
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("Entertainment").add(data);
+      } break;
+      case GlobalStringText.tagCarPool: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'Destination' : DestinationController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("CarPool").add(data);
+      } break;
+      case GlobalStringText.tagAcademicSupport: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("AcademicSupport").add(data);
+      } break;
+      case GlobalStringText.tagStudyBuddy: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("StudyBuddy").add(data);
+      } break;
+      case GlobalStringText.tagMaterial: {
+        Map<String, dynamic> data = {
+          'Title' : TitleController.text,
+          'Location' : LocationController.text,
+          'CourseNum' : CourseNumberController.text,
+          'Time' : TimeController.text,
+          'Description' : DescriptionController.text,
+          'Owner' : user?.displayName,
+        };
+        doc_ref = await _firestore.collection("Material").add(data);
+      } break;
+      default: {}
     }
     _firestore.collection("${user?.uid} tickets").add({
       'ref': doc_ref,
