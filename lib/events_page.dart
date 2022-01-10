@@ -12,9 +12,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
-import 'package:studenthub/GenericPageCreation.dart';
+import 'package:studenthub/ticket_form_Screen.dart';
 import 'Auth.dart';
-import 'GenericPageCreation.dart';
 import 'package:studenthub/FavoritesPage.dart';
 
 import 'package:intl/intl.dart';
@@ -724,10 +723,11 @@ class Ticket extends StatefulWidget {
   bool? isOpenedTicket;
   bool? isLoved;
   Void2VoidFunc? update;
+  String? category;
 
   Ticket(this._title, this._desc, this._time, this._color, this._location,
       this._owner,
-      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved, this.update})
+      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved, this.update, this.category})
       : super(key: key);
 
   @override
@@ -1068,8 +1068,22 @@ class _TicketState extends State<Ticket> {
   }
 
   void editOpened() {
+    Map<String, dynamic> data = {
+      'ref' : widget.ref,
+      'time' : widget._time,
+      'title' : widget._title,
+      'description' : widget._desc,
+      'location' : widget._location,
+      'destination' : widget.dest,
+      'type' : widget.type,
+      'course' : widget.course,
+    };
+
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => MaintaincePage()));
+        builder: (context) => NewPostScreen(widget.category!, data: data,))).then((value)
+    {
+      widget.update!();
+    });
   }
 
   void deleteOpened() {
