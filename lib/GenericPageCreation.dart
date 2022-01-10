@@ -121,8 +121,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
           value: food,
           child: Text(
             food.name,
-            style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300 )),
-
+            style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300)),
           ),
         ),
       );
@@ -139,9 +142,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
           value: event,
           child: Text(
             event.name,
-            style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300  )),
-            ),
+            style: GoogleFonts.poppins(
+                textStyle: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300)),
           ),
+        ),
       );
     }
     return items;
@@ -175,8 +182,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
-
         resizeToAvoidBottomInset: false,
         backgroundColor: GlobalStringText.FifthpurpleColor,
         body: Column(
@@ -185,12 +192,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
               child: Container(
                 margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                 child: IconButton(
-                  onPressed: () {  Navigator.of(context).pop(); },
-                  icon: Icon(Icons.arrow_back,color: Colors.white,)
-
-                ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    )),
                 alignment: Alignment.topLeft,
-
               ),
               decoration: BoxDecoration(
                 // spice up the button with a radius
@@ -198,7 +207,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   Radius.circular(10),
                 ),
                 gradient: LinearGradient(
-                  // gradient starts from left
+                    // gradient starts from left
                     begin: Alignment.centerLeft,
                     // gradient ends at right
                     end: Alignment.centerRight,
@@ -211,7 +220,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       GlobalStringText.FirstpurpleColor,
                     ]),
               ),
-              height: 110 ,
+              height: 110,
             ),
             Expanded(
               child: Container(
@@ -223,14 +232,15 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
                     key: _key,
-                    child: ListView(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: TicketFields(),
-                        )
-                      ],
-                    )),
+                    child:  SingleChildScrollView(
+                        reverse: true,
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: bottom),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: TicketFields(),
+                          ),
+                        ))),
               ),
             )
           ],
@@ -238,6 +248,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   List<Widget> TicketFields() {
+
     return <Widget>[
 //------------------------------------------------------------------------------------------------------------//
       Container(
@@ -250,9 +261,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Image.asset(GlobalStringText.ImagesTitle),
-                  IconButton(onPressed: () {
-                    pushTicket();
-                  }, icon: Image.asset(GlobalStringText.ImagesAddTicket), iconSize: 60, padding: EdgeInsets.zero,),
+                  IconButton(
+                    onPressed: () {
+                      pushTicket();
+                    },
+                    icon: Image.asset(GlobalStringText.ImagesAddTicket),
+                    iconSize: 60,
+                    padding: EdgeInsets.zero,
+                  ),
                 ],
               ),
               alignment: Alignment.centerRight,
@@ -273,7 +289,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 ),
                 labelText: 'Pick what ever title you want',
                 labelStyle: TextStyle(
-                    fontSize: 14.0,
+                    fontSize: 15.0,
                     color: GlobalStringText.textFieldGrayColor,
                     fontFamily: GlobalStringText.FontTextFormField,
                     fontWeight: FontWeight.w300),
@@ -314,7 +330,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           //helperText: 'Keep it short, this is just a demo.',
           labelText: 'Pick city and street number',
           labelStyle: TextStyle(
-              fontSize: 14.0,
+              fontSize: 15.0,
               color: GlobalStringText.textFieldGrayColor,
               fontFamily: GlobalStringText.FontTextFormField,
               fontWeight: FontWeight.w300),
@@ -355,7 +371,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
           //helperText: 'Keep it short, this is just a demo.',
           labelText: 'Pick a date and an hour and stick to the format',
           labelStyle: TextStyle(
-              fontSize: 14.0,
+              fontSize: 15.0,
               color: GlobalStringText.textFieldGrayColor,
               fontFamily: GlobalStringText.FontTextFormField,
               fontWeight: FontWeight.w300),
@@ -367,7 +383,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
       const SizedBox(height: 5.0),
       Visibility(
-          visible: widget.category == GlobalStringText.tagMaterial || widget.category == GlobalStringText.tagStudyBuddy || widget.category == GlobalStringText.tagAcademicSupport,
+          visible: widget.category == GlobalStringText.tagMaterial ||
+              widget.category == GlobalStringText.tagStudyBuddy ||
+              widget.category == GlobalStringText.tagAcademicSupport,
           child: Column(
             children: [
               Align(
@@ -402,7 +420,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   //helperText: 'Keep it short, this is just a demo.',
                   labelText: 'Choose Course Number',
                   labelStyle: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 15.0,
                       color: GlobalStringText.textFieldGrayColor,
                       fontFamily: GlobalStringText.FontTextFormField,
                       fontWeight: FontWeight.w300),
@@ -443,7 +461,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             DropdownButton(
                               borderRadius: BorderRadius.circular(8.0),
                               dropdownColor:
-                              GlobalStringText.textFieldDeepPinkColor,
+                                  GlobalStringText.textFieldDeepPinkColor,
                               isExpanded: true,
                               icon: const Icon(Icons.arrow_drop_down),
                               iconSize: 40,
@@ -496,7 +514,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             DropdownButton(
                               borderRadius: BorderRadius.circular(8.0),
                               dropdownColor:
-                              GlobalStringText.textFieldDeepPinkColor,
+                                  GlobalStringText.textFieldDeepPinkColor,
                               isExpanded: true,
                               icon: const Icon(Icons.arrow_drop_down),
                               iconSize: 40,
@@ -548,7 +566,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   //helperText: 'Keep it short, this is just a demo.',
                   labelText: 'Pick destination',
                   labelStyle: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 15.0,
                       color: GlobalStringText.textFieldGrayColor,
                       fontFamily: GlobalStringText.FontTextFormField,
                       fontWeight: FontWeight.w300),
@@ -588,10 +606,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
             ),
           ),
           hintText: 'Enter Description for your Ticket',
-          hintStyle: TextStyle(fontSize: 12.0,fontFamily: GlobalStringText.FontTextFormField, color: GlobalStringText.textFieldGrayColor),
+          hintStyle: TextStyle(
+              fontSize: 12.0,
+              fontFamily: GlobalStringText.FontTextFormField,
+              color: GlobalStringText.textFieldGrayColor),
           labelText: 'Describe your ticket...',
           labelStyle: TextStyle(
-              fontSize: 14.0, color: GlobalStringText.textFieldGrayColor, fontFamily: GlobalStringText.FontTextFormField,fontWeight: FontWeight.w300),
+              fontSize: 15.0,
+              color: GlobalStringText.textFieldGrayColor,
+              fontFamily: GlobalStringText.FontTextFormField,
+              fontWeight: FontWeight.w300),
           prefixText: ' ',
           //suffixStyle: const TextStyle(color: Colors.green)
         ),
@@ -607,78 +631,91 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
-    switch(widget.category) {
-      case GlobalStringText.tagFood: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Time' : TimeController.text,
-          'Type' : _selectedFood.getName(),
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Food").add(data);
-      } break;
-      case GlobalStringText.tagEntertainment: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Time' : TimeController.text,
-          'Type' : _selectedEvent.getName(),
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Entertainment").add(data);
-      } break;
-      case GlobalStringText.tagCarPool: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'Destination' : DestinationController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("CarPool").add(data);
-      } break;
-      case GlobalStringText.tagAcademicSupport: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("AcademicSupport").add(data);
-      } break;
-      case GlobalStringText.tagStudyBuddy: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("StudyBuddy").add(data);
-      } break;
-      case GlobalStringText.tagMaterial: {
-        Map<String, dynamic> data = {
-          'Title' : TitleController.text,
-          'Location' : LocationController.text,
-          'CourseNum' : CourseNumberController.text,
-          'Time' : TimeController.text,
-          'Description' : DescriptionController.text,
-          'Owner' : user?.displayName,
-        };
-        doc_ref = await _firestore.collection("Material").add(data);
-      } break;
-      default: {}
+    switch (widget.category) {
+      case GlobalStringText.tagFood:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Time': TimeController.text,
+            'Type': _selectedFood.getName(),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Food").add(data);
+        }
+        break;
+      case GlobalStringText.tagEntertainment:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Time': TimeController.text,
+            'Type': _selectedEvent.getName(),
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Entertainment").add(data);
+        }
+        break;
+      case GlobalStringText.tagCarPool:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'Destination': DestinationController.text,
+            'Time': TimeController.text,
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("CarPool").add(data);
+        }
+        break;
+      case GlobalStringText.tagAcademicSupport:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': TimeController.text,
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("AcademicSupport").add(data);
+        }
+        break;
+      case GlobalStringText.tagStudyBuddy:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': TimeController.text,
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("StudyBuddy").add(data);
+        }
+        break;
+      case GlobalStringText.tagMaterial:
+        {
+          Map<String, dynamic> data = {
+            'Title': TitleController.text,
+            'Location': LocationController.text,
+            'CourseNum': CourseNumberController.text,
+            'Time': TimeController.text,
+            'Description': DescriptionController.text,
+            'Owner': user?.displayName,
+          };
+          doc_ref = await _firestore.collection("Material").add(data);
+        }
+        break;
+      default:
+        {}
     }
     _firestore.collection("${user?.uid} tickets").add({
-      'ref' : doc_ref,
-      'category' : widget.category,
+      'ref': doc_ref,
+      'category': widget.category,
     });
     Navigator.of(context).pop();
   }

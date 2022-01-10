@@ -39,7 +39,7 @@ class GlobalStringText {
   static Color LightGreenColorFirst = Color(0xffA7FBB6);
   static Color LightOarngeColorFirst = Color(0xffFFD387);
   static Color LightRedColorFirst = Color(0xffFF8787);
-  static Color textFieldGrayColor = Color(0xffA6BCD0);
+  static Color textFieldGrayColor = Colors.black;
   static Color FirstpurpleColor =  Color(0xff6F65EE);
   static Color SecondpurpleColor =  Color(0xff7B74F3);
   static Color ThirdpurpleColor =  Color(0xff756CF1);

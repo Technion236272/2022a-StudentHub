@@ -15,6 +15,7 @@ import 'package:studenthub/CatogryHomePage.dart';
 import 'package:studenthub/GenericPageCreation.dart';
 import 'Auth.dart';
 import 'GenericPageCreation.dart';
+import 'package:studenthub/FavoritesPage.dart';
 
 import 'package:intl/intl.dart';
 import 'main.dart';
@@ -436,8 +437,7 @@ class _EventsPageState extends State<EventsPage> {
                     // waiting for yousef to do the pages
                     case 0:
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const EventsPage(
-                              category: GlobalStringText.tagEntertainment)));
+                          builder: (context) => FavoritesPage()));
                       break;
                     case 1:
                       Navigator.of(context).push(MaterialPageRoute(
@@ -446,8 +446,7 @@ class _EventsPageState extends State<EventsPage> {
 
                     case 2:
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const EventsPage(
-                              category: GlobalStringText.tagCarPool)));
+                          builder: (context) => MaintaincePage()));
                       break;
                   }
                 });
@@ -752,13 +751,13 @@ class _TicketState extends State<Ticket> {
     var titleSave = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+        Expanded(child:Text(
           widget._title,
-          maxLines: 1,
+          maxLines: 2,
           style: GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28,
               color: GlobalStringText.purpleColor,
               fontWeight: FontWeight.bold)),
-        ),
+        )),
         IconButton(
             onPressed: love,
             icon: _isSaved
@@ -775,11 +774,11 @@ class _TicketState extends State<Ticket> {
 
     var openedTicketEdit = Row(
       children: [
-        Text(
+        Expanded(child:Text(
           widget._title,
-          maxLines: 1,
+          maxLines: 2,
           style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
-        ),
+        )),
         Spacer(),
         IconButton(
           icon: Image.asset("images/edit.png"),
