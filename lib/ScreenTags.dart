@@ -40,9 +40,10 @@ class GlobalStringText {
   static Color LightOarngeColorFirst = Color(0xffFFD387);
   static Color LightRedColorFirst = Color(0xffFF8787);
   static Color textFieldGrayColor = Colors.black;
-  static Color FirstpurpleColor =  Color(0xff6F65EE);
-  static Color SecondpurpleColor =  Color(0xff7B74F3);
-  static Color ThirdpurpleColor =  Color(0xff756CF1);
+
+  static Color FirstpurpleColor =  Color(0xff7B74F3);
+  static Color SecondpurpleColor =  Color(0xff756CF1);
+  static Color ThirdpurpleColor =  Color(0xff6F65EE);
   static Color ForthpurpleColor =  Color(0xff7268F0);
   static Color FifthpurpleColor =  Color(0xff6D63EA);
   static Color purpleColor =  Color(0xff6769EC);
@@ -92,6 +93,12 @@ class GlobalStringText {
 
   static String ImagesAcadimicSupport = "assets/images/icons8-helping-hand-64.png";
   static String ImagesStudyBuddy = "assets/images/icons8-book-and-pencil-64.png";
+
+////////////////////// dec///////////////////
+
+
+
+
 
 
 //------------------------------ScreenTag---------------------------------------//

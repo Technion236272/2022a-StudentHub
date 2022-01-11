@@ -57,6 +57,8 @@ dependencies:
     git:
       url: https://github.com/Realank/flutter_datetime_picker.git
       ref: master
+  flutter_keyboard_visibility: ^5.1.0
+  emoji_picker_flutter: ^1.0.8
 
 dev_dependencies:
   flutter_test:
