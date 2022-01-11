@@ -34,7 +34,7 @@ class GlobalStringText {
   static Color textFieldPinkColor = Color(0xfff8e4e4);
   static Color textFieldDeepPinkColor = Color(0xffF8C4C4);
   static Color DeepPinkColorFirst = Color(0xffFFDADA);
-  static Color LightYellowColorFirst = Color(0xffFFFFB8);
+  static Color LightYellowColorFirst = Color(0xffCCCCFF);
   static Color LightBlueColorFirst = Color(0xffC3FEF8);
   static Color LightGreenColorFirst = Color(0xffA7FBB6);
   static Color LightOarngeColorFirst = Color(0xffFFD387);
