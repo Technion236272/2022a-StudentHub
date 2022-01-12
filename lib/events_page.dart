@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:filter_list/filter_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,7 +22,6 @@ import 'notificationHelper.dart';
 
 import 'MaintainceScreen.dart';
 
-
 class EventsPage extends StatefulWidget {
   final String category;
 
@@ -41,6 +40,21 @@ class _EventsPageState extends State<EventsPage> {
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
   List user_favorites = [];
+  final TextEditingController _filter = new TextEditingController();
+  String _searchText = ""; //search bar text
+  List<Ticket> names = []; //all tickets
+  List<Ticket> filteredNames = []; // tickets  filtered by search text
+  Icon _searchIcon = new Icon(Icons.search);
+  Widget _appBarTitle = new Text('Student Hub');
+  bool search_tapped = false; // flag if the search on right top pressed
+  List<String> filter_list = [
+    "Sport",
+    "BoardGames",
+    "Party",
+    "Chilling",
+    "Other"
+  ]; // filtered list in entertainment
+  List<String>? selected_filter_list = []; //selected filters
 
   @override
   void initState() {
@@ -64,10 +78,73 @@ class _EventsPageState extends State<EventsPage> {
       }
     });
     tickets = getTickets();
+    this._getNames();
+  }
+
+  _EventsPageState() {
+    _filter.addListener(() {
+      if (_filter.text.isEmpty) {
+        setState(() {
+          _searchText = "";
+        });
+      } else {
+        setState(() {
+          _searchText = _filter.text;
+          processSearch();
+        });
+      }
+    });
+  }
+
+  void _getNames() async {
+    List<Ticket> tempList = await getTickets();
+    setState(() {
+      names = tempList;
+      filteredNames = [];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var filtered_column = Column(
+      children: [
+        Visibility(
+            maintainAnimation: true,
+            maintainState: true,
+            visible: _isVisible,
+            child: AnimatedOpacity(
+              opacity: _isVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: getCategoryIcon(widget.category),
+            )),
+        getCategoryTitle(),
+        Expanded(
+            child: ListView(
+          children: (selected_filter_list!.length == 0 ||
+                  selected_filter_list == null)
+              ? names
+              : _searchText.isEmpty?filterList():processSearch(filterList: selected_filter_list),
+        ))
+      ],
+    );
+    var search_column = Column(
+      children: [
+        Visibility(
+            maintainAnimation: true,
+            maintainState: true,
+            visible: _isVisible,
+            child: AnimatedOpacity(
+              opacity: _isVisible ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: getCategoryIcon(widget.category),
+            )),
+        getCategoryTitle(),
+        Expanded(
+            child: ListView(
+          children: filteredNames,
+        ))
+      ],
+    );
     var mainCol = Column(
       children: [
         Visibility(
@@ -111,56 +188,89 @@ class _EventsPageState extends State<EventsPage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                padding: const EdgeInsets.only(left: 20),
-                child: SizedBox(
-                    width: 70,
-                    height: 70,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    NewPostScreen(widget.category))).then((value) {
-                                      setState(() {
-                                        tickets = getTickets();
-                                      });
-                            });
-                          },
-                          child: Tab(
-                            icon: Container(
-                              child: Image(
-                                image: AssetImage(
-                                  GlobalStringText.ImagesAddTicket,
+              opacity: search_tapped ? 0 : 1,
+              duration: Duration(milliseconds: 500),
+              child: AnimatedOpacity(
+                opacity: _isVisible ? 1 : 0,
+                duration: const Duration(milliseconds: 500),
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  padding: const EdgeInsets.only(left: 20),
+                  child: SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: FittedBox(
+                        child: FloatingActionButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          NewPostScreen(widget.category)))
+                                  .then((value) {
+                                setState(() async {
+                                  tickets = getTickets();
+                                  names= await getTickets();
+                                });
+                              });
+                            },
+                            child: Tab(
+                              icon: Container(
+                                child: Image(
+                                  image: AssetImage(
+                                    GlobalStringText.ImagesAddTicket,
+                                  ),
+                                  fit: BoxFit.contain,
                                 ),
-                                fit: BoxFit.contain,
+                                height: 60,
+                                width: 60,
                               ),
-                              height: 60,
-                              width: 60,
                             ),
-                          ),
-                          backgroundColor: GlobalStringText.whiteColor),
-                    )),
+                            backgroundColor: GlobalStringText.whiteColor),
+                      )),
+                ),
               ),
             ),
             SizedBox(
               height: 10.0,
             ),
             AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                padding: const EdgeInsets.only(left: 20),
-                child: buildBottomNavigationBar(),
+              opacity: search_tapped ? 0 : 1,
+              duration: Duration(milliseconds: 500),
+              child: AnimatedOpacity(
+                opacity: _isVisible ? 1 : 0,
+                duration: const Duration(milliseconds: 500),
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  padding: const EdgeInsets.only(left: 20),
+                  child: buildBottomNavigationBar(),
+                ),
               ),
             ),
           ],
         ),
-        appBar: const SearchAppBar(),
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: _appBarTitle,
+          actions: [
+            Visibility(
+              child: IconButton(
+                icon: Image.asset("images/filter.png"),
+                onPressed: filterTap,
+              ),
+              visible: (search_tapped || widget.category !="Entertainment") ? false : true,
+            ),
+            Visibility(
+              child: GestureDetector(
+                child: IconButton(
+                  icon: _searchIcon,
+                  onPressed: onSearchTapUp,
+                ),
+              ),
+              visible: true,
+            ),
+          ],
+        ),
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: const BoxDecoration(
@@ -173,7 +283,7 @@ class _EventsPageState extends State<EventsPage> {
                   blurRadius: 3.0,
                 )
               ]),
-          child: mainCol,
+          child: selected_filter_list!.length==0?((_searchText.isNotEmpty) ? search_column : mainCol):filtered_column,
         ),
       ),
       decoration: BoxDecoration(
@@ -182,7 +292,7 @@ class _EventsPageState extends State<EventsPage> {
           Radius.circular(10),
         ),
         gradient: LinearGradient(
-          // gradient starts from left
+            // gradient starts from left
             begin: Alignment.centerLeft,
             // gradient ends at right
             end: Alignment.centerRight,
@@ -198,17 +308,124 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  void filterTap() async {
+    await FilterListDialog.display<String>(context,
+        listData: filter_list,
+        selectedTextBackgroundColor: Colors.deepPurpleAccent,
+        selectedListData: selected_filter_list,
+        applyButonTextBackgroundColor: Colors.deepPurpleAccent,
+        height: MediaQuery.of(context).size.height * 0.55,
+        width: MediaQuery.of(context).size.width * 0.75,
+        headlineText: "Select Types of Entertainment",
+        headerTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        searchFieldHintText: "Search Here", choiceChipLabel: (item) {
+      return item;
+    }, validateSelectedItem: (list, val) {
+      return list!.contains(val);
+    }, onItemSearch: (list, text) {
+      if (list!.any(
+          (element) => element.toLowerCase().contains(text.toLowerCase()))) {
+        return list
+            .where(
+                (element) => element.toLowerCase().contains(text.toLowerCase()))
+            .toList();
+      } else {
+        return [];
+      }
+    }, onApplyButtonClick: (list) {
+      if (list != null) {
+        setState(() {
+          selected_filter_list = List.from(list);
+        });
+      }
+      Navigator.pop(context);
+    });
+  }
+
+  List<Ticket> filterList() {
+    List<Ticket> filteredList = [];
+
+
+    for (var i = 0; i < names.length; i++) {
+      if (selected_filter_list!.contains(names[i].type)) {
+        filteredList.add(names[i]);
+      }
+    }
+    return filteredList;
+  }
+
+  void onSearchTapUp() {
+    setState(() {
+      if (this._searchIcon.icon == Icons.search) {
+        search_tapped = true;
+        this._searchIcon = new Icon(Icons.close);
+        this._appBarTitle = new TextField(
+          controller: _filter,
+          style: TextStyle(color: Colors.white),
+          decoration: new InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: new Icon(Icons.search),
+              hintText: 'Search...'),
+        );
+      } else {
+        search_tapped = false;
+        this._searchIcon = new Icon(Icons.search);
+        this._appBarTitle = new Text('Student Hub');
+
+        _filter.clear();
+      }
+    });
+  }
+
+  List<Ticket> processSearch({List<String>? filterList}) {
+    filteredNames = [];
+
+    if (_searchText.isNotEmpty) {
+      for (var i = 0; i < names.length; i++) {
+
+        if (names[i]._time.toLowerCase().contains(_searchText.toLowerCase()) ||
+            names[i]._title.toLowerCase().contains(_searchText.toLowerCase()) ||
+            names[i]._desc.toLowerCase().contains(_searchText.toLowerCase()) ||
+            names[i]
+                ._location
+                .toLowerCase()
+                .contains(_searchText.toLowerCase()) ||
+            (names[i].dest != null &&
+                names[i]
+                    .dest!
+                    .toLowerCase()
+                    .contains(_searchText.toLowerCase())) ||
+            (names[i].course != null &&
+                names[i]
+                    .course!
+                    .toLowerCase()
+                    .contains(_searchText.toLowerCase())) ||
+            (names[i]._owner != null &&
+                names[i]
+                    ._owner
+                    .toLowerCase()
+                    .contains(_searchText.toLowerCase()))) {
+          if(filterList!=null && filterList.length!=0 && names[i].type !=null && !filterList.contains(names[i].type))
+            continue;
+          filteredNames.add(names[i]);
+        }
+      }
+    }
+    return filteredNames;
+  }
+
   Future<List<Ticket>> getTickets() async {
     var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     await _firestore
         .collection("${user?.uid} favorites")
-        .get().then((value) => {
-      value.docs.forEach((element) {
-        user_favorites.add(element.data()['ref']);
-      })
-    });
+        .get()
+        .then((value) => {
+              value.docs.forEach((element) {
+                user_favorites.add(element.data()['ref']);
+              })
+            });
     final Color catColor = getCategoryColor();
     switch (widget.category) {
       case GlobalStringText.tagFood:
@@ -573,70 +790,6 @@ class _EventsPageState extends State<EventsPage> {
   }
 }
 
-class SearchAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const SearchAppBar({Key? key}) : super(key: key);
-
-  @override
-  _SearchAppBarState createState() => _SearchAppBarState();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(56);
-}
-
-class _SearchAppBarState extends State<SearchAppBar>
-    with SingleTickerProviderStateMixin {
-  late double rippleStartX, rippleStartY;
-  late AnimationController _controller;
-  late Animation _animation;
-
-  @override
-  initState() {
-    super.initState();
-
-    _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
-    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: const Text("Student HUB"),
-          actions: [
-            Visibility(
-              child: GestureDetector(
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {},
-                ),
-                onTapUp: onSearchTapUp,
-              ),
-              visible: false,
-            ),
-          ],
-        )
-      ],
-    );
-  }
-
-  void onSearchTapUp(TapUpDetails details) {
-    setState(() {
-      rippleStartX = details.globalPosition.dx;
-      rippleStartY = details.globalPosition.dy;
-    });
-
-    print("pointer location $rippleStartX, $rippleStartY");
-    _controller.forward();
-  }
-}
-
 class MyPainter extends CustomPainter {
   final Offset center;
   final double radius, containerHeight;
@@ -694,7 +847,15 @@ class Ticket extends StatefulWidget {
 
   Ticket(this._title, this._desc, this._time, this._color, this._location,
       this._owner,
-      {Key? key, this.dest, this.type, this.course, this.isOpenedTicket, this.ref, this.isLoved, this.update, this.category})
+      {Key? key,
+      this.dest,
+      this.type,
+      this.course,
+      this.isOpenedTicket,
+      this.ref,
+      this.isLoved,
+      this.update,
+      this.category})
       : super(key: key);
 
   @override
@@ -718,42 +879,46 @@ class _TicketState extends State<Ticket> {
     var titleSave = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child:Text(
+        Expanded(
+            child: Text(
           widget._title,
           maxLines: 2,
-          style: GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 28,
-              color: GlobalStringText.purpleColor,
-              fontWeight: FontWeight.bold)),
+          style: GoogleFonts.montserrat(
+              textStyle: TextStyle(
+                  fontSize: 28,
+                  color: GlobalStringText.purpleColor,
+                  fontWeight: FontWeight.bold)),
         )),
         IconButton(
             onPressed: love,
             icon: _isSaved
                 ? const Icon(
-              Icons.favorite,
-              color: Colors.redAccent,
-            )
+                    Icons.favorite,
+                    color: Colors.redAccent,
+                  )
                 : const Icon(
-              Icons.favorite_border_outlined,
-              color: Colors.white,
-            ))
+                    Icons.favorite_border_outlined,
+                    color: Colors.white,
+                  ))
       ],
     );
 
     var openedTicketEdit = Row(
-          children: [
-            Expanded(child:Text(
-              widget._title,
-              maxLines: 2,
-              style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
-            )),
-            Spacer(),
-            IconButton(
-              icon: Image.asset("images/edit.png"),
-              onPressed: editOpened,
-            ),
-            IconButton(onPressed: deleteOpened, icon: Image.asset("images/del.png"))
-          ],
-        );
+      children: [
+        Expanded(
+            child: Text(
+          widget._title,
+          maxLines: 2,
+          style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
+        )),
+        Spacer(),
+        IconButton(
+          icon: Image.asset("images/edit.png"),
+          onPressed: editOpened,
+        ),
+        IconButton(onPressed: deleteOpened, icon: Image.asset("images/del.png"))
+      ],
+    );
     Widget childTicket;
     if (_isExpanded) {
       String extra_info = '';
@@ -799,7 +964,10 @@ class _TicketState extends State<Ticket> {
               ),
               Align(
                 alignment: Alignment.bottomRight,
-                child: IconButton(icon: getCategoryIcon(widget.category!), onPressed: () {},),
+                child: IconButton(
+                  icon: getCategoryIcon(widget.category!),
+                  onPressed: () {},
+                ),
               )
             ],
           ),
@@ -813,16 +981,17 @@ class _TicketState extends State<Ticket> {
               children: [
                 Text(
                   "Ticket Description : ",
-                  style: GoogleFonts.montserrat(textStyle: TextStyle(
-                      fontSize: 15,
-                      color: GlobalStringText.purpleColor,
-                      fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),
                 ),
                 Expanded(
-                    child: Text(widget._desc,
-                      style: TextStyle(fontSize: 17, color: Colors.black),
-
-                    )),
+                    child: Text(
+                  widget._desc,
+                  style: TextStyle(fontSize: 17, color: Colors.black),
+                )),
               ],
               crossAxisAlignment: CrossAxisAlignment.start,
             ),
@@ -831,17 +1000,20 @@ class _TicketState extends State<Ticket> {
               children: [
                 Text(
                   "Ticket Owner : ",
-                  style: GoogleFonts.montserrat(textStyle: TextStyle(
-                      fontSize: 15,
-                      color: GlobalStringText.purpleColor,
-                      fontWeight: FontWeight.bold)),
-
+                  style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),
                 ),
-                Expanded(child: Text(widget._owner,
+                Expanded(
+                    child: Text(
+                  widget._owner,
                   style: TextStyle(fontSize: 17, color: Colors.black),
                   overflow: TextOverflow.fade,
                   maxLines: 1,
-                  softWrap: false,))
+                  softWrap: false,
+                ))
               ],
             ),
             SizedBox(height: 3),
@@ -849,25 +1021,26 @@ class _TicketState extends State<Ticket> {
               children: [
                 Text(
                   "Location : ",
-                  style: GoogleFonts.montserrat(textStyle: TextStyle(
-                      fontSize: 15,
-                      color: GlobalStringText.purpleColor,
-                      fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),
                 ),
                 Text(widget._location,
                     style: TextStyle(fontSize: 17, color: Colors.black))
               ],
-
             ),
             SizedBox(height: 3),
             Row(
               children: [
                 Text(
                   "Time : ",
-                  style: GoogleFonts.montserrat(textStyle: TextStyle(
-                      fontSize: 15,
-                      color: GlobalStringText.purpleColor,
-                      fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),
                 ),
                 Text(widget._time,
                     style: TextStyle(fontSize: 17, color: Colors.black))
@@ -878,31 +1051,31 @@ class _TicketState extends State<Ticket> {
               children: [
                 Text(
                   extra_info,
-                  style: GoogleFonts.montserrat(textStyle: TextStyle(
-                      fontSize: 15,
-                      color: GlobalStringText.purpleColor,
-                      fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          color: GlobalStringText.purpleColor,
+                          fontWeight: FontWeight.bold)),
                 ),
                 Text(extra_info_data,
                     style: TextStyle(fontSize: 17, color: Colors.black))
               ],
-
             ),
             SizedBox(height: 3),
             Row(
               children: [
-                IconButton(onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MaintaincePage()));
-                }, icon: Image.asset('images/icons8-sent.png')),
-                IconButton(onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MaintaincePage()));
-                }, icon: Image.asset('images/icons8-messaging-96.png')),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => MaintaincePage()));
+                    },
+                    icon: Image.asset('images/icons8-sent.png')),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => MaintaincePage()));
+                    },
+                    icon: Image.asset('images/icons8-messaging-96.png')),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
             ),
@@ -936,29 +1109,35 @@ class _TicketState extends State<Ticket> {
               ),
               Align(
                 alignment: Alignment.bottomRight,
-                child: IconButton(icon: getCategoryIcon(widget.category!), onPressed: () {},),
+                child: IconButton(
+                  icon: getCategoryIcon(widget.category!),
+                  onPressed: () {},
+                ),
               )
             ],
           ),
         );
       } else {
-        childTicket = Column(
-            children: [
-              titleSave,
-              Text(widget._desc,
-                  maxLines: 2,
-                  overflow: TextOverflow.fade,
-                  style: TextStyle(fontSize: 17,
-                      color: GlobalStringText.textFieldGrayColor)),
-              Container(
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Text(widget._time,
-                      style: GoogleFonts.montserrat(textStyle: TextStyle(
-                          fontSize: 25,
-                          color: GlobalStringText.purpleColor,
-                          fontWeight: FontWeight.bold)),),))
-            ]);
+        childTicket = Column(children: [
+          titleSave,
+          Text(widget._desc,
+              maxLines: 2,
+              overflow: TextOverflow.fade,
+              style: TextStyle(
+                  fontSize: 17, color: GlobalStringText.textFieldGrayColor)),
+          Container(
+              child: Align(
+            alignment: Alignment.bottomRight,
+            child: Text(
+              widget._time,
+              style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(
+                      fontSize: 25,
+                      color: GlobalStringText.purpleColor,
+                      fontWeight: FontWeight.bold)),
+            ),
+          ))
+        ]);
       }
     }
     if (widget.isOpenedTicket != null &&
@@ -985,8 +1164,7 @@ class _TicketState extends State<Ticket> {
   void love() {
     var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final User? user = Provider.of<AuthRepository>(context, listen: false)
-        .user;
+    final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     if (_isSaved == false) {
       scheduleNotification(
           notifsPlugin,
@@ -1001,11 +1179,15 @@ class _TicketState extends State<Ticket> {
         'id': Ticket.id++,
       });
     } else {
-      _firestore.collection("${user?.uid} favorites").where('id', isEqualTo: notif_id).get().then((collection) => {
-        collection.docs.forEach((element) {
-          element.reference.delete();
-        })
-      });
+      _firestore
+          .collection("${user?.uid} favorites")
+          .where('id', isEqualTo: notif_id)
+          .get()
+          .then((collection) => {
+                collection.docs.forEach((element) {
+                  element.reference.delete();
+                })
+              });
       notifsPlugin.cancel(notif_id);
     }
     setState(() {
@@ -1015,19 +1197,23 @@ class _TicketState extends State<Ticket> {
 
   void editOpened() {
     Map<String, dynamic> data = {
-      'ref' : widget.ref,
-      'time' : widget._time,
-      'title' : widget._title,
-      'description' : widget._desc,
-      'location' : widget._location,
-      'destination' : widget.dest,
-      'type' : widget.type,
-      'course' : widget.course,
+      'ref': widget.ref,
+      'time': widget._time,
+      'title': widget._title,
+      'description': widget._desc,
+      'location': widget._location,
+      'destination': widget.dest,
+      'type': widget.type,
+      'course': widget.course,
     };
 
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => NewPostScreen(widget.category!, data: data,))).then((value)
-    {
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+            builder: (context) => NewPostScreen(
+                  widget.category!,
+                  data: data,
+                )))
+        .then((value) {
       widget.update!();
     });
   }
