@@ -697,6 +697,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Type': _selectedFood.getName(),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("Food").add(data);
         }
@@ -710,6 +711,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Type': _selectedEvent.getName(),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("Entertainment").add(data);
         }
@@ -723,6 +725,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("CarPool").add(data);
         }
@@ -736,6 +739,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("AcademicSupport").add(data);
         }
@@ -749,6 +753,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("StudyBuddy").add(data);
         }
@@ -762,6 +767,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
+            'uid' : user?.uid
           };
           doc_ref = await _firestore.collection("Material").add(data);
         }
