@@ -1,0 +1,327 @@
+import 'package:badges/badges.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter/services.dart';
+import 'package:line_icons/line_icons.dart';
+import 'ScreenTags.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'chatScreen.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'FavoritesPage.dart';
+import 'package:studenthub/CatogryHomePage.dart';
+
+
+
+class ChatModel {
+  String name;
+  bool isGroup;
+  String time;
+  String currentMessage;
+  //String status // i added this for u incase u want to add if it read or unread;
+  ChatModel({
+    required this.name,
+    required this.isGroup,
+    required this.time,
+    required this.currentMessage,
+   // required this.status,
+  });
+}
+
+class inboxScreen extends StatefulWidget {
+
+ // final ChatModel sourceChat;
+
+  @override
+  _inboxScreen createState() => _inboxScreen();
+}
+
+class _inboxScreen extends State<inboxScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _controller;
+  double gap = 10;
+  int selectedIndex = 2;
+  int badge = 0;
+  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: 2, vsync: this, initialIndex: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: appBarComponent(context),
+      body: body(context),
+      bottomNavigationBar: buildBottomNavigationBar(),
+
+    );
+  }
+
+  PreferredSizeWidget appBarComponent(context) {
+    return PreferredSize(child:
+    SafeArea(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.2,
+          color: Color(0xFF8C88F9),
+          child: Column(
+            children: <Widget>[
+              Padding(child : Row(
+                children: <Widget>[
+                  IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      )),
+                  //  new Spacer(),
+                  Text(
+                    "Your Inbox",
+                    maxLines: 1,
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.quicksand(textStyle:TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 25,
+                        color: GlobalStringText.whiteColor),),
+                  )
+                ],
+              ), padding: EdgeInsets.only(top: 5, right: 60)),
+
+
+
+            ],
+          ),
+        )),
+
+      preferredSize:const Size.square(kToolbarHeight),
+
+    );
+  }
+
+  Widget body(context)
+  {
+    return Container(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+      color: Theme.of(context).canvasColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            child: TabBar(
+              controller: _controller,
+              indicatorColor: Colors.white60,
+              indicatorWeight: 5,
+              tabs: const [
+                Tab(text: 'Chats'),
+                Tab(text: 'Group Chats',)
+
+              ] ), color: Color(0xFF8C88F9),),
+         Expanded(child: TabBarView(
+             controller: _controller,
+             children: <Widget> [
+               chatListComponent([
+                 ChatModel(name: "Raja Zidane", isGroup: false, time: "14:50", currentMessage: "Hey Man "),
+                 ChatModel(name: "Yosef Yassin", isGroup: false, time: "15:00", currentMessage: "Wanna smoke? ")
+               ]),
+               chatListComponent([
+                 ChatModel(name: "Raja Zidane", isGroup: true, time: "14:50", currentMessage: "Hey Man "),
+                 ChatModel(name: "Yosef Yassin", isGroup: true, time: "15:00", currentMessage: "Wanna smoke? ")
+               ]),
+             ]))
+
+
+      ],) ,
+    );
+  }
+
+  Widget chatListComponent(List<ChatModel> chats) {
+    return Expanded(
+      flex: 1,
+      child: ListView.builder(
+        itemCount: chats.length,
+        reverse: false,
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, i) => chatItemComponent(chats[i], context),
+      ),
+    );
+  }
+
+
+  Widget chatItemComponent(ChatModel chat, context) {
+    final group = false; // this is for testing only
+
+    final mWidth = MediaQuery.of(context).size.width;
+    final width = chat.currentMessage.length > mWidth / 7 ? mWidth / 1.3 : null;
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ChatScreen()));
+          // here we should push the chat screen with the message list , we already have the chat i think we should save the message list here
+      },
+
+      child:
+      Column(children: [
+        ListTile(
+          leading:  CircleAvatar(
+            radius: 30,
+            child: showIcon(chat.isGroup),
+            backgroundColor:   Color.fromRGBO(143, 148, 251, 1),
+
+          ),
+          title: Text(
+            chat.name,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: Row(
+            children: [
+              Icon(Icons.done),
+              SizedBox(
+                width: 3,
+              ),
+              Text(
+                chat.currentMessage,
+                style: TextStyle(
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+          trailing: Text(chat.time),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(right: 20, left: 20),
+          child: Divider(
+            thickness: 1,
+          ),
+        ),
+      ],),
+    );
+
+  }
+
+  Widget showIcon(flag)
+  {
+    if(flag) {
+      return Icon(LineIcons.userFriends,size: 30,color :Colors.white);
+    } else {
+      return Icon(LineIcons.user,size: 30,color: Colors.white,);
+    }
+  }
+
+  Widget buildBottomNavigationBar() {
+    return SafeArea(
+      top: true,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: -10,
+              blurRadius: 60,
+              color: Colors.black.withOpacity(.4),
+              offset: Offset(0, 25),
+            )
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
+          child: GNav(
+
+            tabs: [
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.pink,
+                iconColor: Colors.black,
+                textColor: Colors.pink,
+                backgroundColor: Colors.pink.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.heart,
+                leading: selectedIndex == 1 || badge == 0
+                    ? null
+                    : Badge(
+                  badgeColor: Colors.red.shade100,
+                  elevation: 0,
+                  position: BadgePosition.topEnd(top: -12, end: -12),
+                  badgeContent: Text(
+                    badge.toString(),
+                    style: TextStyle(color: Colors.red.shade900),
+                  ),
+                  child: Icon(
+                    LineIcons.heart,
+                    color: selectedIndex == 1
+                        ? Colors.pink
+                        : Colors.black,
+                  ),
+                ),
+                text: 'Favorite tickets',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.purple,
+                iconColor: Colors.black,
+                textColor: Colors.purple,
+                backgroundColor: Colors.purple.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.home,
+                text: 'HomePage',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.amber[600],
+                iconColor: Colors.black,
+                textColor: Colors.amber[600],
+                backgroundColor: Colors.amber[600]!.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.inbox,
+                text: 'Inbox',
+              ),
+
+            ],
+            selectedIndex: selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                switch (index) {
+                // just update the navigator i putted random navigation for the purpose of testing...
+                // waiting for yousef to do the pages
+                  case 0 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => FavoritesPage()));
+                    break;
+                  case 1 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => CategoryPageScreen()));
+                    break;
+
+                  case 2 :
+
+                    break;
+                }
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+
+}

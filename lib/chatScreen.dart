@@ -49,9 +49,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   PreferredSizeWidget appBarComponent(context) {
-    final theme = Theme.of(context);
+   // final theme = Theme.of(context);
     return PreferredSize(
-      preferredSize: Size.square(kToolbarHeight),
+      preferredSize: const Size.square(kToolbarHeight),
       child: Container(
         height: 90,
         decoration: BoxDecoration(
@@ -79,10 +79,14 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 25, right: 50),
+              padding: EdgeInsets.only(top: 25, right: 60),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width / 2,
-                child: Row(children: [Icon(LineIcons.user),SizedBox(width: 5,),Text(
+                child: Row(children:
+                [
+                  Icon(LineIcons.user),
+                  SizedBox(width: 5,),
+                  Text(
                   "Raja Zidane",
                   maxLines: 1,
                   textAlign: TextAlign.left,
@@ -265,13 +269,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     )),
               ),
             ),
-            const IconButton(
-                onPressed: null,
-                icon: Icon(
-                  Icons.send_sharp,
-                  color: Colors.deepPurpleAccent,
-                  size: 30,
-                )),
+           Padding(child :  FloatingActionButton(
+               onPressed: null,
+               backgroundColor: GlobalStringText.textFieldColor,
+               child:  const Icon(
+                 Icons.send_sharp,
+                 color: Colors.deepPurpleAccent,
+                 size: 30,
+               )),padding: const EdgeInsets.only(left: 10.0),
+      )
             // createMessageMutationComponent(context)
           ],
         ),

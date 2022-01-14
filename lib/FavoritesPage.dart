@@ -1,13 +1,16 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:studenthub/main.dart';
 import 'ScreenTags.dart';
 import 'package:studenthub/Auth.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'events_page.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'inboxScreen.dart';
+import 'package:studenthub/CatogryHomePage.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key}) : super(key: key);
@@ -19,6 +22,10 @@ class FavoritesPage extends StatefulWidget {
 class _FavoritesPage extends State<FavoritesPage> {
   late Future<List<favoriteTicket>> tickets;
   late List<favoriteTicket> local_tickets;
+  double gap = 10;
+  int selectedIndex = 0;
+  int badge = 0;
+  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
 
   @override
   void initState() {
@@ -30,13 +37,16 @@ class _FavoritesPage extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final user = Provider.of<AuthRepository>(context);
+
     return Scaffold(
+
       body: Column(
+
         children: <Widget>[
           SafeArea(
               child: Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.18,
             color: Color(0xFF8C88F9),
             child: Column(
               children: <Widget>[
@@ -170,7 +180,111 @@ class _FavoritesPage extends State<FavoritesPage> {
           )
         ],
       ),
+
+
     );
+  }
+
+  Widget buildBottomNavigationBar() {
+    return Container(
+      child: SafeArea(
+      top: true,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: -10,
+              blurRadius: 60,
+              color: Colors.black.withOpacity(.4),
+              offset: Offset(0, 25),
+            )
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
+          child: GNav(
+
+            tabs: [
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.pink,
+                iconColor: Colors.black,
+                textColor: Colors.pink,
+                backgroundColor: Colors.pink.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.heart,
+                leading: selectedIndex == 1 || badge == 0
+                    ? null
+                    : Badge(
+                  badgeColor: Colors.red.shade100,
+                  elevation: 0,
+                  position: BadgePosition.topEnd(top: -12, end: -12),
+                  badgeContent: Text(
+                    badge.toString(),
+                    style: TextStyle(color: Colors.red.shade900),
+                  ),
+                  child: Icon(
+                    LineIcons.heart,
+                    color: selectedIndex == 1
+                        ? Colors.pink
+                        : Colors.black,
+                  ),
+                ),
+                text: 'Favorite tickets',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.purple,
+                iconColor: Colors.black,
+                textColor: Colors.purple,
+                backgroundColor: Colors.purple.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.home,
+                text: 'HomePage',
+              ),
+              GButton(
+                gap: gap,
+                iconActiveColor: Colors.amber[600],
+                iconColor: Colors.black,
+                textColor: Colors.amber[600],
+                backgroundColor: Colors.amber[600]!.withOpacity(.2),
+                iconSize: 24,
+                padding: padding,
+                icon: LineIcons.inbox,
+                text: 'Inbox',
+              ),
+
+            ],
+            selectedIndex: selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                switch (index) {
+                // just update the navigator i putted random navigation for the purpose of testing...
+                // waiting for yousef to do the pages
+                  case 0 :
+
+                    break;
+                  case 1 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => CategoryPageScreen()));
+                    break;
+
+                  case 2 :
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => inboxScreen()));
+                    break;
+                }
+              });
+            },
+          ),
+        ),
+      ),
+    ),);
   }
 
   void updatelist(int id) {
