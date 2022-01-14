@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'events_page.dart';
 import 'openedTicketsPage.dart';
+import 'inboxScreen.dart';
 
 class CategoryPageScreen extends StatefulWidget {
   const CategoryPageScreen({Key? key}) : super(key: key);
@@ -228,6 +229,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
               GlobalStringText.ThirdpurpleColor,
               GlobalStringText.SecondpurpleColor,
               GlobalStringText.FirstpurpleColor,
+              Color.fromRGBO(143, 148, 251, 1),
+
 
             ]),
       ),
@@ -324,7 +327,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                   case 2 :
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MaintaincePage()));
+                        builder: (context) => inboxScreen()));
                     break;
                 }
               });
