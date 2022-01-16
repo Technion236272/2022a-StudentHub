@@ -29,7 +29,6 @@ class _FavoritesPage extends State<FavoritesPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     tickets = getFavoriteTickets(context);
   }
@@ -45,6 +44,8 @@ class _FavoritesPage extends State<FavoritesPage> {
         children: <Widget>[
           SafeArea(
               child: Container(
+
+
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.18,
             color: Color(0xFF8C88F9),
@@ -180,6 +181,7 @@ class _FavoritesPage extends State<FavoritesPage> {
           )
         ],
       ),
+      bottomNavigationBar: buildBottomNavigationBar() ,
 
 
     );
