@@ -216,7 +216,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                     data['groupId'],
-                    data['ownerUid'],
+                    data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -236,7 +236,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -256,7 +256,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -276,7 +276,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -296,7 +296,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -316,7 +316,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],

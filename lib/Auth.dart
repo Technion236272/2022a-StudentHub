@@ -33,11 +33,12 @@ class AuthRepository with ChangeNotifier {
       final new_user = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
 
+
+
            User? user = new_user.user;
           user?.updateDisplayName(name);
           await user?.reload();
           user = await _auth.currentUser;
-
 
 
 
@@ -103,6 +104,7 @@ class AuthRepository with ChangeNotifier {
     } else {
       _user = firebaseUser;
       _status = Status.Authenticated;
+
     }
     notifyListeners();
   }

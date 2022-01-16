@@ -16,12 +16,11 @@ import 'package:studenthub/chatScreen.dart';
 import 'package:studenthub/ticket_form_Screen.dart';
 import 'Auth.dart';
 import 'package:studenthub/FavoritesPage.dart';
-
 import 'package:intl/intl.dart';
 import 'main.dart';
 import 'notificationHelper.dart';
-
 import 'MaintainceScreen.dart';
+import 'profilePage.dart';
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -436,7 +435,7 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -459,7 +458,7 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -482,7 +481,7 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -508,13 +507,14 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
                 catColor,
                 data['Location'],
                 data['Owner'],
+
                 course: data['CourseNum'],
                 ref: element.reference,
                 isLoved: user_favorites.contains(element.reference),
@@ -531,13 +531,14 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
                 catColor,
                 data['Location'],
                 data['Owner'],
+
                 course: data['CourseNum'],
                 ref: element.reference,
                 isLoved: user_favorites.contains(element.reference),
@@ -554,13 +555,14 @@ class _EventsPageState extends State<EventsPage> {
               var data = element.data();
               var ticket = Ticket(
                 data['groupId'],
-                data['ownerUid'],
+                data['uid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
                 catColor,
                 data['Location'],
                 data['Owner'],
+
                 course: data['CourseNum'],
                 ref: element.reference,
                 isLoved: user_favorites.contains(element.reference),
@@ -842,8 +844,8 @@ class Ticket extends StatefulWidget {
   final String _location;
   final Color _color;
   final String _owner;
-  final String _ownerId;
   final String _ticketId;
+  final String _userID;
   var ref;
   String? dest;
   String? type;
@@ -853,7 +855,7 @@ class Ticket extends StatefulWidget {
   Void2VoidFunc? update;
   String? category;
 
-  Ticket(this._ticketId, this._ownerId, this._title, this._desc, this._time, this._color, this._location,
+  Ticket(this._ticketId, this._userID, this._title, this._desc, this._time, this._color, this._location,
       this._owner,
       {Key? key,
       this.dest,
@@ -960,7 +962,7 @@ class _TicketState extends State<Ticket> {
               Text(widget._desc,
                   style: const TextStyle(
                       fontSize: 17, color: Colors.indigoAccent)),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               SizedBox(
@@ -1015,13 +1017,20 @@ class _TicketState extends State<Ticket> {
                           fontWeight: FontWeight.bold)),
                 ),
                 Expanded(
-                    child: Text(
-                  widget._owner,
-                  style: TextStyle(fontSize: 17, color: Colors.black),
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  softWrap: false,
-                ))
+                    child: InkWell(
+                      child: Text(widget._owner,
+                      style: TextStyle(fontSize: 17, color: Colors.black,fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.fade,
+                      maxLines: 1,
+                      softWrap: false,),
+                      onTap: (){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    profilePage(userID: widget._userID)));
+                      },
+
+                    ),)
               ],
             ),
             SizedBox(height: 3),
@@ -1075,7 +1084,7 @@ class _TicketState extends State<Ticket> {
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._ownerId, false, widget._owner)));
+                          builder: (context) => ChatScreen(widget._userID, false, widget._owner)));
                     },
                     icon: Image.asset('images/icons8-sent.png')),
                 IconButton(

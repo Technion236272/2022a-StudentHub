@@ -8,6 +8,9 @@ import 'Auth.dart';
 import 'notificationHelper.dart';
 import 'events_page.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:studenthub/chatScreen.dart';
+import 'inboxScreen.dart';
+import 'profilePage.dart';
 
 final FlutterLocalNotificationsPlugin notifsPlugin =
     FlutterLocalNotificationsPlugin();

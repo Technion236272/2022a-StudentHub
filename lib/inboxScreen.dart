@@ -78,7 +78,10 @@ class _inboxScreen extends State<inboxScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
+
       appBar: appBarComponent(context),
       body: body(context),
       bottomNavigationBar: buildBottomNavigationBar(),

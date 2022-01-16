@@ -22,6 +22,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'events_page.dart';
 import 'openedTicketsPage.dart';
 import 'inboxScreen.dart';
+import 'profilePage.dart';
 
 class CategoryPageScreen extends StatefulWidget {
   const CategoryPageScreen({Key? key}) : super(key: key);
@@ -101,7 +102,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               ),)
                           ),
                           Tab(
-                              icon: new Image.asset(
+                              icon: Image.asset(
                                   GlobalStringText.ImageWavingTest)),
                           //Image.asset(GlobalStringText.ImageWaving,fit : BoxFit.scaleDown ),
                           //waving hand here
@@ -195,7 +196,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      FavoritesPage()));
+                                                      profilePage(userID: (user.user?.uid ?? ""))));
                                         }),
                                   ],
                                 ),
