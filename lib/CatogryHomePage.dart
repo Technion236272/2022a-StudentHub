@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'chat_backend.dart';
 import 'events_page.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
@@ -174,10 +175,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                   fit: BoxFit.scaleDown),
                                             )),
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CategoryPageScreen()));
+                                          Chat.sendGroup('message1', 'group1');
                                         }),
                                     GestureDetector(
                                         child: Container(

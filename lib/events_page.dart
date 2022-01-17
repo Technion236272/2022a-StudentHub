@@ -12,6 +12,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:studenthub/CatogryHomePage.dart';
+import 'package:studenthub/chatScreen.dart';
 import 'package:studenthub/ticket_form_Screen.dart';
 import 'Auth.dart';
 import 'package:studenthub/FavoritesPage.dart';
@@ -419,7 +420,7 @@ class _EventsPageState extends State<EventsPage> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     await _firestore
-        .collection("${user?.uid} favorites")
+        .collection("users/${user?.uid}/favorites")
         .get()
         .then((value) => {
               value.docs.forEach((element) {
@@ -434,6 +435,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -455,6 +458,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -476,6 +481,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -500,6 +507,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -521,6 +530,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -542,6 +553,8 @@ class _EventsPageState extends State<EventsPage> {
             collection.docs.forEach((element) {
               var data = element.data();
               var ticket = Ticket(
+                data['groupId'],
+                data['ownerUid'],
                 data['Title'],
                 data['Description'],
                 data['Time'],
@@ -559,13 +572,6 @@ class _EventsPageState extends State<EventsPage> {
         break;
       default:
         {
-          tickets.add(Ticket(
-              "_title",
-              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-              "14:30",
-              getCategoryColor(),
-              '',
-              ''));
         }
     }
     return tickets;
@@ -836,6 +842,8 @@ class Ticket extends StatefulWidget {
   final String _location;
   final Color _color;
   final String _owner;
+  final String _ownerId;
+  final String _ticketId;
   var ref;
   String? dest;
   String? type;
@@ -845,7 +853,7 @@ class Ticket extends StatefulWidget {
   Void2VoidFunc? update;
   String? category;
 
-  Ticket(this._title, this._desc, this._time, this._color, this._location,
+  Ticket(this._ticketId, this._ownerId, this._title, this._desc, this._time, this._color, this._location,
       this._owner,
       {Key? key,
       this.dest,
@@ -1067,13 +1075,13 @@ class _TicketState extends State<Ticket> {
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => MaintaincePage()));
+                          builder: (context) => ChatScreen(widget._ownerId, false, widget._owner)));
                     },
                     icon: Image.asset('images/icons8-sent.png')),
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => MaintaincePage()));
+                          builder: (context) => ChatScreen(widget._ticketId, true, '')));
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),
               ],
@@ -1174,13 +1182,13 @@ class _TicketState extends State<Ticket> {
           datetime.subtract(Duration(minutes: 10)),
           Ticket.id);
       notif_id = Ticket.id;
-      _firestore.collection("${user?.uid} favorites").add({
+      _firestore.collection("users/${user?.uid}/favorites").add({
         'ref': widget.ref,
         'id': Ticket.id++,
       });
     } else {
       _firestore
-          .collection("${user?.uid} favorites")
+          .collection("users/${user?.uid}/favorites")
           .where('id', isEqualTo: notif_id)
           .get()
           .then((collection) => {
