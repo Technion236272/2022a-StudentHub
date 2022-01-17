@@ -301,7 +301,7 @@ class _FavoritesPage extends State<FavoritesPage> {
     var tickets = <favoriteTicket>[];
 
     await _firestore
-        .collection("${user?.uid} favorites")
+        .collection("users/${user?.uid}/favorites")
         .get()
         .then((collection) async {
       for (var element in collection.docs) {
@@ -390,7 +390,7 @@ class _favoriteTicketState extends State<favoriteTicket> {
   void removeFavorite() {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
-    _firestore.collection("${user?.uid} favorites").where('id', isEqualTo: widget.notification_id).get().then((collection) => {
+    _firestore.collection("users/${user?.uid}/favorites").where('id', isEqualTo: widget.notification_id).get().then((collection) => {
       collection.docs.forEach((element) {
         element.reference.delete();
       })

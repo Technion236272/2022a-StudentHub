@@ -15,6 +15,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'FavoritesPage.dart';
 import 'package:studenthub/CatogryHomePage.dart';
 
+import 'chat_backend.dart';
+
 
 
 class ChatModel {
@@ -22,14 +24,31 @@ class ChatModel {
   bool isGroup;
   String time;
   String currentMessage;
-  //String status // i added this for u incase u want to add if it read or unread;
+  bool isRead;
+  String uid;
+
   ChatModel({
     required this.name,
     required this.isGroup,
     required this.time,
     required this.currentMessage,
-   // required this.status,
+    required this.isRead,
+    required this.uid
   });
+
+  factory ChatModel.fromJson(dynamic json) {
+    var time = DateTime.fromMillisecondsSinceEpoch((json['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
+    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    return ChatModel(
+        name: json['name'], isGroup: false, isRead: json['isRead'] ?? true, time: timeFormat, currentMessage: json['lastMessage'], uid: (json as DocumentSnapshot).id);
+  }
+
+  factory ChatModel.group(DocumentSnapshot snapshot) {
+    var time = DateTime.fromMillisecondsSinceEpoch((snapshot['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
+    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    return ChatModel(
+        name: 'Ticket thread', isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
+  }
 }
 
 class inboxScreen extends StatefulWidget {
@@ -53,6 +72,7 @@ class _inboxScreen extends State<inboxScreen>
   void initState() {
     super.initState();
     _controller = TabController(length: 2, vsync: this, initialIndex: 0);
+    Chat.init(context);
   }
 
   @override
@@ -130,14 +150,50 @@ class _inboxScreen extends State<inboxScreen>
          Expanded(child: TabBarView(
              controller: _controller,
              children: <Widget> [
-               chatListComponent([
-                 ChatModel(name: "Raja Zidane", isGroup: false, time: "14:50", currentMessage: "Hey Man "),
-                 ChatModel(name: "Yosef Yassin", isGroup: false, time: "15:00", currentMessage: "Wanna smoke? ")
-               ]),
-               chatListComponent([
-                 ChatModel(name: "Raja Zidane", isGroup: true, time: "14:50", currentMessage: "Hey Man "),
-                 ChatModel(name: "Yosef Yassin", isGroup: true, time: "15:00", currentMessage: "Wanna smoke? ")
-               ]),
+               StreamBuilder(stream: Chat.getChats(), builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                 switch (snapshot.connectionState) {
+                   case ConnectionState.waiting:
+                     {
+                       return const Center(child: Text("Loading"));
+                     }
+                   default:
+                     {
+                       if (snapshot.hasError) {
+                         return Center(child: Text("Error: ${snapshot.error}"));
+                       } else {
+                         List list = (snapshot.data as QuerySnapshot).docs;
+                         return ListView.builder(
+                           itemCount: list.length,
+                           reverse: false,
+                           physics: const BouncingScrollPhysics(),
+                           itemBuilder: (context, i) => chatItemComponent(ChatModel.fromJson(list[i]), context),
+                         );
+                       }
+                     }
+                 }
+               },),
+               StreamBuilder(stream: Chat.getGroupChats(), builder: (context, snapshot) {
+                 switch (snapshot.connectionState) {
+                   case ConnectionState.waiting:
+                     {
+                       return const Center(child: Text("Loading"));
+                     }
+                   default:
+                     {
+                       if (snapshot.hasError) {
+                         return Center(child: Text("Error: ${snapshot.error}"));
+                       } else {
+                         List list = (snapshot.data as QuerySnapshot).docs;
+                         return ListView.builder(
+                           itemCount: list.length,
+                           reverse: false,
+                           physics: const BouncingScrollPhysics(),
+                           itemBuilder: (context, i) => chatItemComponent(ChatModel.group(list[i]), context),
+                         );
+                       }
+                     }
+                 }
+               }),
              ]))
 
 
@@ -146,14 +202,11 @@ class _inboxScreen extends State<inboxScreen>
   }
 
   Widget chatListComponent(List<ChatModel> chats) {
-    return Expanded(
-      flex: 1,
-      child: ListView.builder(
+    return ListView.builder(
         itemCount: chats.length,
         reverse: false,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, i) => chatItemComponent(chats[i], context),
-      ),
     );
   }
 
@@ -166,8 +219,7 @@ class _inboxScreen extends State<inboxScreen>
     return InkWell(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ChatScreen()));
-          // here we should push the chat screen with the message list , we already have the chat i think we should save the message list here
+            builder: (context) => ChatScreen(chat.uid, chat.isGroup, chat.name)));
       },
 
       child:
@@ -195,6 +247,7 @@ class _inboxScreen extends State<inboxScreen>
               Text(
                 chat.currentMessage,
                 style: TextStyle(
+                  fontWeight: chat.isRead? FontWeight.normal : FontWeight.bold,
                   fontSize: 13,
                 ),
               ),

@@ -10,12 +10,18 @@ import 'package:line_icons/line_icons.dart';
 import 'ScreenTags.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'chat_backend.dart';
+
 final _firestore = FirebaseFirestore.instance;
 User? loggedInuser;
 final focusNode = FocusNode();
 
 class ChatScreen extends StatefulWidget {
-  static String id = 'chat_screen';
+  String uid;
+  bool isGroup;
+  String name;
+
+  ChatScreen(this.uid, this.isGroup, this.name, {Key? key}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -27,6 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isEmojiVisible = false;
   bool isKeyboardVisible = false;
   var messageText;
+  late Stream messages;
 
   @override
   void initState() {
@@ -37,6 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
         this.isKeyboardVisible = isKeyboardVisible;
       });
     });
+    messages = widget.isGroup? Chat.getGroupMessages(widget.uid) : Chat.getMessages(widget.uid);
   }
 
   @override
@@ -75,7 +83,9 @@ class _ChatScreenState extends State<ChatScreen> {
               child: IconButton(
                 icon: Icon(Icons.arrow_back,
                     size: 28, color: GlobalStringText.purpleColor),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  },
               ),
             ),
             Padding(
@@ -84,10 +94,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 width: MediaQuery.of(context).size.width / 2,
                 child: Row(children:
                 [
-                  Icon(LineIcons.user),
+                  Icon(widget.isGroup? LineIcons.users : LineIcons.user),
                   SizedBox(width: 5,),
                   Text(
-                  "Raja Zidane",
+                  widget.isGroup? 'Ticket thread' : widget.name,
                   maxLines: 1,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -110,49 +120,35 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          messageListComponent([
-            MessageModel(id: '1', sender: 'Raja', text: 'Hi', me: true),
-            MessageModel(id: '2', sender: 'Mostafa', text: 'Hi', me: false),
-            MessageModel(
-                id: '3',
-                sender: 'Mostafa',
-                text:
-                    'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: false),
-            MessageModel(id: '4', sender: 'Mostafa', text: 'message3', me: false),
-            MessageModel(id: '5', sender: 'Mostafa', text: 'message 4', me: true),
-            MessageModel(id: '5', sender: 'Mostafa', text: 'message 5', me: false),
-            MessageModel(
-                id: '6',
-                sender: 'Mostafa',
-                text:
-                'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: true),
-            MessageModel(
-                id: '6',
-                sender: 'Mostafa',
-                text:
-                'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: true),
-            MessageModel(
-                id: '6',
-                sender: 'Mostafa',
-                text:
-                'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: true),
-            MessageModel(
-                id: '6',
-                sender: 'Mostafa',
-                text:
-                'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: true),
-            MessageModel(
-                id: '6',
-                sender: 'Mostafa',
-                text:
-                'Hi , when are we meeting aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ? ',
-                me: true),
-          ]),
+          StreamBuilder(
+            stream: messages,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.connectionState == ConnectionState.active
+                  || snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text('Error ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  
+                  List list = (snapshot.data as QuerySnapshot).docs;
+                  return Expanded(
+                      flex: 1,
+                      child: ListView.builder(
+                      reverse: true,
+                      itemCount: list.length,
+                      physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, i) => messageItemComponent(MessageModel.fromJson(list[i]), context),
+              )
+                  );
+                } else {
+                  return const Text('Empty data');
+                }
+              } else {
+                return Text('State: ${snapshot.connectionState}');
+              }
+            },
+          ),
           createMessageInputComponent(context)
         ],
       ),
@@ -172,22 +168,22 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messageItemComponent(MessageModel message, context) {
-    final group = false; // this is for testing only
-    double marginL = message.me ? 25 : 15;
-    double marginR = message.me ? 15 : 25;
+    final sentByMe = message.senderId == Chat.user!.uid;
+    double marginL = sentByMe ? 25 : 15;
+    double marginR = sentByMe ? 15 : 25;
     final mWidth = MediaQuery.of(context).size.width;
     final width = message.text.length > mWidth / 7 ? mWidth / 1.3 : null;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment:
-          message.me ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      sentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Container(
           margin: EdgeInsets.all(10),
           padding: EdgeInsets.fromLTRB(marginL, 10, marginR, 10),
           decoration: BoxDecoration(
-            color: message.me ? GlobalStringText.purpleColor : Colors.grey[200],
+            color: sentByMe ? GlobalStringText.purpleColor : Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
           ),
           child: Container(
@@ -195,9 +191,9 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                if (group && !message.me) ...[
+                if (widget.isGroup && !sentByMe) ...[
                   Text(
-                    "Raja", // should be ${message.sender.name}
+                    message.senderName,
                     style: TextStyle(color: Colors.grey[800]),
                   ),
                   Container(margin: EdgeInsets.only(top: 5))
@@ -210,7 +206,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     Text(
                       message.text,
                       style: TextStyle(
-                        color: message.me ? Colors.white : Colors.black,
+                        color: sentByMe ? Colors.white : Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -270,7 +266,12 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
            Padding(child :  FloatingActionButton(
-               onPressed: null,
+               onPressed: () {
+                 widget.isGroup?
+                     Chat.sendGroup(messageController.text, widget.uid)
+                     : Chat.send(messageController.text, widget.uid, widget.name);
+                 messageController.clear();
+               },
                backgroundColor: GlobalStringText.textFieldColor,
                child:  const Icon(
                  Icons.send_sharp,
@@ -302,20 +303,20 @@ class MessageListModel {
 }
 
 class MessageModel {
-  final String id;
-  final String sender;
+  final String senderName;
+  final String senderId;
   final String text;
-  final bool me;
+  final String time;
 
-  MessageModel(
-      {required this.id,
-      required this.sender,
-      required this.text,
-      required this.me});
+  MessageModel({ required this.senderId,
+      required this.time,
+      required this.senderName,
+      required this.text,});
 
   factory MessageModel.fromJson(dynamic json) {
-    // User sender = User.fromJson(json['sender']);
+    var time = DateTime.fromMillisecondsSinceEpoch((json['timeStamp'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
+    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return MessageModel(
-        id: json['id'], text: json['text'], me: json['me'], sender: 'raja');
+        senderName: json['senderName'], text: json['message'], time: timeFormat, senderId: json['senderId']);
   }
 }

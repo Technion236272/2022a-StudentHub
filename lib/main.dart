@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
       create: (_) => AuthRepository.instance(),
       child: Consumer<AuthRepository>(
           builder: (context, auth, _) => MaterialApp(
-                home: CategoryPageScreen(),
+                home: HomePage(),
               )),
     );
   }

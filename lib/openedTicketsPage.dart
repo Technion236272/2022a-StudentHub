@@ -203,7 +203,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
     var tickets = <Ticket>[];
 
     await _firestore
-        .collection("${user?.uid} tickets")
+        .collection("users/${user?.uid}/tickets")
         .get()
         .then((collection) async {
       for (var element in collection.docs) {
@@ -215,6 +215,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagFood:
                 {
                   var ticket = Ticket(
+                    data['groupId'],
+                    data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -233,6 +235,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagEntertainment:
                 {
                   var ticket = Ticket(
+                      data['groupId'],
+                      data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -251,6 +255,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagCarPool:
                 {
                   var ticket = Ticket(
+                      data['groupId'],
+                      data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -269,6 +275,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagAcademicSupport:
                 {
                   var ticket = Ticket(
+                      data['groupId'],
+                      data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -287,6 +295,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagStudyBuddy:
                 {
                   var ticket = Ticket(
+                      data['groupId'],
+                      data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -305,6 +315,8 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
               case GlobalStringText.tagMaterial:
                 {
                   var ticket = Ticket(
+                      data['groupId'],
+                      data['ownerUid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -322,8 +334,6 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 break;
               default:
                 {
-                  tickets.add(
-                      Ticket("_title", "_desc", "14:30", Colors.white, '', ''));
                 }
             }
           });
