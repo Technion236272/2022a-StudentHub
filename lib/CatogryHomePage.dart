@@ -176,7 +176,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                   fit: BoxFit.scaleDown),
                                             )),
                                         onTap: () {
-                                          Chat.sendGroup('message1', 'group1');
+
                                         }),
                                     GestureDetector(
                                         child: Container(

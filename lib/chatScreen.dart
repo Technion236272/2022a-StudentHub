@@ -189,20 +189,17 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Container(
             width: width,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                if (widget.isGroup && !sentByMe) ...[
-                  Text(
-                    message.senderName,
-                    style: TextStyle(color: Colors.grey[800]),
-                  ),
-                  Container(margin: EdgeInsets.only(top: 5))
-                ],
-                Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    if (widget.isGroup && !sentByMe) ...[
+                      Text(
+                        message.senderName,
+                        style: TextStyle(color: Colors.grey[800]),
+                      ),
+                      Container(margin: EdgeInsets.only(top: 5))
+                    ],
                     Text(
                       message.text,
                       style: TextStyle(
@@ -213,8 +210,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   ],
                 ),
-              ],
-            ),
           ),
         )
       ],
@@ -268,7 +263,7 @@ class _ChatScreenState extends State<ChatScreen> {
            Padding(child :  FloatingActionButton(
                onPressed: () {
                  widget.isGroup?
-                     Chat.sendGroup(messageController.text, widget.uid)
+                     Chat.sendGroup(messageController.text, widget.uid, widget.name)
                      : Chat.send(messageController.text, widget.uid, widget.name);
                  messageController.clear();
                },

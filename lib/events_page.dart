@@ -39,7 +39,7 @@ class _EventsPageState extends State<EventsPage> {
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
-  List user_favorites = [];
+  Map<DocumentReference, int> user_favorites = {};
   final TextEditingController _filter = new TextEditingController();
   String _searchText = ""; //search bar text
   List<Ticket> names = []; //all tickets
@@ -162,7 +162,7 @@ class _EventsPageState extends State<EventsPage> {
                             itemCount: (snapshot.data as List<Widget>).length,
                             itemBuilder: (BuildContext context , int index){
 
-                             if((snapshot.data as List<Ticket>)[index]._title.toLowerCase().contains(_searchText))
+                             if(_searchText == '' || (snapshot.data as List<Ticket>)[index]._title.toLowerCase().contains(_searchText))
                                 return (snapshot.data as List<Widget>)[index];
 
                             else{
@@ -431,6 +431,7 @@ class _EventsPageState extends State<EventsPage> {
 
 
   Future<List<Ticket>> getTickets() async {
+    user_favorites.clear();
     var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
@@ -439,7 +440,7 @@ class _EventsPageState extends State<EventsPage> {
         .get()
         .then((value) => {
               value.docs.forEach((element) {
-                user_favorites.add(element.data()['ref']);
+                user_favorites[element.data()['ref']] = element.data()['id'];
               })
             });
     final Color catColor = getCategoryColor();
@@ -460,7 +461,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Owner'],
                 type: data['Type'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -483,7 +485,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Owner'],
                 type: data['Type'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -506,7 +509,8 @@ class _EventsPageState extends State<EventsPage> {
                 data['Owner'],
                 dest: data['Destination'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -530,10 +534,10 @@ class _EventsPageState extends State<EventsPage> {
                 catColor,
                 data['Location'],
                 data['Owner'],
-
                 course: data['CourseNum'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -554,10 +558,10 @@ class _EventsPageState extends State<EventsPage> {
                 catColor,
                 data['Location'],
                 data['Owner'],
-
                 course: data['CourseNum'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -578,10 +582,10 @@ class _EventsPageState extends State<EventsPage> {
                 catColor,
                 data['Location'],
                 data['Owner'],
-
                 course: data['CourseNum'],
                 ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
+                isLoved: user_favorites.containsKey(element.reference),
+                notif_id: user_favorites[element.reference] ?? -1,
               );
               tickets.add(ticket);
             });
@@ -870,7 +874,7 @@ class Ticket extends StatefulWidget {
   bool? isLoved;
   Void2VoidFunc? update;
   String? category;
-  int? wid_id;
+  int? notif_id;
 
   Ticket(this._ticketId, this._userID, this._title, this._desc, this._time, this._color, this._location,
       this._owner,
@@ -882,7 +886,8 @@ class Ticket extends StatefulWidget {
       this.ref,
       this.isLoved,
       this.update,
-      this.category})
+      this.category,
+      this.notif_id})
       : super(key: key);
 
   @override
@@ -892,7 +897,6 @@ class Ticket extends StatefulWidget {
 class _TicketState extends State<Ticket> {
   bool _isSaved = false;
   bool _isExpanded = false;
-  int notif_id = -1;
 
   @override
   void initState() {
@@ -1114,7 +1118,7 @@ class _TicketState extends State<Ticket> {
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._ticketId, true, '')));
+                          builder: (context) => ChatScreen(widget._ticketId, true, widget._title)));
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),
               ],
@@ -1214,8 +1218,7 @@ class _TicketState extends State<Ticket> {
           "you have event soon!",
           datetime.subtract(Duration(minutes: 10)),
           Ticket.id);
-      notif_id = Ticket.id;
-      widget.wid_id=notif_id;
+      widget.notif_id=Ticket.id;
       _firestore.collection("users/${user?.uid}/favorites").add({
         'ref': widget.ref,
         'id': Ticket.id++,
@@ -1223,14 +1226,14 @@ class _TicketState extends State<Ticket> {
     } else {
       _firestore
           .collection("users/${user?.uid}/favorites")
-          .where('id', isEqualTo: widget.wid_id)
+          .where('id', isEqualTo: widget.notif_id)
           .get()
           .then((collection) => {
                 collection.docs.forEach((element) {
                   element.reference.delete();
                 })
               });
-      notifsPlugin.cancel(notif_id);
+      notifsPlugin.cancel(widget.notif_id!);
 
     }
     setState(() {
