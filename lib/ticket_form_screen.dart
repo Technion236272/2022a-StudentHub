@@ -673,8 +673,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
-
-String action = widget.data != null? 'edit' : widget.category;
+    String action = widget.data != null? 'edit' : widget.category;
     switch(action) {
     case 'edit': {
     String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
@@ -698,7 +697,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("Food").add(data);
         }
@@ -713,7 +712,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("Entertainment").add(data);
         }
@@ -728,7 +727,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("CarPool").add(data);
         }
@@ -743,7 +742,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("AcademicSupport").add(data);
         }
@@ -758,7 +757,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("StudyBuddy").add(data);
         }
@@ -773,7 +772,7 @@ String action = widget.data != null? 'edit' : widget.category;
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
           };
           doc_ref = await _firestore.collection("Material").add(data);
         }

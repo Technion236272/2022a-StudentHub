@@ -47,7 +47,7 @@ class ChatModel {
     var time = DateTime.fromMillisecondsSinceEpoch((snapshot['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
     String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
-        name: 'Ticket thread', isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
+        name: snapshot['title'], isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
   }
 }
 
@@ -251,7 +251,7 @@ class _inboxScreen extends State<inboxScreen>
                 chat.currentMessage,
                 style: TextStyle(
                   fontWeight: chat.isRead? FontWeight.normal : FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 14,
                 ),
               ),
             ],
