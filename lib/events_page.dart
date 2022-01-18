@@ -81,25 +81,11 @@ class _EventsPageState extends State<EventsPage> {
     this._getNames();
   }
 
-  _EventsPageState() {
-    _filter.addListener(() {
-      if (_filter.text.isEmpty) {
-        setState(() {
-          _searchText = "";
-        });
-      } else {
-        setState(() {
-          _searchText = _filter.text;
-          processSearch();
-        });
-      }
-    });
-  }
+
 
   void _getNames() async {
-    List<Ticket> tempList = await getTickets();
     setState(() {
-      names = tempList;
+       tickets.then((data){names=data;});
       filteredNames = [];
     });
   }
@@ -120,6 +106,7 @@ class _EventsPageState extends State<EventsPage> {
         getCategoryTitle(),
         Expanded(
             child: ListView(
+              controller: _hideFapController,
           children: (selected_filter_list!.length == 0 ||
                   selected_filter_list == null)
               ? names
@@ -171,8 +158,19 @@ class _EventsPageState extends State<EventsPage> {
                         if (snapshot.hasError) {
                           return Center(child: Text("Error ${snapshot.error}"));
                         } else {
-                          return ListView(
-                            children: snapshot.data as List<Widget>,
+                          return ListView.builder(
+                            itemCount: (snapshot.data as List<Widget>).length,
+                            itemBuilder: (BuildContext context , int index){
+
+                             if((snapshot.data as List<Ticket>)[index]._title.toLowerCase().contains(_searchText))
+                                return (snapshot.data as List<Widget>)[index];
+
+                            else{
+                               return Container();
+                             }
+
+                              },
+                           // children: snapshot.data as List<Widget>,
                             controller: _hideFapController,
                           );
                         }
@@ -200,19 +198,8 @@ class _EventsPageState extends State<EventsPage> {
                       width: 70,
                       height: 70,
                       child: FittedBox(
-                        child: FloatingActionButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          NewPostScreen(widget.category)))
-                                  .then((value) {
-                                setState(() async {
-                                  tickets = getTickets();
-                                  names= await getTickets();
-                                });
-                              });
-                            },
+                        child: (_isVisible && !search_tapped)? FloatingActionButton(
+                            onPressed: addFloatingAction,
                             child: Tab(
                               icon: Container(
                                 child: Image(
@@ -225,7 +212,7 @@ class _EventsPageState extends State<EventsPage> {
                                 width: 60,
                               ),
                             ),
-                            backgroundColor: GlobalStringText.whiteColor),
+                            backgroundColor: GlobalStringText.whiteColor):null,
                       )),
                 ),
               ),
@@ -239,11 +226,11 @@ class _EventsPageState extends State<EventsPage> {
               child: AnimatedOpacity(
                 opacity: _isVisible ? 1 : 0,
                 duration: const Duration(milliseconds: 500),
-                child: Container(
+                child: (_isVisible && !search_tapped) ? Container(
                   margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                   padding: const EdgeInsets.only(left: 20),
                   child: buildBottomNavigationBar(),
-                ),
+                ):null,
               ),
             ),
           ],
@@ -283,7 +270,7 @@ class _EventsPageState extends State<EventsPage> {
                   blurRadius: 3.0,
                 )
               ]),
-          child: selected_filter_list!.length==0?((_searchText.isNotEmpty) ? search_column : mainCol):filtered_column,
+          child: mainCol,
         ),
       ),
       decoration: BoxDecoration(
@@ -308,6 +295,20 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  void addFloatingAction()
+  {
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+        builder: (context) =>
+            NewPostScreen(widget.category)))
+        .then((value) async {
+        names = await getTickets();
+      setState(() {
+        tickets = getTickets();
+        filterList();
+      });
+    });
+  }
   void filterTap() async {
     await FilterListDialog.display<String>(context,
         listData: filter_list,
@@ -338,13 +339,13 @@ class _EventsPageState extends State<EventsPage> {
           selected_filter_list = List.from(list);
         });
       }
+
       Navigator.pop(context);
-    });
+    },);
   }
 
   List<Ticket> filterList() {
     List<Ticket> filteredList = [];
-
 
     for (var i = 0; i < names.length; i++) {
       if (selected_filter_list!.contains(names[i].type)) {
@@ -358,20 +359,26 @@ class _EventsPageState extends State<EventsPage> {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
         search_tapped = true;
+
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
+          onChanged: (value){
+            setState(() {
+              _searchText=value;
+            });
+          },
           controller: _filter,
           style: TextStyle(color: Colors.white),
           decoration: new InputDecoration(
               border: InputBorder.none,
-              prefixIcon: new Icon(Icons.search),
+              prefixIcon:  Icon(Icons.search,color: Colors.white,),
               hintText: 'Search...'),
         );
       } else {
         search_tapped = false;
         this._searchIcon = new Icon(Icons.search);
         this._appBarTitle = new Text('Student Hub');
-
+        _searchText="";
         _filter.clear();
       }
     });
@@ -379,40 +386,49 @@ class _EventsPageState extends State<EventsPage> {
 
   List<Ticket> processSearch({List<String>? filterList}) {
     filteredNames = [];
+    tickets.then((data){if (_searchText.isNotEmpty) {
+      for (var i = 0; i < data.length; i++) {
 
-    if (_searchText.isNotEmpty) {
-      for (var i = 0; i < names.length; i++) {
-
-        if (names[i]._time.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]._title.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]._desc.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]
+        if (data[i]._time.toLowerCase().contains(_searchText.toLowerCase()) ||
+            data[i]._title.toLowerCase().contains(_searchText.toLowerCase()) ||
+            data[i]._desc.toLowerCase().contains(_searchText.toLowerCase()) ||
+            data[i]
                 ._location
                 .toLowerCase()
                 .contains(_searchText.toLowerCase()) ||
-            (names[i].dest != null &&
-                names[i]
+            (data[i].dest != null &&
+                data[i]
                     .dest!
                     .toLowerCase()
                     .contains(_searchText.toLowerCase())) ||
-            (names[i].course != null &&
-                names[i]
+            (data[i].course != null &&
+                data[i]
                     .course!
                     .toLowerCase()
                     .contains(_searchText.toLowerCase())) ||
-            (names[i]._owner != null &&
-                names[i]
+            (data[i]._owner != null &&
+                data[i]
                     ._owner
                     .toLowerCase()
                     .contains(_searchText.toLowerCase()))) {
-          if(filterList!=null && filterList.length!=0 && names[i].type !=null && !filterList.contains(names[i].type))
+          if(filterList!=null && filterList.length!=0 && data[i].type !=null && !filterList.contains(data[i].type))
             continue;
-          filteredNames.add(names[i]);
+
+          filteredNames.add(data[i]);
+
+
+
         }
       }
-    }
+      return filteredNames;
+    }});
+
     return filteredNames;
   }
+
+
+
+
 
   Future<List<Ticket>> getTickets() async {
     var tickets = <Ticket>[];
@@ -854,6 +870,7 @@ class Ticket extends StatefulWidget {
   bool? isLoved;
   Void2VoidFunc? update;
   String? category;
+  int? wid_id;
 
   Ticket(this._ticketId, this._userID, this._title, this._desc, this._time, this._color, this._location,
       this._owner,
@@ -921,7 +938,7 @@ class _TicketState extends State<Ticket> {
           maxLines: 2,
           style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
         )),
-        Spacer(),
+        //Spacer(),
         IconButton(
           icon: Image.asset("images/edit.png"),
           onPressed: editOpened,
@@ -961,7 +978,7 @@ class _TicketState extends State<Ticket> {
               ),
               Text(widget._desc,
                   style: const TextStyle(
-                      fontSize: 17, color: Colors.indigoAccent)),
+                      fontSize: 18, color: Colors.black)),
               const SizedBox(
                 height: 5,
               ),
@@ -969,7 +986,14 @@ class _TicketState extends State<Ticket> {
                 height: 5,
               ),
               Text(
-                "At " + widget._time + ' ' + widget._location,
+                "At " + widget._time,
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                 widget._location,
                 style: TextStyle(fontSize: 20),
               ),
               Align(
@@ -1106,8 +1130,7 @@ class _TicketState extends State<Ticket> {
         childTicket = Container(
           margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
           padding: const EdgeInsets.all(16),
-          height: 164,
-          width: 384,
+
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Color(0xFF7A3E98)),
@@ -1179,6 +1202,7 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
+
     var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
@@ -1191,6 +1215,7 @@ class _TicketState extends State<Ticket> {
           datetime.subtract(Duration(minutes: 10)),
           Ticket.id);
       notif_id = Ticket.id;
+      widget.wid_id=notif_id;
       _firestore.collection("users/${user?.uid}/favorites").add({
         'ref': widget.ref,
         'id': Ticket.id++,
@@ -1198,7 +1223,7 @@ class _TicketState extends State<Ticket> {
     } else {
       _firestore
           .collection("users/${user?.uid}/favorites")
-          .where('id', isEqualTo: notif_id)
+          .where('id', isEqualTo: widget.wid_id)
           .get()
           .then((collection) => {
                 collection.docs.forEach((element) {
@@ -1206,6 +1231,7 @@ class _TicketState extends State<Ticket> {
                 })
               });
       notifsPlugin.cancel(notif_id);
+
     }
     setState(() {
       _isSaved = !_isSaved;
