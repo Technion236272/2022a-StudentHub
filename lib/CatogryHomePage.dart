@@ -41,59 +41,41 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
   String action = "Home";
+  Timestamp? currentBackPressTime;
 
-
-
+  @override
+  void initState() {
+    super.initState();
+    Chat.init(context);
+  }
   ////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final user = Provider.of<AuthRepository>(context);
-    return Container(
-      child: Scaffold(
-        extendBody: true,
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: Column(
-          children: [
-            Container(
-                decoration: const BoxDecoration(
-                  // spice up the button with a radius
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(10),
-                  ),
-                ),
-                height: 135,
-                // we need to agree on one height for all screens eventually
-                padding: const EdgeInsets.fromLTRB(20, 30, 0, 0),
-                child: Column(
-                  children: [
-                    Align(
-                      child: Row(children: [Text(
-                          "Hi " + (user.getName() ?? ""),
-                          style: GoogleFonts.quicksand(textStyle: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: GlobalStringText.QuickSandFont,
-                            color: GlobalStringText.WhiteColorHiMessage,
-                          ),)
+    return WillPopScope(
+        child: Container(
+          child: Scaffold(
+            extendBody: true,
+            resizeToAvoidBottomInset: false,
+            backgroundColor: Colors.transparent,
+            body: Column(
+              children: [
+                Container(
+                    decoration: const BoxDecoration(
+                      // spice up the button with a radius
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
                       ),
-                        IconButton(
-                        onPressed: () async {
-                          await user.signOut();
-                          Navigator.popUntil(context, (route) => route.isFirst);
-                        },
-                        icon: Image.asset("images/logout.png"),
-                        iconSize: 40,
-                      ),],
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,),
-                      alignment: Alignment.centerLeft, //this ok??
                     ),
-                    Align(
-                      child: Row(
-                        children: [
-                          Text(
-                              "Welcome Back!  ",
+                    height: 135,
+                    // we need to agree on one height for all screens eventually
+                    padding: const EdgeInsets.fromLTRB(20, 30, 0, 0),
+                    child: Column(
+                      children: [
+                        Align(
+                          child: Row(children: [Text(
+                              "Hi " + (user.getName() ?? ""),
                               style: GoogleFonts.quicksand(textStyle: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
@@ -101,138 +83,166 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                 color: GlobalStringText.WhiteColorHiMessage,
                               ),)
                           ),
-                          Tab(
-                              icon: Image.asset(
-                                  GlobalStringText.ImageWavingTest)),
-                          //Image.asset(GlobalStringText.ImageWaving,fit : BoxFit.scaleDown ),
-                          //waving hand here
-                        ],
-                      ),
-                      alignment: Alignment.centerLeft, //this ok??
-                    )
-                  ],
-                )),
-            Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 5,
+                            IconButton(
+                              onPressed: () async {
+                                await user.signOut();
+                                Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
+                              },
+                              icon: Image.asset("images/logout.png"),
+                              iconSize: 40,
+                            ),],
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,),
+                          alignment: Alignment.centerLeft, //this ok??
+                        ),
+                        Align(
+                          child: Row(
+                            children: [
+                              Text(
+                                  "Welcome Back!  ",
+                                  style: GoogleFonts.quicksand(textStyle: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: GlobalStringText.QuickSandFont,
+                                    color: GlobalStringText.WhiteColorHiMessage,
+                                  ),)
+                              ),
+                              Tab(
+                                  icon: Image.asset(
+                                      GlobalStringText.ImageWavingTest)),
+                              //Image.asset(GlobalStringText.ImageWaving,fit : BoxFit.scaleDown ),
+                              //waving hand here
+                            ],
+                          ),
+                          alignment: Alignment.centerLeft, //this ok??
                         )
                       ],
-                      color: GlobalStringText.WhiteScreen,
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20))),
-                  padding: const EdgeInsets.only(
-                      left: 21.0, right: 21.0, bottom: 0.0, top: 0.0),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                            margin: const EdgeInsets.only(top: 0.0),
-                            child: Column(children: [
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    GestureDetector(
-                                        child: Container(
-                                            width: 100,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20)),
-                                              color: Colors.transparent,
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      GlobalStringText
-                                                          .ImagesTickets),
-                                                  fit: BoxFit.scaleDown),
-                                            )),
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      OpenedTicketsPage()));
-                                        }),
-                                    GestureDetector(
-                                        child: Container(
-                                            width: 120,
-                                            height: 120,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20)),
-                                              color: Colors.transparent,
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      GlobalStringText
-                                                          .ImagesServices),
-                                                  fit: BoxFit.scaleDown),
-                                            )),
-                                        onTap: () {
+                    )),
+                Expanded(
+                  child: Container(
+                      decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 5,
+                            )
+                          ],
+                          color: GlobalStringText.WhiteScreen,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      padding: const EdgeInsets.only(
+                          left: 21.0, right: 21.0, bottom: 0.0, top: 0.0),
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                                margin: const EdgeInsets.only(top: 0.0),
+                                child: Column(children: [
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                            child: Container(
+                                                width: 100,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(20)),
+                                                  color: Colors.transparent,
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          GlobalStringText
+                                                              .ImagesTickets),
+                                                      fit: BoxFit.scaleDown),
+                                                )),
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed('/Home/Opened');
+                                            }),
+                                        GestureDetector(
+                                            child: Container(
+                                                width: 120,
+                                                height: 120,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(20)),
+                                                  color: Colors.transparent,
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          GlobalStringText
+                                                              .ImagesServices),
+                                                      fit: BoxFit.scaleDown),
+                                                )),
+                                            onTap: () {
 
-                                        }),
-                                    GestureDetector(
-                                        child: Container(
-                                            width: 100,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20)),
-                                              color: Colors.transparent,
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      GlobalStringText
-                                                          .ImagesProfile),
-                                                  fit: BoxFit.scaleDown),
-                                            )),
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      profilePage(userID: (user.user?.uid ?? ""))));
-                                        }),
-                                  ],
-                                ),
-                              )
-                            ])),
-                        CategoryFields(),
-                      ],
-                    ),
-                  )),
+                                            }),
+                                        GestureDetector(
+                                            child: Container(
+                                                width: 100,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(20)),
+                                                  color: Colors.transparent,
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          GlobalStringText
+                                                              .ImagesProfile),
+                                                      fit: BoxFit.scaleDown),
+                                                )),
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed('/Home/Profile', arguments: user.user!.uid);
+                                            }),
+                                      ],
+                                    ),
+                                  )
+                                ])),
+                            CategoryFields(),
+                          ],
+                        ),
+                      )),
+                ),
+              ],
             ),
-          ],
-        ),
-        bottomNavigationBar: buildBottomNavigationBar(),
-      ),
-      decoration: BoxDecoration(
-        // spice up the button with a radius
-        borderRadius: const BorderRadius.all(
-          Radius.circular(10),
-        ),
-        gradient: LinearGradient(
-          // gradient starts from left
-            begin: Alignment.centerLeft,
-            // gradient ends at right
-            end: Alignment.centerRight,
-            // set all your colors
-            colors: [
-              GlobalStringText.FifthpurpleColor,
-              GlobalStringText.ForthpurpleColor,
-              GlobalStringText.ThirdpurpleColor,
-              GlobalStringText.SecondpurpleColor,
-              GlobalStringText.FirstpurpleColor,
-              Color.fromRGBO(143, 148, 251, 1),
+            bottomNavigationBar: buildBottomNavigationBar(),
+          ),
+          decoration: BoxDecoration(
+            // spice up the button with a radius
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10),
+            ),
+            gradient: LinearGradient(
+              // gradient starts from left
+                begin: Alignment.centerLeft,
+                // gradient ends at right
+                end: Alignment.centerRight,
+                // set all your colors
+                colors: [
+                  GlobalStringText.FifthpurpleColor,
+                  GlobalStringText.ForthpurpleColor,
+                  GlobalStringText.ThirdpurpleColor,
+                  GlobalStringText.SecondpurpleColor,
+                  GlobalStringText.FirstpurpleColor,
+                  Color.fromRGBO(143, 148, 251, 1),
 
 
-            ]),
-      ),
+                ]),
+          ),
+        ),
+        onWillPop: () async {
+          Timestamp now = Timestamp.now();
+          if(currentBackPressTime == null || now.toDate().difference(currentBackPressTime!.toDate()) > Duration(seconds: 2)) {
+            currentBackPressTime = now;
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Press again to exit')));
+            return Future.value(false);
+          }
+          return Future.value(true);
+        }
     );
   }
 
@@ -314,19 +324,14 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
                   case 0 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => FavoritesPage()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                     break;
-
                   case 2 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => inboxScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });
@@ -383,11 +388,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(
-                                  category: GlobalStringText
-                                      .tagEntertainment)));
+                      Navigator.of(context).pushNamed('/Home/Entertainment');
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -426,10 +427,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(
-                                  category: GlobalStringText.tagCarPool)));
+                      Navigator.of(context).pushNamed('/Home/CarPool');
                       ;
                     }),
               ],
@@ -474,9 +472,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(category: GlobalStringText.tagFood)));
+                      Navigator.of(context).pushNamed('/Home/Food');
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -515,11 +511,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(
-                                  category: GlobalStringText
-                                      .tagAcademicSupport)));
+                      Navigator.of(context).pushNamed('/Home/AcademicSupport');
                     }),
               ],
             ),
@@ -563,10 +555,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(
-                                  category: GlobalStringText.tagStudyBuddy)));
+                      Navigator.of(context).pushNamed('/Home/StudyBuddy');
                     }),
                 SizedBox(width: 20),
                 GestureDetector(
@@ -604,10 +593,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
 
                         )),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              EventsPage(
-                                  category: GlobalStringText.tagMaterial)));
+                      Navigator.of(context).pushNamed('/Home/Material');
                     }),
               ],
             )

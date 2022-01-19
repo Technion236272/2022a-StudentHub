@@ -85,8 +85,7 @@ class _profilePage extends State<profilePage> {
                       IconButton(
                         onPressed: () async {
                           await user.signOut();
-                          Navigator.popUntil(context, (route) =>
-                          route.isFirst);
+                          Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
                         },
                         icon: Image.asset("images/logout.png"),
                         iconSize: 40,
