@@ -61,6 +61,8 @@ dependencies:
       ref: master
   flutter_keyboard_visibility: ^5.1.0
   emoji_picker_flutter: ^1.0.8
+  google_maps_place_picker_mb: ^2.0.0-mb.13
+  google_maps_flutter: ^2.1.1
 
 dev_dependencies:
   flutter_test:
