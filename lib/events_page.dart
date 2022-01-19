@@ -42,8 +42,6 @@ class _EventsPageState extends State<EventsPage> {
   Map<DocumentReference, int> user_favorites = {};
   final TextEditingController _filter = new TextEditingController();
   String _searchText = ""; //search bar text
-  List<Ticket> names = []; //all tickets
-  List<Ticket> filteredNames = []; // tickets  filtered by search text
   Icon _searchIcon = new Icon(Icons.search);
   Widget _appBarTitle = new Text('Student Hub');
   bool search_tapped = false; // flag if the search on right top pressed
@@ -78,60 +76,19 @@ class _EventsPageState extends State<EventsPage> {
       }
     });
     tickets = getTickets();
-    this._getNames();
   }
 
 
-
-  void _getNames() async {
-    setState(() {
-       tickets.then((data){names=data;});
-      filteredNames = [];
+  _EventsPageState() {
+    _filter.addListener(() {
+      setState(() {
+        tickets=getTickets();
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var filtered_column = Column(
-      children: [
-        Visibility(
-            maintainAnimation: true,
-            maintainState: true,
-            visible: _isVisible,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: getCategoryIcon(widget.category),
-            )),
-        getCategoryTitle(),
-        Expanded(
-            child: ListView(
-              controller: _hideFapController,
-          children: (selected_filter_list!.length == 0 ||
-                  selected_filter_list == null)
-              ? names
-              : _searchText.isEmpty?filterList():processSearch(filterList: selected_filter_list),
-        ))
-      ],
-    );
-    var search_column = Column(
-      children: [
-        Visibility(
-            maintainAnimation: true,
-            maintainState: true,
-            visible: _isVisible,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: getCategoryIcon(widget.category),
-            )),
-        getCategoryTitle(),
-        Expanded(
-            child: ListView(
-          children: filteredNames,
-        ))
-      ],
-    );
     var mainCol = Column(
       children: [
         Visibility(
@@ -160,17 +117,64 @@ class _EventsPageState extends State<EventsPage> {
                         } else {
                           return ListView.builder(
                             itemCount: (snapshot.data as List<Widget>).length,
-                            itemBuilder: (BuildContext context , int index){
 
-                             if(_searchText == '' || (snapshot.data as List<Ticket>)[index]._title.toLowerCase().contains(_searchText))
-                                return (snapshot.data as List<Widget>)[index];
+                            itemBuilder: (BuildContext context, int index) {
+                              if (_searchText.isNotEmpty) {
+                                if ((snapshot.data as List<Ticket>)[index]
+                                    ._title
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) ||(snapshot.data as List<Ticket>)[index]
+                                    ._desc
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase())  || (snapshot.data as List<Ticket>)[index]
+                                    ._owner
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) || (snapshot.data as List<Ticket>)[index]
+                                    ._location
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) || (snapshot.data as List<Ticket>)[index]
+                                    ._time
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) ||( (snapshot.data as List<Ticket>)[index]
+                                    .dest!= null && (snapshot.data as List<Ticket>)[index]
+                                    .dest!
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) ) || ( (snapshot.data as List<Ticket>)[index]
+                                    .course!= null && (snapshot.data as List<Ticket>)[index]
+                                    .course!
+                                    .toLowerCase()
+                                    .contains(_searchText.toLowerCase()) )){
+                                  if(selected_filter_list!.isNotEmpty)
+                                    {
+                                      if(selected_filter_list!.contains((snapshot.data as List<Ticket>)[index].type))
+                                      {
 
-                            else{
-                               return Container();
-                             }
+                                        return (snapshot.data as List<Widget>)[index];
 
-                              },
-                           // children: snapshot.data as List<Widget>,
+                                      }
+                                      else return Container();
+                                    }
+                                  else return (snapshot.data as List<Widget>)[index];
+                                }
+
+                                else {
+                                  return Container();
+                                }
+                              }
+                              else if(selected_filter_list!.isNotEmpty)
+                              {
+
+                                if(selected_filter_list!.contains((snapshot.data as List<Ticket>)[index].type))
+                                {
+
+                                  return (snapshot.data as List<Widget>)[index];
+
+                                }
+                                else return Container();
+                              }
+                                return (snapshot.data as List<Ticket>)[index];
+
+                            },
                             controller: _hideFapController,
                           );
                         }
@@ -198,21 +202,23 @@ class _EventsPageState extends State<EventsPage> {
                       width: 70,
                       height: 70,
                       child: FittedBox(
-                        child: (_isVisible && !search_tapped)? FloatingActionButton(
-                            onPressed: addFloatingAction,
-                            child: Tab(
-                              icon: Container(
-                                child: Image(
-                                  image: AssetImage(
-                                    GlobalStringText.ImagesAddTicket,
+                        child: (_isVisible && !search_tapped)
+                            ? FloatingActionButton(
+                                onPressed: addFloatingAction,
+                                child: Tab(
+                                  icon: Container(
+                                    child: Image(
+                                      image: AssetImage(
+                                        GlobalStringText.ImagesAddTicket,
+                                      ),
+                                      fit: BoxFit.contain,
+                                    ),
+                                    height: 60,
+                                    width: 60,
                                   ),
-                                  fit: BoxFit.contain,
                                 ),
-                                height: 60,
-                                width: 60,
-                              ),
-                            ),
-                            backgroundColor: GlobalStringText.whiteColor):null,
+                                backgroundColor: GlobalStringText.whiteColor)
+                            : null,
                       )),
                 ),
               ),
@@ -226,11 +232,13 @@ class _EventsPageState extends State<EventsPage> {
               child: AnimatedOpacity(
                 opacity: _isVisible ? 1 : 0,
                 duration: const Duration(milliseconds: 500),
-                child: (_isVisible && !search_tapped) ? Container(
-                  margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  padding: const EdgeInsets.only(left: 20),
-                  child: buildBottomNavigationBar(),
-                ):null,
+                child: (_isVisible && !search_tapped)
+                    ? Container(
+                        margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                        padding: const EdgeInsets.only(left: 20),
+                        child: buildBottomNavigationBar(),
+                      )
+                    : null,
               ),
             ),
           ],
@@ -245,7 +253,9 @@ class _EventsPageState extends State<EventsPage> {
                 icon: Image.asset("images/filter.png"),
                 onPressed: filterTap,
               ),
-              visible: (search_tapped || widget.category !="Entertainment") ? false : true,
+              visible: (search_tapped || widget.category != "Entertainment")
+                  ? false
+                  : true,
             ),
             Visibility(
               child: GestureDetector(
@@ -295,65 +305,61 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  void addFloatingAction()
-  {
+  void addFloatingAction() {
     Navigator.of(context)
         .push(MaterialPageRoute(
-        builder: (context) =>
-            NewPostScreen(widget.category)))
+            builder: (context) => NewPostScreen(widget.category)))
         .then((value) async {
-        names = await getTickets();
       setState(() {
         tickets = getTickets();
-        filterList();
       });
     });
   }
+
   void filterTap() async {
-    await FilterListDialog.display<String>(context,
-        listData: filter_list,
-        selectedTextBackgroundColor: Colors.deepPurpleAccent,
-        selectedListData: selected_filter_list,
-        applyButonTextBackgroundColor: Colors.deepPurpleAccent,
-        height: MediaQuery.of(context).size.height * 0.55,
-        width: MediaQuery.of(context).size.width * 0.75,
-        headlineText: "Select Types of Entertainment",
-        headerTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-        searchFieldHintText: "Search Here", choiceChipLabel: (item) {
-      return item;
-    }, validateSelectedItem: (list, val) {
-      return list!.contains(val);
-    }, onItemSearch: (list, text) {
-      if (list!.any(
-          (element) => element.toLowerCase().contains(text.toLowerCase()))) {
-        return list
-            .where(
-                (element) => element.toLowerCase().contains(text.toLowerCase()))
-            .toList();
-      } else {
-        return [];
-      }
-    }, onApplyButtonClick: (list) {
-      if (list != null) {
+    await FilterListDialog.display<String>(
+      context,
+      listData: filter_list,
+      selectedTextBackgroundColor: Colors.deepPurpleAccent,
+      selectedListData: selected_filter_list,
+      applyButonTextBackgroundColor: Colors.deepPurpleAccent,
+      height: MediaQuery.of(context).size.height * 0.55,
+      width: MediaQuery.of(context).size.width * 0.75,
+      headlineText: "Select Types of Entertainment",
+      headerTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+      searchFieldHintText: "Search Here",
+      choiceChipLabel: (item) {
+        return item;
+      },
+      validateSelectedItem: (list, val) {
+        return list!.contains(val);
+      },
+      onItemSearch: (list, text) {
+        if (list!.any(
+            (element) => element.toLowerCase().contains(text.toLowerCase()))) {
+          return list
+              .where((element) =>
+                  element.toLowerCase().contains(text.toLowerCase()))
+              .toList();
+        } else {
+          return [];
+        }
+      },
+      onApplyButtonClick: (list) {
         setState(() {
-          selected_filter_list = List.from(list);
+          tickets=getTickets();
         });
-      }
+        if (list != null) {
+          setState(() {
+            selected_filter_list = List.from(list);
+          });
+        }
 
-      Navigator.pop(context);
-    },);
+        Navigator.pop(context);
+      },
+    );
   }
 
-  List<Ticket> filterList() {
-    List<Ticket> filteredList = [];
-
-    for (var i = 0; i < names.length; i++) {
-      if (selected_filter_list!.contains(names[i].type)) {
-        filteredList.add(names[i]);
-      }
-    }
-    return filteredList;
-  }
 
   void onSearchTapUp() {
     setState(() {
@@ -362,76 +368,36 @@ class _EventsPageState extends State<EventsPage> {
 
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
-          onChanged: (value){
+          onChanged: (value) {
             setState(() {
-              _searchText=value;
+              _searchText = value;
             });
           },
           controller: _filter,
           style: TextStyle(color: Colors.white),
           decoration: new InputDecoration(
               border: InputBorder.none,
-              prefixIcon:  Icon(Icons.search,color: Colors.white,),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
               hintText: 'Search...'),
         );
       } else {
         search_tapped = false;
         this._searchIcon = new Icon(Icons.search);
         this._appBarTitle = new Text('Student Hub');
-        _searchText="";
+        _searchText = "";
+        tickets=getTickets();
         _filter.clear();
       }
     });
   }
 
-  List<Ticket> processSearch({List<String>? filterList}) {
-    filteredNames = [];
-    tickets.then((data){if (_searchText.isNotEmpty) {
-      for (var i = 0; i < data.length; i++) {
-
-        if (data[i]._time.toLowerCase().contains(_searchText.toLowerCase()) ||
-            data[i]._title.toLowerCase().contains(_searchText.toLowerCase()) ||
-            data[i]._desc.toLowerCase().contains(_searchText.toLowerCase()) ||
-            data[i]
-                ._location
-                .toLowerCase()
-                .contains(_searchText.toLowerCase()) ||
-            (data[i].dest != null &&
-                data[i]
-                    .dest!
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase())) ||
-            (data[i].course != null &&
-                data[i]
-                    .course!
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase())) ||
-            (data[i]._owner != null &&
-                data[i]
-                    ._owner
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase()))) {
-          if(filterList!=null && filterList.length!=0 && data[i].type !=null && !filterList.contains(data[i].type))
-            continue;
-
-          filteredNames.add(data[i]);
-
-
-
-        }
-      }
-      return filteredNames;
-    }});
-
-    return filteredNames;
-  }
-
-
-
-
 
   Future<List<Ticket>> getTickets() async {
     user_favorites.clear();
+
     var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
@@ -593,8 +559,7 @@ class _EventsPageState extends State<EventsPage> {
         }
         break;
       default:
-        {
-        }
+        {}
     }
     return tickets;
   }
@@ -876,8 +841,8 @@ class Ticket extends StatefulWidget {
   String? category;
   int? notif_id;
 
-  Ticket(this._ticketId, this._userID, this._title, this._desc, this._time, this._color, this._location,
-      this._owner,
+  Ticket(this._ticketId, this._userID, this._title, this._desc, this._time,
+      this._color, this._location, this._owner,
       {Key? key,
       this.dest,
       this.type,
@@ -981,8 +946,7 @@ class _TicketState extends State<Ticket> {
                 height: 5,
               ),
               Text(widget._desc,
-                  style: const TextStyle(
-                      fontSize: 18, color: Colors.black)),
+                  style: const TextStyle(fontSize: 18, color: Colors.black)),
               const SizedBox(
                 height: 5,
               ),
@@ -997,7 +961,7 @@ class _TicketState extends State<Ticket> {
                 height: 5,
               ),
               Text(
-                 widget._location,
+                widget._location,
                 style: TextStyle(fontSize: 20),
               ),
               Align(
@@ -1045,20 +1009,24 @@ class _TicketState extends State<Ticket> {
                           fontWeight: FontWeight.bold)),
                 ),
                 Expanded(
-                    child: InkWell(
-                      child: Text(widget._owner,
-                      style: TextStyle(fontSize: 17, color: Colors.black,fontWeight: FontWeight.bold),
+                  child: InkWell(
+                    child: Text(
+                      widget._owner,
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                       overflow: TextOverflow.fade,
                       maxLines: 1,
-                      softWrap: false,),
-                      onTap: (){
-                        Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    profilePage(userID: widget._userID)));
-                      },
-
-                    ),)
+                      softWrap: false,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              profilePage(userID: widget._userID)));
+                    },
+                  ),
+                )
               ],
             ),
             SizedBox(height: 3),
@@ -1112,13 +1080,15 @@ class _TicketState extends State<Ticket> {
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._userID, false, widget._owner)));
+                          builder: (context) => ChatScreen(
+                              widget._userID, false, widget._owner)));
                     },
                     icon: Image.asset('images/icons8-sent.png')),
                 IconButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ChatScreen(widget._ticketId, true, widget._title)));
+
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),
               ],
@@ -1134,7 +1104,6 @@ class _TicketState extends State<Ticket> {
         childTicket = Container(
           margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
           padding: const EdgeInsets.all(16),
-
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Color(0xFF7A3E98)),
@@ -1206,7 +1175,6 @@ class _TicketState extends State<Ticket> {
   }
 
   void love() {
-
     var datetime = DateFormat('d.M.yyyy , HH:mm').parse(widget._time);
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
@@ -1219,9 +1187,11 @@ class _TicketState extends State<Ticket> {
           datetime.subtract(Duration(minutes: 10)),
           Ticket.id);
       widget.notif_id=Ticket.id;
+
       _firestore.collection("users/${user?.uid}/favorites").add({
         'ref': widget.ref,
         'id': Ticket.id++,
+
       });
     } else {
       _firestore
@@ -1234,6 +1204,7 @@ class _TicketState extends State<Ticket> {
                 })
               });
       notifsPlugin.cancel(widget.notif_id!);
+
 
     }
     setState(() {
