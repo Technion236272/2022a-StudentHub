@@ -221,8 +221,11 @@ class _inboxScreen extends State<inboxScreen>
     final width = chat.currentMessage.length > mWidth / 7 ? mWidth / 1.3 : null;
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ChatScreen(chat.uid, chat.isGroup, chat.name)));
+        Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+          'uid' : chat.uid,
+          'isGroup' : chat.isGroup,
+          'name' : chat.name
+        });
       },
 
       child:
@@ -356,19 +359,14 @@ class _inboxScreen extends State<inboxScreen>
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
                   case 0 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => FavoritesPage()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CategoryPageScreen()));
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                     break;
-
                   case 2 :
-
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });

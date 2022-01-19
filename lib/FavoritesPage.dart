@@ -65,7 +65,7 @@ class _FavoritesPage extends State<FavoritesPage> {
                     IconButton(
                       onPressed: () async {
                         await user.signOut();
-                        Navigator.popUntil(context, (route) => route.isFirst);
+                        Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
 
                       },
                       icon: Image.asset("images/logout.png"),
@@ -266,19 +266,14 @@ class _FavoritesPage extends State<FavoritesPage> {
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
                   case 0 :
-
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CategoryPageScreen()));
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                     break;
-
                   case 2 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => inboxScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });

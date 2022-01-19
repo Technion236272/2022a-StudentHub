@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/painting.dart';
 import 'package:line_icons/line_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:studenthub/Auth.dart';
@@ -462,10 +463,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
     child: Container(
     child: Row(
     children: [Padding(padding: EdgeInsets.all(5)),
-    Text(
+    Expanded(child: Text(
       _selectedPlaceStart.formattedAddress ?? "",
-    style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
-    )
+      style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+    ))
     ],
     mainAxisAlignment: MainAxisAlignment.start,
     ),
