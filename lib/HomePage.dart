@@ -112,16 +112,14 @@ class HomePage extends StatelessWidget {
                   ),
                   fixedSize: const Size(264, 84)),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SignUpScreen()));
+                Navigator.of(context).pushNamed('/Auth/Signup');
               },
               child: Text('Sign Up'),
             ),
             Padding(padding: EdgeInsets.all(10)),
             OutlinedButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
+                Navigator.of(context).pushNamed('/Auth/Login');
               },
               child: Text('Log in'),
               style: OutlinedButton.styleFrom(

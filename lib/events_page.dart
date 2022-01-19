@@ -307,8 +307,7 @@ class _EventsPageState extends State<EventsPage> {
 
   void addFloatingAction() {
     Navigator.of(context)
-        .push(MaterialPageRoute(
-            builder: (context) => NewPostScreen(widget.category)))
+        .pushNamed('/Home/${widget.category}/Create')
         .then((value) async {
       setState(() {
         tickets = getTickets();
@@ -397,6 +396,7 @@ class _EventsPageState extends State<EventsPage> {
 
   Future<List<Ticket>> getTickets() async {
     user_favorites.clear();
+    Timestamp now = Timestamp.now();
 
     var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -413,24 +413,28 @@ class _EventsPageState extends State<EventsPage> {
     switch (widget.category) {
       case GlobalStringText.tagFood:
         {
-          await _firestore.collection("Food").get().then((collection) {
+          await _firestore.collection("Food").orderBy('Time').get().then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                type: data['Type'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  type: data['Type'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -440,21 +444,25 @@ class _EventsPageState extends State<EventsPage> {
           await _firestore.collection("Entertainment").get().then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                type: data['Type'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  type: data['Type'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -464,21 +472,25 @@ class _EventsPageState extends State<EventsPage> {
           await _firestore.collection("CarPool").get().then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                dest: data['Destination'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  dest: data['Destination'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -491,21 +503,25 @@ class _EventsPageState extends State<EventsPage> {
               .then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -515,21 +531,25 @@ class _EventsPageState extends State<EventsPage> {
           await _firestore.collection("StudyBuddy").get().then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -539,21 +559,25 @@ class _EventsPageState extends State<EventsPage> {
           await _firestore.collection("Material").get().then((collection) {
             collection.docs.forEach((element) {
               var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['uid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.containsKey(element.reference),
-                notif_id: user_favorites[element.reference] ?? -1,
-              );
-              tickets.add(ticket);
+              if ((data['Time'] as Timestamp).compareTo(now) < 0) {
+                deleteTicket(element);
+              } else {
+                var ticket = Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: element.reference,
+                  isLoved: user_favorites.containsKey(element.reference),
+                  notif_id: user_favorites[element.reference] ?? -1,
+                );
+                tickets.add(ticket);
+              }
             });
           });
         }
@@ -562,6 +586,22 @@ class _EventsPageState extends State<EventsPage> {
         {}
     }
     return tickets;
+  }
+
+  void deleteTicket(QueryDocumentSnapshot<Map<String, dynamic>> element) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    _firestore.collection('users/${element.data()['uid']}/tickets').where('ref', isEqualTo: element.reference).get().then((value) {
+      for (var element in value.docs) {
+        element.reference.delete();
+      }});
+    _firestore.collection('chats').doc(element.data()['groupId']).get().then((value) {
+      List<dynamic> subs = value.data()?['subs'];
+      for (var sub in subs) {
+        _firestore.collection('users/${sub as String}/groups').doc(element.data()['groupId']).delete();
+      }
+    });
+    _firestore.collection('chats').doc(element.data()['groupId']).delete();
+    element.reference.delete();
   }
 
   Widget buildBottomNavigationBar() {
@@ -642,20 +682,14 @@ class _EventsPageState extends State<EventsPage> {
               onTabChange: (index) {
                 setState(() {
                   switch (index) {
-                    // just update the navigator i putted random navigation for the purpose of testing...
-                    // waiting for yousef to do the pages
-                    case 0:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => FavoritesPage()));
+                    case 0 :
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                       break;
-                    case 1:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CategoryPageScreen()));
+                    case 1 :
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                       break;
-
-                    case 2:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => MaintaincePage()));
+                    case 2 :
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                       break;
                   }
                 });
@@ -1021,9 +1055,7 @@ class _TicketState extends State<Ticket> {
                       softWrap: false,
                     ),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              profilePage(userID: widget._userID)));
+                      Navigator.of(context).pushNamed('/Home/Profile', arguments: widget._userID);
                     },
                   ),
                 )
@@ -1079,16 +1111,20 @@ class _TicketState extends State<Ticket> {
               children: [
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                              widget._userID, false, widget._owner)));
+                      Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+                        'uid' : widget._userID,
+                        'isGroup' : false,
+                        'name' : widget._owner
+                      });
                     },
                     icon: Image.asset('images/icons8-sent.png')),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._ticketId, true, widget._title)));
-
+                      Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+                        'uid' : widget._ticketId,
+                        'isGroup' : true,
+                        'name' : widget._title
+                      });
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),
               ],
@@ -1224,13 +1260,10 @@ class _TicketState extends State<Ticket> {
       'course': widget.course,
     };
 
-    Navigator.of(context)
-        .push(MaterialPageRoute(
-            builder: (context) => NewPostScreen(
-                  widget.category!,
-                  data: data,
-                )))
-        .then((value) {
+    Navigator.of(context).pushNamed('/Home/Opened/Edit', arguments: {
+      'category' : widget.category,
+      'data' : data,
+    }).then((value) {
       widget.update!();
     });
   }
