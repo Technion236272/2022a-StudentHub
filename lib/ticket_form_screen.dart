@@ -13,6 +13,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+import 'package:google_maps_place_picker_mb/providers/place_provider.dart';
+import 'package:google_maps_place_picker_mb/providers/search_provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 //---------------------------------------CLASSES--------------------------------------------------//
 class Food {
@@ -68,6 +72,7 @@ class NewPostScreen extends StatefulWidget {
   String category;
   Map? data;
 
+
   NewPostScreen(this.category, {Key? key,  this.data}) : super(key: key);
 
   @override
@@ -77,10 +82,14 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  
-  //var ReciveUserID="";
+
+  static final kInitialPosition = LatLng(-33.8567844, 151.213108);
+
 
   DateTime selected_time = DateTime.now();
+  late PickResult _selectedPlaceStart = PickResult();
+  late PickResult _selectedPlaceDest = PickResult();
+
   TextEditingController TitleController = TextEditingController();
   TextEditingController LocationController = TextEditingController();
   TextEditingController DestinationController = TextEditingController();
@@ -321,35 +330,156 @@ class _NewPostScreenState extends State<NewPostScreen> {
         alignment: Alignment.centerLeft,
       ),
       const SizedBox(height: 5.0),
-      TextFormField(
-        focusNode: myFocusNodeLocation,
-        controller: LocationController,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: GlobalStringText.textFieldPinkColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(
-              width: 0,
-              style: BorderStyle.solid,
-            ),
-          ),
-          hintText: 'Example : Haifa , Technion 28 ',
-          hintStyle: TextStyle(
-              fontSize: 12.0, color: GlobalStringText.textFieldGrayColor),
-          //helperText: 'Keep it short, this is just a demo.',
-          labelText: 'Pick city and street number',
-          labelStyle: TextStyle(
-              fontSize: 15.0,
-              color: GlobalStringText.textFieldGrayColor,
-              fontFamily: GlobalStringText.FontTextFormField,
-              fontWeight: FontWeight.w300),
-
-          prefixText: ' ',
-          //suffixStyle: const TextStyle(color: Colors.green)
+    InkWell(
+    onTap: ()  {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PlacePicker(
+              apiKey: "AIzaSyAfka9If5Jz-DslgoEWvm8pqfp_9Y2xoGs",
+              hintText: "Find a place ...",
+              searchingText: "Please wait ...",
+              selectText: "Select place",
+              outsideOfPickAreaText: "Place not in area",
+              initialPosition: kInitialPosition,
+              useCurrentLocation: true,
+              selectInitialPosition: true,
+              usePinPointingSearch: true,
+              usePlaceDetailSearch: true,
+              onPlacePicked: (result) {
+                _selectedPlaceStart = result;
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+              // forceSearchOnZoomChanged: true,
+              // automaticallyImplyAppBarLeading: false,
+              // autocompleteLanguage: "ko",
+              // region: 'au',
+              // pickArea: CircleArea(
+              //   center: HomePage.kInitialPosition,
+              //   radius: 300,
+              //   fillColor: Colors.lightGreen.withGreen(255).withAlpha(32),
+              //   strokeColor: Colors.lightGreen.withGreen(255).withAlpha(192),
+              //   strokeWidth: 2,
+              // ),
+              // selectedPlaceWidgetBuilder: (_, selectedPlace, state, isSearchBarFocused) {
+              //   print("state: $state, isSearchBarFocused: $isSearchBarFocused");
+              //   return isSearchBarFocused
+              //       ? Container()
+              //       : FloatingCard(
+              //           bottomPosition: 0.0, // MediaQuery.of(context) will cause rebuild. See MediaQuery document for the information.
+              //           leftPosition: 0.0,
+              //           rightPosition: 0.0,
+              //           width: 500,
+              //           borderRadius: BorderRadius.circular(12.0),
+              //           child: state == SearchingState.Searching
+              //               ? Center(child: CircularProgressIndicator())
+              //               : RaisedButton(
+              //                   child: Text("Pick Here"),
+              //                   onPressed: () {
+              //                     // IMPORTANT: You MUST manage selectedPlace data yourself as using this build will not invoke onPlacePicker as
+              //                     //            this will override default 'Select here' Button.
+              //                     print("do something with [selectedPlace] data");
+              //                     Navigator.of(context).pop();
+              //                   },
+              //                 ),
+              //         );
+              // },
+              // pinBuilder: (context, state) {
+              //   if (state == PinState.Idle) {
+              //     return Icon(Icons.favorite_border);
+              //   } else {
+              //     return Icon(Icons.favorite);
+              //   }
+              // },
+              // introModalWidgetBuilder: (context,  close) {
+              //   return Positioned(
+              //     top: MediaQuery.of(context).size.height * 0.35,
+              //     right: MediaQuery.of(context).size.width * 0.15,
+              //     left: MediaQuery.of(context).size.width * 0.15,
+              //     child: Container(
+              //       width: MediaQuery.of(context).size.width * 0.7,
+              //       child: Material(
+              //         type: MaterialType.canvas,
+              //         color: Theme.of(context).cardColor,
+              //         shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(12.0),
+              //         ),
+              //         elevation: 4.0,
+              //         child: ClipRRect(
+              //           borderRadius: BorderRadius.circular(12.0),
+              //           child: Container(
+              //             padding: EdgeInsets.all(8.0),
+              //             child: Column(
+              //               children: [
+              //                 SizedBox.fromSize(size: new Size(0, 10)),
+              //                 Text("Please select your preferred address.",
+              //                   style: TextStyle(
+              //                     fontWeight: FontWeight.bold,
+              //                   )
+              //                 ),
+              //                 SizedBox.fromSize(size: new Size(0, 10)),
+              //                 SizedBox.fromSize(
+              //                   size: Size(MediaQuery.of(context).size.width * 0.6, 56), // button width and height
+              //                   child: ClipRRect(
+              //                     borderRadius: BorderRadius.circular(10.0),
+              //                     child: Material(
+              //                       child: InkWell(
+              //                         overlayColor: MaterialStateColor.resolveWith(
+              //                           (states) => Colors.blueAccent
+              //                         ),
+              //                         onTap: close,
+              //                         child: Row(
+              //                           mainAxisAlignment: MainAxisAlignment.center,
+              //                           children: [
+              //                             Icon(Icons.check_sharp, color: Colors.blueAccent),
+              //                             SizedBox.fromSize(size: new Size(10, 0)),
+              //                             Text("OK",
+              //                               style: TextStyle(
+              //                                 color: Colors.blueAccent
+              //                               )
+              //                             )
+              //                           ],
+              //                         )
+              //                       ),
+              //                     ),
+              //                   ),
+              //                 )
+              //               ]
+              //             )
+              //           ),
+              //         ),
+              //       ),
+              //     )
+              //   );
+              // },
+            );
+          },
         ),
-      ),
+      );
+    },
+    child: Container(
+    child: Row(
+    children: [Padding(padding: EdgeInsets.all(5)),
+    Text(
+      _selectedPlaceStart.formattedAddress ?? "",
+    style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+    )
+    ],
+    mainAxisAlignment: MainAxisAlignment.start,
+    ),
+    decoration: BoxDecoration(
+    color: Color(0xFFF0F4F8),
+    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    border: Border.all(color: Colors.black)),
+    height: 50,
+    ),
+    ),
 
+
+
+      SizedBox(height: 10,),
       ///////////////------------------------------------------------------------------/////////////////
       Align(
         child: Row(
@@ -587,34 +717,152 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 alignment: Alignment.centerLeft,
               ),
               const SizedBox(height: 5.0),
-              TextFormField(
-                focusNode: myFocusNodeCourse,
-                controller: DestinationController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: GlobalStringText.textFieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      width: 0,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  hintText: 'example Hamarganet st,Nesher',
-                  hintStyle: TextStyle(
-                      fontSize: 12.0,
-                      fontFamily: GlobalStringText.FontTextFormField,
-                      color: GlobalStringText.textFieldGrayColor),
-                  //helperText: 'Keep it short, this is just a demo.',
-                  labelText: 'Pick destination',
-                  labelStyle: TextStyle(
-                      fontSize: 15.0,
-                      color: GlobalStringText.textFieldGrayColor,
-                      fontFamily: GlobalStringText.FontTextFormField,
-                      fontWeight: FontWeight.w300),
+              InkWell(
 
-                  prefixText: ' ',
-                  //suffixStyle: const TextStyle(color: Colors.green)
+                onTap: ()  {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return PlacePicker(
+                          apiKey: "AIzaSyAfka9If5Jz-DslgoEWvm8pqfp_9Y2xoGs",
+                          hintText: "Find a place ...",
+                          searchingText: "Please wait ...",
+                          selectText: "Select place",
+                          outsideOfPickAreaText: "Place not in area",
+                          initialPosition: kInitialPosition,
+                          useCurrentLocation: true,
+                          selectInitialPosition: true,
+                          usePinPointingSearch: true,
+                          usePlaceDetailSearch: true,
+                          onPlacePicked: (result) {
+                            _selectedPlaceDest = result;
+                            Navigator.of(context).pop();
+                            setState(() {});
+                          },
+                          // forceSearchOnZoomChanged: true,
+                          // automaticallyImplyAppBarLeading: false,
+                          // autocompleteLanguage: "ko",
+                          // region: 'au',
+                          // pickArea: CircleArea(
+                          //   center: HomePage.kInitialPosition,
+                          //   radius: 300,
+                          //   fillColor: Colors.lightGreen.withGreen(255).withAlpha(32),
+                          //   strokeColor: Colors.lightGreen.withGreen(255).withAlpha(192),
+                          //   strokeWidth: 2,
+                          // ),
+                          // selectedPlaceWidgetBuilder: (_, selectedPlace, state, isSearchBarFocused) {
+                          //   print("state: $state, isSearchBarFocused: $isSearchBarFocused");
+                          //   return isSearchBarFocused
+                          //       ? Container()
+                          //       : FloatingCard(
+                          //           bottomPosition: 0.0, // MediaQuery.of(context) will cause rebuild. See MediaQuery document for the information.
+                          //           leftPosition: 0.0,
+                          //           rightPosition: 0.0,
+                          //           width: 500,
+                          //           borderRadius: BorderRadius.circular(12.0),
+                          //           child: state == SearchingState.Searching
+                          //               ? Center(child: CircularProgressIndicator())
+                          //               : RaisedButton(
+                          //                   child: Text("Pick Here"),
+                          //                   onPressed: () {
+                          //                     // IMPORTANT: You MUST manage selectedPlace data yourself as using this build will not invoke onPlacePicker as
+                          //                     //            this will override default 'Select here' Button.
+                          //                     print("do something with [selectedPlace] data");
+                          //                     Navigator.of(context).pop();
+                          //                   },
+                          //                 ),
+                          //         );
+                          // },
+                          // pinBuilder: (context, state) {
+                          //   if (state == PinState.Idle) {
+                          //     return Icon(Icons.favorite_border);
+                          //   } else {
+                          //     return Icon(Icons.favorite);
+                          //   }
+                          // },
+                          // introModalWidgetBuilder: (context,  close) {
+                          //   return Positioned(
+                          //     top: MediaQuery.of(context).size.height * 0.35,
+                          //     right: MediaQuery.of(context).size.width * 0.15,
+                          //     left: MediaQuery.of(context).size.width * 0.15,
+                          //     child: Container(
+                          //       width: MediaQuery.of(context).size.width * 0.7,
+                          //       child: Material(
+                          //         type: MaterialType.canvas,
+                          //         color: Theme.of(context).cardColor,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(12.0),
+                          //         ),
+                          //         elevation: 4.0,
+                          //         child: ClipRRect(
+                          //           borderRadius: BorderRadius.circular(12.0),
+                          //           child: Container(
+                          //             padding: EdgeInsets.all(8.0),
+                          //             child: Column(
+                          //               children: [
+                          //                 SizedBox.fromSize(size: new Size(0, 10)),
+                          //                 Text("Please select your preferred address.",
+                          //                   style: TextStyle(
+                          //                     fontWeight: FontWeight.bold,
+                          //                   )
+                          //                 ),
+                          //                 SizedBox.fromSize(size: new Size(0, 10)),
+                          //                 SizedBox.fromSize(
+                          //                   size: Size(MediaQuery.of(context).size.width * 0.6, 56), // button width and height
+                          //                   child: ClipRRect(
+                          //                     borderRadius: BorderRadius.circular(10.0),
+                          //                     child: Material(
+                          //                       child: InkWell(
+                          //                         overlayColor: MaterialStateColor.resolveWith(
+                          //                           (states) => Colors.blueAccent
+                          //                         ),
+                          //                         onTap: close,
+                          //                         child: Row(
+                          //                           mainAxisAlignment: MainAxisAlignment.center,
+                          //                           children: [
+                          //                             Icon(Icons.check_sharp, color: Colors.blueAccent),
+                          //                             SizedBox.fromSize(size: new Size(10, 0)),
+                          //                             Text("OK",
+                          //                               style: TextStyle(
+                          //                                 color: Colors.blueAccent
+                          //                               )
+                          //                             )
+                          //                           ],
+                          //                         )
+                          //                       ),
+                          //                     ),
+                          //                   ),
+                          //                 )
+                          //               ]
+                          //             )
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     )
+                          //   );
+                          // },
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  child: Row(
+                    children: [
+                      Padding(padding: EdgeInsets.all(5)),
+                      Text(
+                        _selectedPlaceDest.formattedAddress ?? "",
+                        style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+                      )
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.start,
+                  ),
+                  decoration: BoxDecoration(
+                      color: Color(0xFFF0F4F8),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      border: Border.all(color: Colors.black)),
+                  height: 50,
                 ),
               ),
             ],
@@ -679,7 +927,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
     (widget.data!['ref'] as DocumentReference).update({
     'Title' : TitleController.text,
-    'Location' : LocationController.text,
+    'Location' : _selectedPlaceStart.formattedAddress,
     'Time' : DateFormat('d.M.yyyy , HH:mm').format(selected_time),
     'Type' : type,
     'Description' : DescriptionController.text,
@@ -691,7 +939,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Type': _selectedFood.getName(),
             'Description': DescriptionController.text,
@@ -706,7 +954,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Type': _selectedEvent.getName(),
             'Description': DescriptionController.text,
@@ -721,8 +969,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
-            'Destination': DestinationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
+            'Destination': _selectedPlaceDest.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
@@ -736,7 +984,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
@@ -751,7 +999,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
@@ -766,7 +1014,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
