@@ -76,17 +76,17 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: 90,
-              width: 90,
-              padding: EdgeInsets.only(top: 20, right: 100),
-              child: IconButton(
-                icon: Icon(Icons.arrow_back,
+            InkWell(
+              child: Container(
+                height: 90,
+                width: 90,
+                padding: EdgeInsets.only(top: 20, right: 100, left: 5),
+                child: Icon(Icons.arrow_back,
                     size: 28, color: GlobalStringText.purpleColor),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  },
               ),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
             ),
             Padding(
               padding: EdgeInsets.only(top: 25, right: 60),
