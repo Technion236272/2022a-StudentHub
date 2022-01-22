@@ -464,7 +464,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     child: Row(
     children: [Padding(padding: EdgeInsets.all(5)),
     Expanded(child: Text(
-      _selectedPlaceStart.formattedAddress ?? "",
+      _selectedPlaceStart.formattedAddress ?? (widget.category == GlobalStringText.tagCarPool? "Please pick Departure" : ""),
       style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
     ))
     ],
@@ -852,9 +852,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   child: Row(
                     children: [
                       Padding(padding: EdgeInsets.all(5)),
-                      Text(
-                        _selectedPlaceDest.formattedAddress ?? "",
-                        style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+                      Expanded(
+                        child: Text(
+                          _selectedPlaceDest.formattedAddress ?? "Please pick Destination",
+                          style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+                        ),
                       )
                     ],
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -919,6 +921,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   Future<void> pushTicket() async {
+    if(emptyFieldExists()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill all fields')));
+      return Future.value(false);
+    }
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
@@ -1035,5 +1042,36 @@ class _NewPostScreenState extends State<NewPostScreen> {
       'category': widget.category,
     });
     Navigator.of(context).pop();
+  }
+
+  bool emptyFieldExists() {
+    switch(widget.category) {
+      case GlobalStringText.tagFood:
+        return (TitleController.text.isEmpty ||
+                _selectedPlaceStart.formattedAddress == null ||
+                _selectedFood.getName().isEmpty);
+      case GlobalStringText.tagEntertainment:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            _selectedEvent.getName().isEmpty);
+      case GlobalStringText.tagCarPool:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            _selectedPlaceDest.formattedAddress == null);
+      case GlobalStringText.tagAcademicSupport:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+
+      case GlobalStringText.tagStudyBuddy:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+      case GlobalStringText.tagMaterial:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+      default: return false;
+    }
   }
 }
