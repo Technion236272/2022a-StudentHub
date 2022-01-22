@@ -41,6 +41,7 @@ class _EventsPageState extends State<EventsPage> {
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
   Map<DocumentReference, int> user_favorites = {};
+  var favoritesReady;
   final TextEditingController _filter = new TextEditingController();
   String _searchText = ""; //search bar text
   Icon _searchIcon = new Icon(Icons.search);
@@ -103,8 +104,8 @@ class _EventsPageState extends State<EventsPage> {
             )),
         getCategoryTitle(),
         Expanded(
-            child: FutureBuilder(
-                future: tickets,
+            child: StreamBuilder(
+                stream: tickets,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -116,67 +117,105 @@ class _EventsPageState extends State<EventsPage> {
                         if (snapshot.hasError) {
                           return Center(child: Text("Error ${snapshot.error}"));
                         } else {
-                          return ListView.builder(
-                            itemCount: (snapshot.data as List<Widget>).length,
-
-                            itemBuilder: (BuildContext context, int index) {
-                              if (_searchText.isNotEmpty) {
-                                if ((snapshot.data as List<Ticket>)[index]
-                                    ._title
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) ||(snapshot.data as List<Ticket>)[index]
-                                    ._desc
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase())  || (snapshot.data as List<Ticket>)[index]
-                                    ._owner
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) || (snapshot.data as List<Ticket>)[index]
-                                    ._location
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) || (snapshot.data as List<Ticket>)[index]
-                                    ._time
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) ||( (snapshot.data as List<Ticket>)[index]
-                                    .dest!= null && (snapshot.data as List<Ticket>)[index]
-                                    .dest!
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) ) || ( (snapshot.data as List<Ticket>)[index]
-                                    .course!= null && (snapshot.data as List<Ticket>)[index]
-                                    .course!
-                                    .toLowerCase()
-                                    .contains(_searchText.toLowerCase()) )){
-                                  if(selected_filter_list!.isNotEmpty)
+                          List list = (snapshot.data as QuerySnapshot).docs;
+                          list.removeWhere((element) {
+                            var now = Timestamp.now();
+                            var data = element.data();
+                            if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(minutes: 20))) < 0) {
+                              deleteTicket(element);
+                              return true;
+                            }
+                            return false;
+                          });
+                          return FutureBuilder(
+                              future: favoritesReady,
+                              builder: (context, snapshot) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.waiting:
                                     {
-                                      if(selected_filter_list!.contains((snapshot.data as List<Ticket>)[index].type))
-                                      {
-
-                                        return (snapshot.data as List<Widget>)[index];
-
-                                      }
-                                      else return Container();
+                                      return const Center(child: Text("Loading"));
                                     }
-                                  else return (snapshot.data as List<Widget>)[index];
-                                }
+                                  default:
+                                    {
+                                      if (snapshot.hasError) {
+                                        return Center(child: Text("Error ${snapshot.error}"));
+                                      } else {
+                                        list.removeWhere((element) {
+                                          var now = Timestamp.now();
+                                          var data = element.data();
+                                          if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(minutes: 20))) < 0) {
+                                            deleteTicket(element);
+                                            return true;
+                                          }
+                                          return false;
+                                        });
+                                        return ListView.builder(
+                                          itemCount: list.length,
 
-                                else {
-                                  return Container();
+                                          itemBuilder: (BuildContext context, int index) {
+                                            Ticket ticket = Ticket.fromJson(list[index], widget.category, user_favorites);
+                                            if (_searchText.isNotEmpty) {
+                                              if (ticket
+                                                  ._title
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ||ticket
+                                                  ._desc
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase())  || ticket
+                                                  ._owner
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) || ticket
+                                                  ._location
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) || ticket
+                                                  ._time
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ||( ticket
+                                                  .dest!= null && ticket
+                                                  .dest!
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ) || ( ticket
+                                                  .course!= null && ticket
+                                                  .course!
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) )){
+                                                if(selected_filter_list!.isNotEmpty)
+                                                {
+                                                  if(selected_filter_list!.contains(ticket.type))
+                                                  {
+
+                                                    return ticket;
+
+                                                  }
+                                                  else return Container();
+                                                }
+                                                else return ticket;
+                                              }
+
+                                              else {
+                                                return Container();
+                                              }
+                                            }
+                                            else if(selected_filter_list!.isNotEmpty)
+                                            {
+
+                                              if(selected_filter_list!.contains(ticket.type))
+                                              {
+
+                                                return ticket;
+
+                                              }
+                                              else return Container();
+                                            }
+                                            return ticket;
+
+                                          },
+                                          controller: _hideFapController,
+                                        );
+                                      }
+                                    }
                                 }
                               }
-                              else if(selected_filter_list!.isNotEmpty)
-                              {
-
-                                if(selected_filter_list!.contains((snapshot.data as List<Ticket>)[index].type))
-                                {
-
-                                  return (snapshot.data as List<Widget>)[index];
-
-                                }
-                                else return Container();
-                              }
-                                return (snapshot.data as List<Ticket>)[index];
-
-                            },
-                            controller: _hideFapController,
                           );
                         }
                       }
@@ -395,14 +434,11 @@ class _EventsPageState extends State<EventsPage> {
   }
 
 
-  Future<List<Ticket>> getTickets() async {
+  Stream getTickets() {
     user_favorites.clear();
-    Timestamp now = Timestamp.now();
-
-    var tickets = <Ticket>[];
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
-    await _firestore
+    favoritesReady = _firestore
         .collection("users/${user?.uid}/favorites")
         .get()
         .then((value) => {
@@ -410,183 +446,38 @@ class _EventsPageState extends State<EventsPage> {
                 user_favorites[element.data()['ref']] = element.data()['id'];
               })
             });
-    final Color catColor = getCategoryColor();
     switch (widget.category) {
       case GlobalStringText.tagFood:
         {
-          await _firestore.collection("Food").orderBy('Time').get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  type: data['Type'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+          return _firestore.collection("Food").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagEntertainment:
         {
-          await _firestore.collection("Entertainment").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  type: data['Type'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+          return _firestore.collection("Entertainment").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagCarPool:
         {
-          await _firestore.collection("CarPool").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  dest: data['Destination'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+          return _firestore.collection("CarPool").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagAcademicSupport:
         {
-          await _firestore
+          return _firestore
               .collection("AcademicSupport")
-              .get()
-              .then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+              .orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagStudyBuddy:
         {
-          await _firestore.collection("StudyBuddy").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+          return _firestore.collection("StudyBuddy").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagMaterial:
         {
-          await _firestore.collection("Material").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate()) < 0) {
-                deleteTicket(element);
-              } else {
-                var ticket = Ticket(
-                  data['groupId'],
-                  data['uid'],
-                  data['Title'],
-                  data['Description'],
-                  data['Time'],
-                  catColor,
-                  data['Location'],
-                  data['Owner'],
-                  course: data['CourseNum'],
-                  ref: element.reference,
-                  isLoved: user_favorites.containsKey(element.reference),
-                  notif_id: user_favorites[element.reference] ?? -1,
-                );
-                tickets.add(ticket);
-              }
-            });
-          });
+          return _firestore.collection("Material").orderBy('Time').snapshots();
         }
-        break;
       default:
-        {}
+        {
+          return const Stream.empty();
+        }
     }
-    return tickets;
   }
 
   Widget buildBottomNavigationBar() {
@@ -684,39 +575,6 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
-  }
-
-  Color getCategoryColor() {
-    switch (widget.category) {
-      case GlobalStringText.tagEntertainment:
-        {
-          return GlobalStringText.DeepPinkColorFirst;
-        }
-      case GlobalStringText.tagFood:
-        {
-          return GlobalStringText.LightBlueColorFirst;
-        }
-      case GlobalStringText.tagStudyBuddy:
-        {
-          return GlobalStringText.LightOarngeColorFirst;
-        }
-      case GlobalStringText.tagMaterial:
-        {
-          return GlobalStringText.LightRedColorFirst;
-        }
-      case GlobalStringText.tagCarPool:
-        {
-          return GlobalStringText.LightYellowColorFirst;
-        }
-      case GlobalStringText.tagAcademicSupport:
-        {
-          return GlobalStringText.LightGreenColorFirst;
-        }
-      default:
-        {
-          return Colors.white;
-        }
-    }
   }
 
   Widget getCategoryTitle() {
@@ -873,6 +731,119 @@ class Ticket extends StatefulWidget {
       this.category,
       this.notif_id})
       : super(key: key);
+
+  factory Ticket.fromJson(DocumentSnapshot<Map<String,dynamic>> e, String category, Map<DocumentReference<Object?>, int> userFavorites) {
+    final Color catColor = getCategoryColor(category);
+    Map<String,dynamic> data = e.data()!;
+    switch (category) {
+      case GlobalStringText.tagFood:
+        {
+          return Ticket(
+            data['groupId'],
+            data['uid'],
+            data['Title'],
+            data['Description'],
+            data['Time'],
+            catColor,
+            data['Location'],
+            data['Owner'],
+            type: data['Type'],
+            ref: e.reference,
+            isLoved: userFavorites.containsKey(e.reference),
+            notif_id: userFavorites[e.reference] ?? -1,
+          );
+        }
+      case GlobalStringText.tagEntertainment:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  type: data['Type'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagCarPool:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  dest: data['Destination'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagAcademicSupport:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagStudyBuddy:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagMaterial:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      default:
+        {
+          return Ticket('_ticketId', '_userID', '_title', '_desc', '_time', Colors.white, '_location', '_owner');
+        }
+    }
+  }
 
   @override
   _TicketState createState() => _TicketState();
@@ -1256,7 +1227,9 @@ class _TicketState extends State<Ticket> {
   }
 
   void deleteOpened() {
-    deleteTicket(widget.ref);
+    (widget.ref as DocumentReference<Map<String,dynamic>>).get().then((value) {
+      deleteTicket(value);
+    });
     widget.update!();
   }
 
@@ -1264,6 +1237,40 @@ class _TicketState extends State<Ticket> {
     setState(() {
       _isExpanded = !_isExpanded;
     });
+  }
+}
+
+
+Color getCategoryColor(String category) {
+  switch (category) {
+    case GlobalStringText.tagEntertainment:
+      {
+        return GlobalStringText.DeepPinkColorFirst;
+      }
+    case GlobalStringText.tagFood:
+      {
+        return GlobalStringText.LightBlueColorFirst;
+      }
+    case GlobalStringText.tagStudyBuddy:
+      {
+        return GlobalStringText.LightOarngeColorFirst;
+      }
+    case GlobalStringText.tagMaterial:
+      {
+        return GlobalStringText.LightRedColorFirst;
+      }
+    case GlobalStringText.tagCarPool:
+      {
+        return GlobalStringText.LightYellowColorFirst;
+      }
+    case GlobalStringText.tagAcademicSupport:
+      {
+        return GlobalStringText.LightGreenColorFirst;
+      }
+    default:
+      {
+        return Colors.white;
+      }
   }
 }
 
@@ -1300,18 +1307,18 @@ Widget getCategoryIcon(String category) {
   }
 }
 
-void deleteTicket(QueryDocumentSnapshot<Map<String, dynamic>> element) {
+void deleteTicket(DocumentSnapshot<Map<String, dynamic>> element) {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  _firestore.collection('users/${element.data()['uid']}/tickets').where('ref', isEqualTo: element.reference).get().then((value) {
+  _firestore.collection('chats').doc(element.data()!['groupId']).get().then((value) {
+    List<dynamic> subs = value.get('subs');
+    for (var sub in subs) {
+      _firestore.collection('users/${sub as String}/groups').doc(element.data()!['groupId']).delete();
+    }
+    _firestore.collection('chats').doc(element.data()!['groupId']).delete();
+  });
+  _firestore.collection('users/${element.data()!['uid']}/tickets').where('ref', isEqualTo: element.reference).get().then((value) {
     for (var element in value.docs) {
       element.reference.delete();
     }});
-  _firestore.collection('chats').doc(element.data()['groupId']).get().then((value) {
-    List<dynamic> subs = value.data()?['subs'];
-    for (var sub in subs) {
-      _firestore.collection('users/${sub as String}/groups').doc(element.data()['groupId']).delete();
-    }
-  });
-  _firestore.collection('chats').doc(element.data()['groupId']).delete();
   element.reference.delete();
 }
