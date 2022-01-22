@@ -75,7 +75,7 @@ class Chat {
 
 
   static Stream<QuerySnapshot<Map<String,dynamic>>> getGroupMessages(String groupId) {
-    return firestore.collection('chats/$groupId/messages').orderBy('timeStamp').snapshots();
+    return firestore.collection('chats/$groupId/messages').orderBy('timeStamp', descending: true).snapshots();
   }
 
 }
