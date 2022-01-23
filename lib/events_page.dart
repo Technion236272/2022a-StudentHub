@@ -562,7 +562,7 @@ class _EventsPageState extends State<EventsPage> {
                       Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                       break;
                     case 1 :
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                       break;
                     case 2 :
                       Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);

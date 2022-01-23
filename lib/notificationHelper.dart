@@ -56,6 +56,8 @@ Future<void> scheduleNotification(
     'Scheduled notification', // This specifies the name of the notification channel
     channelDescription: 'A scheduled notification', //This specifies the description of the channel
     icon: 'icon',
+    priority: Priority.high,
+    importance: Importance.max
   );
   var iOSSpecifics = notifs.IOSNotificationDetails();
   var platformChannelSpecifics = notifs.NotificationDetails(

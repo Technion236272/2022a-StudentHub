@@ -52,7 +52,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                       children: <Widget>[
                         IconButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                             },
                             icon: Icon(
                               Icons.arrow_back,
