@@ -102,7 +102,7 @@ class _inboxScreen extends State<inboxScreen>
                 children: <Widget>[
                   IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                       },
                       icon: const Icon(
                         Icons.arrow_back,
@@ -312,23 +312,6 @@ class _inboxScreen extends State<inboxScreen>
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -363,10 +346,9 @@ class _inboxScreen extends State<inboxScreen>
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                     break;
                   case 2 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });

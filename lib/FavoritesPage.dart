@@ -38,14 +38,12 @@ class _FavoritesPage extends State<FavoritesPage> {
     final user = Provider.of<AuthRepository>(context);
 
     return Scaffold(
-
+      backgroundColor: GlobalStringText.WhiteScreen,
       body: Column(
 
         children: <Widget>[
           SafeArea(
               child: Container(
-
-
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.18,
             color: Color(0xFF8C88F9),
@@ -90,7 +88,7 @@ class _FavoritesPage extends State<FavoritesPage> {
                       Row(
                         children: <Widget>[
                           Text(
-                            "Welcome Back!",
+                            "Welcome Back! ",
                             style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -112,16 +110,18 @@ class _FavoritesPage extends State<FavoritesPage> {
             child: Container(
               height: MediaQuery.of(context).size.height * 0.8,
               width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
+              decoration:  BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20.0),
                     topLeft: Radius.circular(20.0)),
-                color: Colors.white,
+                color: GlobalStringText.WhiteScreen,
                 boxShadow: [
                   BoxShadow(
                       color: Color(0xFF8C88F9),
                       spreadRadius: 12,
-                      blurRadius: 10)
+                      blurRadius: 10,
+                    offset: Offset(0, -10),
+                  )
                 ],
               ),
               child: Container(
@@ -189,12 +189,13 @@ class _FavoritesPage extends State<FavoritesPage> {
 
   Widget buildBottomNavigationBar() {
     return Container(
+      color: GlobalStringText.WhiteScreen,
       child: SafeArea(
       top: true,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: GlobalStringText.WhiteScreen,
           borderRadius: BorderRadius.all(Radius.circular(50)),
           boxShadow: [
             BoxShadow(
@@ -219,23 +220,6 @@ class _FavoritesPage extends State<FavoritesPage> {
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -267,10 +251,9 @@ class _FavoritesPage extends State<FavoritesPage> {
               setState(() {
                 switch (index) {
                   case 0 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                     break;
                   case 2 :
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);

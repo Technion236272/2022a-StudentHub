@@ -75,7 +75,7 @@ class _profilePage extends State<profilePage> {
                     children: <Widget>[
                       IconButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                           },
                           icon: Icon(
                             Icons.arrow_back,
@@ -249,37 +249,6 @@ class _profilePage extends State<profilePage> {
                       )
                     ],
                   ),
-                  Visibility(
-                      visible: user.user?.uid == widget.userID,
-                      child:  Padding(
-                          child:Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              GestureDetector(child:Image.asset(
-                                "images/icons8-denied-96.png",
-                                height: 100,
-                                width: 100,
-                              ),
-                                onTap:() {}, // here should implement delete user and delete all of its tickets
-                              )
-                            ],
-                          ),padding: EdgeInsets.only(left: 0, top: 50,right: 30))),
-                  Visibility(
-                      visible: user.user?.uid == widget.userID,
-                      child:  Padding(
-                          child:Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Text(
-                                "Delete Account",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Montserrat',
-                                    color: Color(0xFF6769EC)),
-                              )
-                            ],
-                          ),padding: EdgeInsets.only(left: 0, top: 0)))
 
 
                 ],
