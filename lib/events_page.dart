@@ -869,6 +869,8 @@ class _TicketState extends State<Ticket> {
             child: Text(
           widget._title,
           maxLines: 2,
+              overflow: TextOverflow.fade,
+              softWrap: true,
           style: GoogleFonts.montserrat(
               textStyle: TextStyle(
                   fontSize: 28,
@@ -895,6 +897,8 @@ class _TicketState extends State<Ticket> {
             child: Text(
           widget._title,
           maxLines: 2,
+              overflow: TextOverflow.fade,
+              softWrap: true,
           style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
         )),
         //Spacer(),
@@ -936,6 +940,9 @@ class _TicketState extends State<Ticket> {
                 height: 5,
               ),
               Text(widget._desc,
+                  overflow: TextOverflow.fade,
+                  maxLines: 5,
+                  softWrap: true,
                   style: const TextStyle(fontSize: 18, color: Colors.black)),
               const SizedBox(
                 height: 5,
@@ -952,6 +959,9 @@ class _TicketState extends State<Ticket> {
               ),
               Text(
                 widget._location,
+                overflow: TextOverflow.fade,
+                maxLines: 2,
+                softWrap: true,
                 style: TextStyle(fontSize: 20),
               ),
               Align(
@@ -982,6 +992,9 @@ class _TicketState extends State<Ticket> {
                 Expanded(
                     child: Text(
                   widget._desc,
+                      overflow: TextOverflow.clip,
+                      maxLines: 6,
+                      softWrap: true,
                   style: TextStyle(fontSize: 17, color: Colors.black),
                 )),
               ],
@@ -1002,13 +1015,13 @@ class _TicketState extends State<Ticket> {
                   child: InkWell(
                     child: Text(
                       widget._owner,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 17,
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
                       overflow: TextOverflow.fade,
-                      maxLines: 1,
-                      softWrap: false,
+                      maxLines: 2,
+                      softWrap: true,
                     ),
                     onTap: () {
                       Navigator.of(context).pushNamed('/Home/Profile', arguments: widget._userID);
@@ -1029,8 +1042,17 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Expanded(child: Text(widget._location,
-                    style: TextStyle(fontSize: 17, color: Colors.black)),)
+                Expanded(child:
+                Text(
+                  widget._location,
+                  style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                     ),
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  softWrap: true,
+                ),)
               ],
             ),
             SizedBox(height: 3),
@@ -1044,11 +1066,15 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(widget._time,
+                Expanded(child:                 Text(widget._time,
+                    overflow: TextOverflow.fade,
+                    maxLines: 2,
+                    softWrap: true,
                     style: TextStyle(fontSize: 17, color: Colors.black))
+                )
               ],
             ),
-            SizedBox(height: 3),
+            SizedBox(height: 5),
             Row(
               children: [
                 Text(
@@ -1059,8 +1085,14 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(extra_info_data,
-                    style: TextStyle(fontSize: 17, color: Colors.black))
+                Expanded(child:  Text(
+                  extra_info_data,
+                  style: TextStyle(fontSize: 17, color: Colors.black),
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  softWrap: true,
+                )
+                )
               ],
             ),
             SizedBox(height: 3),
