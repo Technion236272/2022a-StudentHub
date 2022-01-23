@@ -168,7 +168,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                 width: 120,
                                                 height: 120,
                                                 decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(
+                                                  borderRadius: const BorderRadius.all(
                                                       Radius.circular(20)),
                                                   color: Colors.transparent,
                                                   image: DecorationImage(
@@ -250,7 +250,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
     return SafeArea(
       top: true,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -277,23 +277,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
+
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -328,7 +312,6 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                     break;
                   case 1 :
-                    Navigator.of(context).popUntil((route) => route.isFirst);
                     break;
                   case 2 :
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
@@ -601,6 +584,5 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
         ));
   }
 }
-
 
 
