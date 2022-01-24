@@ -17,13 +17,18 @@ Our application provides essential social and academic services to solve these p
 * Find a group for a game night.
 * Find someone to go out to eat or share a drink with.
 * Find someone to place an order with and share delivery costs.
+* Chat with the ticket owner
+* Chat with the group that is particpating in a certain ticket ( Group Chat)
 
 ### Complementary features
 
 * All users will be verified upon registration by presenting their student ID.
-* Event Reminder .
-* 'Faviorite Tickets' tab which contains upcoming events and starred tickets.
-* 'My Tickets' tab which contains created tickets.
+* Event Reminder (Notifactions).
+* Chat Notifcations (for recived messages).
+* 'Faviorite Tickets' tab which contains upcoming events that the people loved.
+* 'My Tickets' tab which contains user created tickets.
+* Search bar for all types of searches.
+* Filtering option for entertamient tickets.
 
 
 
