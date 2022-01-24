@@ -61,8 +61,17 @@
 * * PhoneNumber
 
 ## * chats
-* Chats with users ( which contain messages documents , every message contains (a fields : message , sender id , sender name , timestamp))
-* group chats ( contains messages documents , , every message contains (a fields : message , sender id , sender name , timestamp)
+* Chats with users doc : 
+* * Messages (contains a doc which contains ) :
+* * * Message
+* * * Sender ID 
+* * * Sender Name
+* * * TimeStamp
 
-
+* group chats doc :
+* * Messages (contains a doc which contains ) :
+* * * Message
+* * * Sender ID 
+* * * Sender Name
+* * * TimeStamp
 
