@@ -44,9 +44,11 @@
 
 ## * Users
 * Chats ( ref id for chats)
+** ref
 * favirotes (id for ticket in favs)
 * groups (Group chat (contains : isread , last message , time , title)
 * tickets ( contains id to the user opened tickets ticket)
+* User Info ( Name , faculty , gender , phone number)
 
 ## * chats
 * Chats with users ( which contain messages documents , every message contains (a fields : message , sender id , sender name , timestamp))
