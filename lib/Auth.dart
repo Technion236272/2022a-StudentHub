@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -33,11 +34,18 @@ class AuthRepository with ChangeNotifier {
           email: email, password: password);
 
       User? user = new_user.user;
+      String? token = await FirebaseMessaging.instance.getToken();
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'Full Name': name,
         'Phone Number': phone_number,
         'Faculty': faculty,
-        'Gender': Gender
+        'Gender': Gender,
+        'Token' : token
+      });
+      FirebaseMessaging.instance.onTokenRefresh.listen((token) {
+        FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+          'Token' : token
+        }, SetOptions(merge: true));
       });
       user.updateDisplayName(name);
       await user.reload();

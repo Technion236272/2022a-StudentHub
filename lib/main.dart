@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,35 @@ Future<void> main() async {
   NotificationAppLaunchDetails? notifLaunch =
       await notifsPlugin.getNotificationAppLaunchDetails();
   await initNotifications(notifsPlugin);
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    importance: Importance.max,
+  );
+  await notifsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
 
+    // If `onMessage` is triggered with a notification, construct our own
+    // local notification to show to users using the created channel.
+    if (notification != null && android != null) {
+      notifsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              priority: Priority.high,
+              icon: android.smallIcon,
+            ),
+          ));
+    }
+  });
   runApp(App());
 }
 
