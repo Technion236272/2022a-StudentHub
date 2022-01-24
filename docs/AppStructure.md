@@ -35,13 +35,16 @@
 
 ## My Opened tickets Screen 
 
-## Chat with the ticket owner screen(second sprint)
-
-## Inbox Screen ( second sprint)
+## Chat with the ticket owner screen
 
 ## Chat with the event group (second sprint)
 
-## Maintaince Page screen( for unready pages)
+
+## Inbox Screen 
+** People Chats Tab
+** Group Chats Tab
+
+## Profile Page Screen 
 
 
 
