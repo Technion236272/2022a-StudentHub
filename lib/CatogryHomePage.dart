@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+
 import 'ScreenTags.dart';
 import 'package:connectivity/connectivity.dart';
 import 'dart:core';
@@ -11,7 +13,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:badges/badges.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studenthub/MaintainceScreen.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'FavoritesPage.dart';
 
 import 'package:studenthub/Auth.dart';
@@ -163,23 +165,19 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                             onTap: () {
                                               Navigator.of(context).pushNamed('/Home/Opened');
                                             }),
-                                        GestureDetector(
-                                            child: Container(
-                                                width: 120,
-                                                height: 120,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: const BorderRadius.all(
-                                                      Radius.circular(20)),
-                                                  color: Colors.transparent,
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          GlobalStringText
-                                                              .ImagesServices),
-                                                      fit: BoxFit.scaleDown),
-                                                )),
-                                            onTap: () {
-
-                                            }),
+                                        Container(
+                                            width: 120,
+                                            height: 120,
+                                            decoration: BoxDecoration(
+                                              borderRadius: const BorderRadius.all(
+                                                  Radius.circular(20)),
+                                              color: Colors.transparent,
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      GlobalStringText
+                                                          .ImagesServices),
+                                                  fit: BoxFit.scaleDown),
+                                            )),
                                         GestureDetector(
                                             child: Container(
                                                 width: 100,
