@@ -71,7 +71,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                         Radius.circular(10),
                       ),
                     ),
-                    height: 135,
+                    //height: 135,
                     // we need to agree on one height for all screens eventually
                     padding: const EdgeInsets.fromLTRB(20, 30, 0, 0),
                     child: Column(
@@ -82,7 +82,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               Text("Hi " + (user.getName() ?? ""),
                                   style: GoogleFonts.quicksand(
                                     textStyle: TextStyle(
-                                      fontSize: 30,
+                                      fontSize: 25,
                                       fontWeight: FontWeight.bold,
                                       fontFamily:
                                           GlobalStringText.QuickSandFont,
@@ -110,7 +110,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                               Text("Welcome Back!  ",
                                   style: GoogleFonts.quicksand(
                                     textStyle: TextStyle(
-                                      fontSize: 30,
+                                      fontSize: 25,
                                       fontWeight: FontWeight.bold,
                                       fontFamily:
                                           GlobalStringText.QuickSandFont,

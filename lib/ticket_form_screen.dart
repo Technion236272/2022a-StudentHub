@@ -758,7 +758,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Food").add(data);
         }
@@ -773,7 +773,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Entertainment").add(data);
         }
@@ -788,7 +788,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("CarPool").add(data);
         }
@@ -803,7 +803,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("AcademicSupport").add(data);
         }
@@ -818,7 +818,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("StudyBuddy").add(data);
         }
@@ -833,7 +833,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
             'uid' : user?.uid,
-            'groupId' : (await _firestore.collection('chats').add({ 'subs' : [user!.uid] })).id
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Material").add(data);
         }

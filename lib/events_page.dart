@@ -1110,10 +1110,13 @@ class _TicketState extends State<Ticket> {
                   ,visible: widget._userID != Chat.user!.uid,),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
-                        'uid' : widget._ticketId,
-                        'isGroup' : true,
-                        'name' : widget._title
+                      Chat.firestore.collection('users/${Chat.user!.uid}/groups').doc(widget._ticketId).get().then((value) {
+                        Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+                          'uid' : widget._ticketId,
+                          'isGroup' : true,
+                          'name' : widget._title,
+                          'mute' : value.data()?['mute'] ?? false
+                        });
                       });
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),

@@ -26,6 +26,7 @@ class ChatModel {
   String currentMessage;
   bool isRead;
   String uid;
+  bool? mute;
 
   ChatModel({
     required this.name,
@@ -33,7 +34,8 @@ class ChatModel {
     required this.time,
     required this.currentMessage,
     required this.isRead,
-    required this.uid
+    required this.uid,
+    this.mute
   });
 
   factory ChatModel.fromJson(dynamic json) {
@@ -57,13 +59,14 @@ class ChatModel {
     }
     String timeFormat = '$timePrefix${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
-        name: snapshot['title'], isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
+        mute: snapshot['mute'], name: snapshot['title'], isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
   }
 }
 
 class inboxScreen extends StatefulWidget {
 
- // final ChatModel sourceChat;
+ bool? group;
+ inboxScreen({bool? this.group});
 
   @override
   _inboxScreen createState() => _inboxScreen();
@@ -83,7 +86,7 @@ class _inboxScreen extends State<inboxScreen>
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 2, vsync: this, initialIndex: 0);
+    _controller = TabController(length: 2, vsync: this, initialIndex: widget.group == null? 0:1);
     Chat.init(context);
     scrollController.addListener(() {
       if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
@@ -218,6 +221,10 @@ class _inboxScreen extends State<inboxScreen>
                          return Center(child: Text("Error: ${snapshot.error}"));
                        } else {
                          List list = (snapshot.data as QuerySnapshot).docs;
+                         list.removeWhere((element) {
+                           if ((element as DocumentSnapshot<Map<String,dynamic>>).data() == null) return true;
+                           return !((element as DocumentSnapshot<Map<String,dynamic>>).data()!.containsKey('isRead'));
+                         });
                          return ListView.builder(
                            itemCount: list.length,
                            reverse: false,
@@ -255,7 +262,8 @@ class _inboxScreen extends State<inboxScreen>
         Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
           'uid' : chat.uid,
           'isGroup' : chat.isGroup,
-          'name' : chat.name
+          'name' : chat.name,
+          'mute' : chat.mute
         });
       },
 
@@ -285,7 +293,7 @@ class _inboxScreen extends State<inboxScreen>
                 chat.currentMessage,
                 style: TextStyle(
                   fontWeight: chat.isRead? FontWeight.normal : FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: chat.isRead? 14 : 16,
                 ),
               ),
             ],

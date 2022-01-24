@@ -104,7 +104,14 @@ class MyApp extends StatelessWidget {
                     }
                     case '/Home/Inbox/Chat' : {
                       Map<String,dynamic> args = settings.arguments as Map<String,dynamic>;
-                      return MaterialPageRoute(builder: (_) => ChatScreen(args['uid'], args['isGroup'], args['name']));
+                      if(args['isGroup']){
+                        return MaterialPageRoute(builder: (_) => ChatScreen(args['uid'], args['isGroup'], args['name'], mute: args['mute'],));
+                      }
+                      return MaterialPageRoute(builder: (_) => ChatScreen(args['uid'], args['isGroup'], args['name'],));
+                    }
+                    case '/Home/Inbox' : {
+                      Map<String,dynamic>? args = settings.arguments as Map<String,dynamic>?;
+                      return MaterialPageRoute(builder: (_) => inboxScreen(group: args?['group']),);
                     }
                   }
             },
@@ -114,7 +121,6 @@ class MyApp extends StatelessWidget {
                 '/Auth/Signup' : (context) => SignUpScreen(),
                 '/Home' : (context) => const CategoryPageScreen(),
                 '/Home/Favorites' : (context) => const FavoritesPage(),
-                '/Home/Inbox' : (context) => inboxScreen(),
                 '/Home/Opened' : (context) => const OpenedTicketsPage(),
                 '/Home/Entertainment' : (context) => const EventsPage(category: GlobalStringText.tagEntertainment,),
                 '/Home/CarPool' : (context) => const EventsPage(category: GlobalStringText.tagCarPool,),

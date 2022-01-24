@@ -21,7 +21,7 @@ Future<void> initNotifications(
     notifs.FlutterLocalNotificationsPlugin
     notifsPlugin) async {
   var initializationSettingsAndroid =
-  notifs.AndroidInitializationSettings('icon');
+  notifs.AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettingsIOS = notifs.IOSInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -51,7 +51,7 @@ Future<void> scheduleNotification(
     id, // This specifies the ID of the Notification
     'Scheduled notification', // This specifies the name of the notification channel
     channelDescription: 'A scheduled notification', //This specifies the description of the channel
-    icon: 'icon',
+    icon: '@mipmap/ic_launcher',
     priority: Priority.high,
     importance: Importance.max
   );

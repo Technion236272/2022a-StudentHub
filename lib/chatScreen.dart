@@ -21,8 +21,9 @@ class ChatScreen extends StatefulWidget {
   String uid;
   bool isGroup;
   String name;
+  bool? mute;
 
-  ChatScreen(this.uid, this.isGroup, this.name, {Key? key}) : super(key: key);
+  ChatScreen(this.uid, this.isGroup, this.name, {Key? key, bool? this.mute}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -35,7 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isKeyboardVisible = false;
   var messageText;
   late Stream messages;
-  bool mute = false;
+  late bool mute;
 
 
   @override
@@ -49,16 +50,9 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     messages = widget.isGroup? Chat.getGroupMessages(widget.uid) : Chat.getMessages(widget.uid);
     currentChatId = widget.uid;
-    _firestore.collection('chats').doc(widget.uid).get().then((value) {
-      Map<String,bool> subs = value.data()!['subs'];
-      if(!subs.containsKey(Chat.user!.uid)) {
-        subs[Chat.user!.uid] = false;
-        value.reference.set({'subs' : subs}, SetOptions(merge: true));
-        mute = false;
-      } else {
-        mute = subs[Chat.user! .uid]!;
-      }
-    });
+    if(widget.isGroup) {
+      mute = widget.mute!;
+    }
   }
 
   @override
@@ -69,7 +63,8 @@ class _ChatScreenState extends State<ChatScreen> {
       body: body(context),
     ), onWillPop: () {
       currentChatId = null;
-      return Future.value(true);
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst, arguments: widget.isGroup? {'group': widget.isGroup}: null);
+      return Future.value(false);
     });
   }
 
@@ -102,38 +97,42 @@ class _ChatScreenState extends State<ChatScreen> {
                     size: 28, color: GlobalStringText.purpleColor),
               ),
               onTap: () {
-                Navigator.of(context).pop();
+                currentChatId = null;
+                Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst, arguments: widget.isGroup? {'group': widget.isGroup}: null);
               },
             ),
             Padding(
-              padding: EdgeInsets.only(top: 25, right: 60),
+              padding: EdgeInsets.only(top: 25, right: 80),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width / (widget.isGroup? 3:2),
-                child: Row(children:
-                [
-                  Icon(widget.isGroup? LineIcons.users : LineIcons.user),
-                  SizedBox(width: 5,),
-                  Text(
-                  widget.isGroup? 'Group Chat' : widget.name,
-                  maxLines: 1,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18,
-                      color: GlobalStringText.purpleColor),
-                ),],)
+                child: Align(child: Row(
+                  children:
+                  [
+                    Icon(widget.isGroup? LineIcons.users : LineIcons.user),
+                    SizedBox(width: 2,),
+                    Align(child: Text(
+                      widget.isGroup? 'Group Chat' : widget.name,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: GlobalStringText.purpleColor),
+                    ),alignment: Alignment.center,),],), alignment: Alignment.center,)
               ),
             ),
-            if(widget.isGroup)...[Padding(
-              padding: EdgeInsets.only(top: 25),
-              child: IconButton(onPressed: () async  {
-                Chat.flipMute(widget.uid, !mute);
-                setState(() {
-                  mute = !mute;
-                });
+            if(widget.isGroup)...[
+              Padding(
+                padding: EdgeInsets.only(top: 25),
+                child: IconButton(onPressed: () async  {
+                  Chat.flipMute(widget.uid, !mute);
+                  setState(() {
+                    mute = !mute;
+                  });
 
-              }, icon: Icon(mute? Icons.volume_mute_rounded : Icons.volume_down_rounded, size: 25, color: Colors.deepPurpleAccent,)),
-            )]
+                }, icon: Icon(mute? Icons.volume_mute_rounded : Icons.volume_down_rounded, size: 25, color: Colors.deepPurpleAccent,)),
+              )
+            ]
           ],
         ),
       ),

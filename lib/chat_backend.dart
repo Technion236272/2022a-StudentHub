@@ -55,13 +55,14 @@ class Chat {
   }
 
   static void flipMute(String groupId, bool mute) {
-    firestore.collection("prayerRooms")
+    firestore.collection("chats")
         .doc(groupId)
         .set({
-      'subs.${user!.uid}': mute,
+      'subs': {user!.uid: mute},
     },
       SetOptions(merge: true),
     );
+    firestore.collection('users/${user!.uid}/groups').doc(groupId).set({'mute' : mute}, SetOptions(merge: true));
   }
 
   static void sendGroup(String message, String groupId, String title) {
@@ -74,9 +75,13 @@ class Chat {
     });
 
     firestore.collection('chats').doc(groupId).get().then((value) {
-      Map<String, bool> subs = value.data()?['subs'];
+      Map<String, dynamic> subs = value.data()?['subs'];
+      if(!subs.containsKey(user!.uid)) {
+        subs[user!.uid] = false;
+        value.reference.set({'subs': {user!.uid : false}}, SetOptions(merge: true));
+      }
       subs.forEach((uid, mute) {
-        firestore.collection('users/$uid/groups').doc(groupId).set({'lastMessage' : message, 'time' : timeStamp, 'isRead' : false, 'title' : title});
+        firestore.collection('users/$uid/groups').doc(groupId).set({'lastMessage' : message, 'time' : timeStamp, 'isRead' : false, 'title' : title, 'mute' : false});
         if(!mute && uid != user!.uid) sendFcmMessage(user!.displayName!, message, uid, groupId: groupId);
       });
     });
@@ -111,7 +116,7 @@ class Chat {
           "body": message,
         },
         "data": {
-          "chatId" : groupId ?? uid
+          "chatId" : groupId ?? user!.uid
         },
         "priority": "high",
         "to": "${token!}",
