@@ -60,7 +60,6 @@ class AuthRepository with ChangeNotifier {
         return Error.Email_Already_in_Use;
       }
     } catch (e) {
-      print(e);
       _status = Status.Unauthenticated;
       notifyListeners();
       return Error.Other_Error;

@@ -43,7 +43,7 @@ class Chat {
   }
 
   static Stream<QuerySnapshot<Map<String,dynamic>>> getChats()  {
-    return firestore.collection('users/${user!.uid}/chats').orderBy('time').snapshots();
+    return firestore.collection('users/${user!.uid}/chats').orderBy('time', descending: true).snapshots();
   }
 
 
@@ -52,6 +52,16 @@ class Chat {
     ids.sort();
     firestore.collection('users/${user!.uid}/chats').doc(uid).set({'isRead' : true}, SetOptions(merge: true));
     return firestore.collection('chats/${ids[0]}-${ids[1]}/messages').orderBy('timeStamp', descending: true).snapshots();
+  }
+
+  static void flipMute(String groupId, bool mute) {
+    firestore.collection("prayerRooms")
+        .doc(groupId)
+        .set({
+      'subs.${user!.uid}': mute,
+    },
+      SetOptions(merge: true),
+    );
   }
 
   static void sendGroup(String message, String groupId, String title) {
@@ -64,18 +74,17 @@ class Chat {
     });
 
     firestore.collection('chats').doc(groupId).get().then((value) {
-      List<dynamic> subs = value.data()?['subs'];
-      for (var element in subs) {
-        firestore.collection('users/${element as String}/groups').doc(groupId).set({'lastMessage' : message, 'time' : timeStamp, 'isRead' : false, 'title' : title});
-        sendFcmMessage(user!.displayName!, message, element);
-      }
+      Map<String, bool> subs = value.data()?['subs'];
+      subs.forEach((uid, mute) {
+        firestore.collection('users/$uid/groups').doc(groupId).set({'lastMessage' : message, 'time' : timeStamp, 'isRead' : false, 'title' : title});
+        if(!mute && uid != user!.uid) sendFcmMessage(user!.displayName!, message, uid, groupId: groupId);
+      });
     });
-    firestore.collection('chats').doc(groupId).set({'subs' : FieldValue.arrayUnion([user!.uid])}, SetOptions(merge: true));
     firestore.collection('users/${user!.uid}/groups').doc(groupId).set({'isRead' : true}, SetOptions(merge: true));
   }
 
   static Stream<QuerySnapshot<Map<String,dynamic>>> getGroupChats()  {
-    return firestore.collection('users/${user!.uid}/groups').orderBy('time').snapshots();
+    return firestore.collection('users/${user!.uid}/groups').orderBy('time', descending: true).snapshots();
   }
 
 
@@ -83,11 +92,11 @@ class Chat {
     return firestore.collection('chats/$groupId/messages').orderBy('timeStamp', descending: true).snapshots();
   }
 
-  static void sendFcmMessage(String title, String message, String uid) {
+  static Future<void> sendFcmMessage(String title, String message, String uid, {String? groupId}) async {
     try {
 
       var token;
-      firestore.collection('users').doc(uid).get().then((value) {
+      await firestore.collection('users').doc(uid).get().then((value) {
         token = value.data()!['Token'];
       });
       var url = Uri.parse('https://fcm.googleapis.com/fcm/send');
@@ -101,11 +110,13 @@ class Chat {
           "title": title,
           "body": message,
         },
+        "data": {
+          "chatId" : groupId ?? uid
+        },
         "priority": "high",
         "to": "${token!}",
       };
-
-      http.post(url, headers: header, body: json.encode(request));
+      await http.post(url, headers: header, body: json.encode(request));
     } catch (e, s) {
     }
   }

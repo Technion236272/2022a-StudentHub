@@ -206,7 +206,9 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 ),
               ],
             ),
-            bottomNavigationBar: buildBottomNavigationBar(),
+            //bottomNavigationBar: ,
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: buildBottomNavigationBar() ,
           ),
           decoration: BoxDecoration(
             // spice up the button with a radius

@@ -37,75 +37,75 @@ class _FavoritesPage extends State<FavoritesPage> {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final user = Provider.of<AuthRepository>(context);
 
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       backgroundColor: GlobalStringText.WhiteScreen,
       body: Column(
 
         children: <Widget>[
           SafeArea(
               child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.18,
-            color: Color(0xFF8C88F9),
-            child: Column(
-              children: <Widget>[
-                Row(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.18,
+                color: Color(0xFF8C88F9),
+                child: Column(
                   children: <Widget>[
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        )),
-                    new Spacer(),
-                    IconButton(
-                      onPressed: () async {
-                        await user.signOut();
-                        Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            )),
+                        new Spacer(),
+                        IconButton(
+                          onPressed: () async {
+                            await user.signOut();
+                            Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
 
-                      },
-                      icon: Image.asset("images/logout.png"),
-                      iconSize: 40,
+                          },
+                          icon: Image.asset("images/logout.png"),
+                          iconSize: 40,
+                        )
+                      ],
+                    ),
+                    Container(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text("Hi ${user.getName()}",
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand-Bold.ttf',
+                                    color: Colors.white,
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                "Welcome Back! ",
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Quicksand-Bold.ttf',
+                                  color: Colors.white,
+                                ),
+                              ),
+                              new Image.asset(GlobalStringText.ImageWavingTest)
+                            ],
+                          )
+                        ],
+                      ),
+                      margin: EdgeInsets.only(left: 15),
                     )
                   ],
                 ),
-                Container(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text("Hi ${user.getName()}",
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand-Bold.ttf',
-                                color: Colors.white,
-                              )),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            "Welcome Back! ",
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Quicksand-Bold.ttf',
-                              color: Colors.white,
-                            ),
-                          ),
-                          new Image.asset(GlobalStringText.ImageWavingTest)
-                        ],
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 15),
-                )
-              ],
-            ),
-          )),
+              )),
           Flexible(
             child: Container(
               height: MediaQuery.of(context).size.height * 0.8,
@@ -117,10 +117,10 @@ class _FavoritesPage extends State<FavoritesPage> {
                 color: GlobalStringText.WhiteScreen,
                 boxShadow: [
                   BoxShadow(
-                      color: Color(0xFF8C88F9),
-                      spreadRadius: 12,
-                      blurRadius: 10,
-                    offset: Offset(0, -10),
+                    color: Color(0xFF8C88F9),
+                    spreadRadius: 12,
+                    blurRadius: 10,
+                    offset: Offset(0, -2),
                   )
                 ],
               ),
@@ -184,7 +184,10 @@ class _FavoritesPage extends State<FavoritesPage> {
       bottomNavigationBar: buildBottomNavigationBar() ,
 
 
-    );
+    ), onWillPop: () {
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+      return Future.value(false);
+    });
   }
 
   Widget buildBottomNavigationBar() {
@@ -253,7 +256,7 @@ class _FavoritesPage extends State<FavoritesPage> {
                   case 0 :
                     break;
                   case 1 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
                     break;
                   case 2 :
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);

@@ -11,6 +11,7 @@ import 'ScreenTags.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'chat_backend.dart';
+import 'main.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User? loggedInuser;
@@ -34,6 +35,8 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isKeyboardVisible = false;
   var messageText;
   late Stream messages;
+  bool mute = false;
+
 
   @override
   void initState() {
@@ -45,15 +48,29 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     });
     messages = widget.isGroup? Chat.getGroupMessages(widget.uid) : Chat.getMessages(widget.uid);
+    currentChatId = widget.uid;
+    _firestore.collection('chats').doc(widget.uid).get().then((value) {
+      Map<String,bool> subs = value.data()!['subs'];
+      if(!subs.containsKey(Chat.user!.uid)) {
+        subs[Chat.user!.uid] = false;
+        value.reference.set({'subs' : subs}, SetOptions(merge: true));
+        mute = false;
+      } else {
+        mute = subs[Chat.user! .uid]!;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       backgroundColor: Colors.white,
       appBar: appBarComponent(context),
       body: body(context),
-    );
+    ), onWillPop: () {
+      currentChatId = null;
+      return Future.value(true);
+    });
   }
 
   PreferredSizeWidget appBarComponent(context) {
@@ -91,13 +108,13 @@ class _ChatScreenState extends State<ChatScreen> {
             Padding(
               padding: EdgeInsets.only(top: 25, right: 60),
               child: SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
+                width: MediaQuery.of(context).size.width / (widget.isGroup? 3:2),
                 child: Row(children:
                 [
                   Icon(widget.isGroup? LineIcons.users : LineIcons.user),
                   SizedBox(width: 5,),
                   Text(
-                  widget.isGroup? 'Ticket thread' : widget.name,
+                  widget.isGroup? 'Group Chat' : widget.name,
                   maxLines: 1,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -107,6 +124,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),],)
               ),
             ),
+            if(widget.isGroup)...[Padding(
+              padding: EdgeInsets.only(top: 25),
+              child: IconButton(onPressed: () async  {
+                Chat.flipMute(widget.uid, !mute);
+                setState(() {
+                  mute = !mute;
+                });
+
+              }, icon: Icon(mute? Icons.volume_mute_rounded : Icons.volume_down_rounded, size: 25, color: Colors.deepPurpleAccent,)),
+            )]
           ],
         ),
       ),
