@@ -77,7 +77,7 @@ class _inboxScreen extends State<inboxScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
@@ -86,7 +86,10 @@ class _inboxScreen extends State<inboxScreen>
       body: body(context),
       bottomNavigationBar: buildBottomNavigationBar(),
 
-    );
+    ), onWillPop: () {
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+      return Future.value(false);
+    },);
   }
 
   PreferredSizeWidget appBarComponent(context) {
@@ -343,7 +346,7 @@ class _inboxScreen extends State<inboxScreen>
               setState(() {
                 switch (index) {
                   case 0 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => false);
                     break;
                   case 1 :
                     Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);

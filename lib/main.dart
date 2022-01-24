@@ -21,6 +21,7 @@ import 'profilePage.dart';
 
 final FlutterLocalNotificationsPlugin notifsPlugin =
     FlutterLocalNotificationsPlugin();
+String? currentChatId;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,13 +36,15 @@ Future<void> main() async {
   await notifsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
+  await Firebase.initializeApp();
+  await FirebaseMessaging.instance.getToken();
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
     // If `onMessage` is triggered with a notification, construct our own
     // local notification to show to users using the created channel.
-    if (notification != null && android != null) {
+    if (notification != null && android != null && message.data['chatId'] != currentChatId) {
       notifsPlugin.show(
           notification.hashCode,
           notification.title,
@@ -50,7 +53,7 @@ Future<void> main() async {
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
-              priority: Priority.high,
+              priority: Priority.max,
               icon: android.smallIcon,
             ),
           ));
