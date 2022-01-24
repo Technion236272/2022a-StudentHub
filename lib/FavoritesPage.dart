@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:studenthub/main.dart';
 import 'ScreenTags.dart';
@@ -26,11 +27,28 @@ class _FavoritesPage extends State<FavoritesPage> {
   int selectedIndex = 0;
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  ScrollController scrollController = ScrollController();
+  bool _isVisible = true;
 
   @override
   void initState() {
     super.initState();
     tickets = getFavoriteTickets(context);
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
+        if (_isVisible == true) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      } else if (scrollController.position.maxScrollExtent != scrollController.position.pixels) {
+        if (_isVisible == false) {
+          setState(() {
+            _isVisible = true;
+          });
+        }
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -161,11 +179,12 @@ class _FavoritesPage extends State<FavoritesPage> {
                                 } else {
                                   local_tickets = snapshot.data as List<favoriteTicket>;
                                   return ListView.separated(
+                                    controller: scrollController,
                                     itemBuilder: (context, i) {
                                       return local_tickets[i];
                                     },
                                     itemCount: local_tickets.length,
-                                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                    separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 5,),
                                   );
                                 }
                               }
@@ -181,7 +200,8 @@ class _FavoritesPage extends State<FavoritesPage> {
           )
         ],
       ),
-      bottomNavigationBar: buildBottomNavigationBar() ,
+      floatingActionButton: Visibility(child:buildBottomNavigationBar(), visible: _isVisible,) ,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
 
     ), onWillPop: () {
@@ -192,7 +212,7 @@ class _FavoritesPage extends State<FavoritesPage> {
 
   Widget buildBottomNavigationBar() {
     return Container(
-      color: GlobalStringText.WhiteScreen,
+      color: Colors.transparent,
       child: SafeArea(
       top: true,
       child: Container(

@@ -38,14 +38,24 @@ class ChatModel {
 
   factory ChatModel.fromJson(dynamic json) {
     var time = DateTime.fromMillisecondsSinceEpoch((json['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
-    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    var now = DateTime.now();
+    String timePrefix = '';
+    if(time.day < now.day) {
+      timePrefix = '${time.day.toString().padLeft(2,'0')}/${time.month.toString().padLeft(2,'0')} , ';
+    }
+    String timeFormat = '$timePrefix${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
         name: json['name'], isGroup: false, isRead: json['isRead'] ?? true, time: timeFormat, currentMessage: json['lastMessage'], uid: (json as DocumentSnapshot).id);
   }
 
   factory ChatModel.group(DocumentSnapshot snapshot) {
     var time = DateTime.fromMillisecondsSinceEpoch((snapshot['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
-    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    var now = DateTime.now();
+    String timePrefix = '';
+    if(time.day < now.day) {
+      timePrefix = '${time.day.toString().padLeft(2,'0')}/${time.month.toString().padLeft(2,'0')} , ';
+    }
+    String timeFormat = '$timePrefix${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
         name: snapshot['title'], isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
   }
@@ -66,6 +76,8 @@ class _inboxScreen extends State<inboxScreen>
   int selectedIndex = 2;
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  bool _isVisible = true;
+  ScrollController scrollController = ScrollController();
 
 
   @override
@@ -73,6 +85,21 @@ class _inboxScreen extends State<inboxScreen>
     super.initState();
     _controller = TabController(length: 2, vsync: this, initialIndex: 0);
     Chat.init(context);
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
+        if (_isVisible == true) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      } else if (scrollController.position.maxScrollExtent != scrollController.position.pixels) {
+        if (_isVisible == false) {
+          setState(() {
+            _isVisible = true;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -84,7 +111,8 @@ class _inboxScreen extends State<inboxScreen>
 
       appBar: appBarComponent(context),
       body: body(context),
-      bottomNavigationBar: buildBottomNavigationBar(),
+      floatingActionButton: Visibility(child: buildBottomNavigationBar(), visible: _isVisible,),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
     ), onWillPop: () {
       Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
