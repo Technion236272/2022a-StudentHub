@@ -1,16 +1,13 @@
 ![App Stracture Diagram](FireBaseNew.png "FireBase.png Diagram")
 
 
-### FireBase
+## FireBase
 
 
-### * FireStore
+## * FireStore
 
-## * User Fav Tickets
 
 ## * Categories
-
-## * User Opened Tickets
 
 ## * Enterintament
 
