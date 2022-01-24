@@ -1,4 +1,4 @@
-![App Stracture Diagram](FireBase.png "FireBase.png Diagram")
+![App Stracture Diagram](FireBaseNew.png "FireBase.png Diagram")
 
 
 ### FireBase
