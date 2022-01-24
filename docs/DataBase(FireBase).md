@@ -34,9 +34,23 @@
 
 
 ## *	UserOpenedTickets
-*	UserID
+*	Category
 *	Ticket Reference(For the actual ticket)
 
 ## * Fav Ticket Structure 
-* User ID
+* ID
 * Ticket Reference (for the actual ticket)
+
+
+## * Users
+* Chats ( ref id for chats)
+* favirotes (id for ticket in favs)
+* groups (Group chat (contains : isread , last message , time , title)
+* tickets ( contains id to the user opened tickets ticket)
+
+## * chats
+* Chats with users ( which contain messages documents , every message contains (a fields : message , sender id , sender name , timestamp))
+* group chats ( contains messages documents , , every message contains (a fields : message , sender id , sender name , timestamp)
+
+
+
