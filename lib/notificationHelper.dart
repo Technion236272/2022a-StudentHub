@@ -35,12 +35,8 @@ Future<void> initNotifications(
       android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
   await notifsPlugin.initialize(initializationSettings,
       onSelectNotification: (String? payload) async {
-        if (payload != null) {
-          print('notification payload: ' + payload);
-        }
         selectNotificationSubject.add(payload!);
       });
-  print("Notifications initialized successfully");
 }
 
 

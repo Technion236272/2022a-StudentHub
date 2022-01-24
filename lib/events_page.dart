@@ -121,7 +121,7 @@ class _EventsPageState extends State<EventsPage> {
                           list.removeWhere((element) {
                             var now = Timestamp.now();
                             var data = element.data();
-                            if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(minutes: 20))) < 0) {
+                            if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(hours: 1))) < 0) {
                               deleteTicket(element);
                               return true;
                             }
@@ -562,7 +562,7 @@ class _EventsPageState extends State<EventsPage> {
                       Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                       break;
                     case 1 :
-                      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
                       break;
                     case 2 :
                       Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
