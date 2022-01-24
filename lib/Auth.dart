@@ -73,7 +73,10 @@ class AuthRepository with ChangeNotifier {
       final user = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       if (user.user!.emailVerified)
+      {
+        _user = user.user;
         return true;
+      }
       else {
         _status = Status.Unauthenticated;
         notifyListeners();
