@@ -4,7 +4,7 @@
 ## * FireBase
 
 
-##  FireStore
+## * FireStore
 
 
 ## * Categories
