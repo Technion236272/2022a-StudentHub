@@ -5,8 +5,8 @@ An application whose goal is to provide specialised services for students that c
 ### Motivation
 
 Many students have difficulty finding a study partner, academic help, a group to hang out with, or a ride to and from campus.
-To solve these problems, students have to search on various platforms.
-Our application provides essential social and academic services to solve these problems, all in one place.
+To solve these problems, students have to search on various platforms in order to find their need.
+Our application provides essential social and academic services to solve these problems, all in one place , in that way we can improve student lifestyle in campus.
 
 ### Core Features
 
