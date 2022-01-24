@@ -50,6 +50,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
     super.initState();
     Chat.init(context);
   }
+
   ////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
@@ -76,38 +77,47 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                     child: Column(
                       children: [
                         Align(
-                          child: Row(children: [Text(
-                              "Hi " + (user.getName() ?? ""),
-                              style: GoogleFonts.quicksand(textStyle: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: GlobalStringText.QuickSandFont,
-                                color: GlobalStringText.WhiteColorHiMessage,
-                              ),)
+                          child: Row(
+                            children: [
+                              Text("Hi " + (user.getName() ?? ""),
+                                  style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          GlobalStringText.QuickSandFont,
+                                      color:
+                                          GlobalStringText.WhiteColorHiMessage,
+                                    ),
+                                  )),
+                              IconButton(
+                                onPressed: () async {
+                                  await user.signOut();
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/Auth', (route) => false);
+                                },
+                                icon: Image.asset("images/logout.png"),
+                                iconSize: 40,
+                              ),
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           ),
-                            IconButton(
-                              onPressed: () async {
-                                await user.signOut();
-                                Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
-                              },
-                              icon: Image.asset("images/logout.png"),
-                              iconSize: 40,
-                            ),],
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,),
                           alignment: Alignment.centerLeft, //this ok??
                         ),
                         Align(
                           child: Row(
                             children: [
-                              Text(
-                                  "Welcome Back!  ",
-                                  style: GoogleFonts.quicksand(textStyle: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: GlobalStringText.QuickSandFont,
-                                    color: GlobalStringText.WhiteColorHiMessage,
-                                  ),)
-                              ),
+                              Text("Welcome Back!  ",
+                                  style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          GlobalStringText.QuickSandFont,
+                                      color:
+                                          GlobalStringText.WhiteColorHiMessage,
+                                    ),
+                                  )),
                               Tab(
                                   icon: Image.asset(
                                       GlobalStringText.ImageWavingTest)),
@@ -145,16 +155,18 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                     alignment: Alignment.topCenter,
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         GestureDetector(
                                             child: Container(
                                                 width: 100,
                                                 height: 100,
                                                 decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(20)),
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(20)),
                                                   color: Colors.transparent,
                                                   image: DecorationImage(
                                                       image: AssetImage(
@@ -163,7 +175,8 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                       fit: BoxFit.scaleDown),
                                                 )),
                                             onTap: () {
-                                              Navigator.of(context).pushNamed('/Home/Opened');
+                                              Navigator.of(context)
+                                                  .pushNamed('/Home/Opened');
                                             }),
                                         Container(
                                             width: 120,
@@ -183,8 +196,9 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                 width: 100,
                                                 height: 100,
                                                 decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(20)),
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(20)),
                                                   color: Colors.transparent,
                                                   image: DecorationImage(
                                                       image: AssetImage(
@@ -193,7 +207,9 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                                                       fit: BoxFit.scaleDown),
                                                 )),
                                             onTap: () {
-                                              Navigator.of(context).pushNamed('/Home/Profile', arguments: user.user!.uid);
+                                              Navigator.of(context).pushNamed(
+                                                  '/Home/Profile',
+                                                  arguments: user.user!.uid);
                                             }),
                                       ],
                                     ),
@@ -216,7 +232,7 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
               Radius.circular(10),
             ),
             gradient: LinearGradient(
-              // gradient starts from left
+                // gradient starts from left
                 begin: Alignment.centerLeft,
                 // gradient ends at right
                 end: Alignment.centerRight,
@@ -228,22 +244,21 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                   GlobalStringText.SecondpurpleColor,
                   GlobalStringText.FirstpurpleColor,
                   Color.fromRGBO(143, 148, 251, 1),
-
-
                 ]),
           ),
         ),
         onWillPop: () async {
           Timestamp now = Timestamp.now();
-          if(currentBackPressTime == null || now.toDate().difference(currentBackPressTime!.toDate()) > Duration(seconds: 2)) {
+          if (currentBackPressTime == null ||
+              now.toDate().difference(currentBackPressTime!.toDate()) >
+                  Duration(seconds: 2)) {
             currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Press again to exit')));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('Press again to exit')));
             return Future.value(false);
           }
           return Future.value(true);
-        }
-    );
+        });
   }
 
   Widget buildBottomNavigationBar() {
@@ -266,7 +281,6 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0, vertical: 7),
           child: GNav(
-
             tabs: [
               GButton(
                 gap: gap,
@@ -277,7 +291,6 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -302,19 +315,18 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
                 icon: LineIcons.inbox,
                 text: 'Inbox',
               ),
-
             ],
             selectedIndex: selectedIndex,
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                  case 0 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
+                  case 0:
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/Home/Favorites', (route) => route.isFirst);
                     break;
-                  case 1 :
-                    break;
-                  case 2 :
-                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
+                  case 2:
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });
@@ -328,261 +340,268 @@ class _CategoryPageScreen extends State<CategoryPageScreen> {
   Widget CategoryFields() {
     return Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(width: 6),
-                GestureDetector(
-                    child: Container(
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: Image.asset(
-                                    'images/icons8-comedy-64.png',
-                                    fit: BoxFit.fill,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text(
-                                    'Entertainment', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 20,
-                                      color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w500),),)
-                              ),
-                            ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(width: 6),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Image.asset(
+                                  'images/icons8-comedy-64.png',
+                                  fit: BoxFit.fill,
+                                )),
                           ),
-                        ),
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.DeepPinkColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/Entertainment');
-                    }),
-                SizedBox(width: 20),
-                GestureDetector(
-                    child: Container(
-
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
-                                  child: Image.asset(
-                                    GlobalStringText.ImagesTravelCat,
-                                    fit: BoxFit.fill,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text('CarPool', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 20,
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              child: Text(
+                                'Entertainment',
+                                style: GoogleFonts.montserrat(
+                                  textStyle: TextStyle(
+                                      fontSize: 18,
                                       color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w500),),)
-                              ),
-                            ],
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              )),
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.DeepPinkColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/Entertainment');
+                }),
+            SizedBox(width: 20),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+                                child: Image.asset(
+                                  GlobalStringText.ImagesTravelCat,
+                                  fit: BoxFit.fill,
+                                )),
                           ),
-                        ),
-
-
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.LightYellowColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/CarPool');
-                      ;
-                    }),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(width: 6),
-                GestureDetector(
-                    child: Container(
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: Image.asset(
-                                    GlobalStringText.ImagesFoodCat,
-                                    fit: BoxFit.fill,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text('Food', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 20,
-                                      color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w500),),)
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: Text(
+                              'CarPool',
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: GlobalStringText.purpleColor,
+                                    fontWeight: FontWeight.w500),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-
-
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.LightBlueColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/Food');
-                    }),
-                SizedBox(width: 20),
-                GestureDetector(
-                    child: Container(
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 13, 0, 0),
-                                  child: Image.asset(
-                                    GlobalStringText.ImagesAcadSupportCat,
-                                    fit: BoxFit.scaleDown,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text(
-                                    'Academic Support', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 16,
-                                      color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w600),),)
-                              ),
-                            ],
-                          ),
-                        ),
-
-
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.LightGreenColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/AcademicSupport');
-                    }),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(width: 6),
-                GestureDetector(
-                    child: Container(
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: Image.asset(
-                                    GlobalStringText.ImagesStudyBudCat,
-                                    fit: BoxFit.fill,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text('Study Buddy', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 20,
-                                      color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w500),),)
-                              ),
-                            ],
-                          ),
-                        ),
-
-
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.LightOarngeColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/StudyBuddy');
-                    }),
-                SizedBox(width: 20),
-                GestureDetector(
-                    child: Container(
-                        child: Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            children: <Widget>[
-
-                              Expanded(child: Container(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: Image.asset(
-                                    GlobalStringText.ImagesMaterialCat,
-                                    fit: BoxFit.fill,)),),
-
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                  child: Text('Material', style: GoogleFonts
-                                      .montserrat(textStyle: TextStyle(
-                                      fontSize: 20,
-                                      color: GlobalStringText.purpleColor,
-                                      fontWeight: FontWeight.w500),),)
-                              ),
-                            ],
-                          ),
-                        ),
-
-
-                        width: MediaQuery.of(context).size.width*0.41,
-                        height: MediaQuery.of(context).size.height*0.185,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: GlobalStringText.LightRedColorFirst,
-
-                        )),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/Home/Material');
-                    }),
-              ],
-            )
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.LightYellowColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/CarPool');
+                  ;
+                }),
           ],
-        ));
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(width: 6),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Image.asset(
+                                  GlobalStringText.ImagesFoodCat,
+                                  fit: BoxFit.fill,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: Text(
+                              'Food',
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: GlobalStringText.purpleColor,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.LightBlueColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/Food');
+                }),
+            SizedBox(width: 20),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 13, 0, 0),
+                                child: Image.asset(
+                                  GlobalStringText.ImagesAcadSupportCat,
+                                  fit: BoxFit.scaleDown,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: Text(
+                              'Academic Support',
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                    fontSize: 14,
+                                    color: GlobalStringText.purpleColor,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.LightGreenColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/AcademicSupport');
+                }),
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(width: 6),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Image.asset(
+                                  GlobalStringText.ImagesStudyBudCat,
+                                  fit: BoxFit.fill,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: Text(
+                              'Study Buddy',
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: GlobalStringText.purpleColor,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.LightOarngeColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/StudyBuddy');
+                }),
+            SizedBox(width: 20),
+            GestureDetector(
+                child: Container(
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.transparent,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Image.asset(
+                                  GlobalStringText.ImagesMaterialCat,
+                                  fit: BoxFit.fill,
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            child: Text(
+                              'Material',
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: GlobalStringText.purpleColor,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.41,
+                    height: MediaQuery.of(context).size.height * 0.185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: GlobalStringText.LightRedColorFirst,
+                    )),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/Home/Material');
+                }),
+          ],
+        )
+      ],
+    ));
   }
 }
-
-
