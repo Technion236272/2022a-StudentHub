@@ -29,7 +29,7 @@ Our application provides essential social and academic services to solve these p
 
 ### Complementary features
 
-* All users will be verified upon registration by presenting their student ID.
+* All users will be verified upon registration by verfecation from their Technion Email
 * Event Reminder (Notifactions).
 * Chat Notifcations (for recived messages).
 * 'Faviorite Tickets' tab which contains upcoming events that the people loved.
