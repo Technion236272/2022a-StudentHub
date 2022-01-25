@@ -190,7 +190,7 @@ class _LoginScreen extends State<LoginScreen> {
                       backgroundColor: Color(0xFF9189F3),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => CategoryPageScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
                   }
 
 

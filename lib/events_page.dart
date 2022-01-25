@@ -16,12 +16,12 @@ import 'package:studenthub/chatScreen.dart';
 import 'package:studenthub/ticket_form_Screen.dart';
 import 'Auth.dart';
 import 'package:studenthub/FavoritesPage.dart';
-
 import 'package:intl/intl.dart';
+import 'chat_backend.dart';
 import 'main.dart';
 import 'notificationHelper.dart';
-
 import 'MaintainceScreen.dart';
+import 'profilePage.dart';
 
 class EventsPage extends StatefulWidget {
   final String category;
@@ -40,11 +40,10 @@ class _EventsPageState extends State<EventsPage> {
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
-  List user_favorites = [];
+  Map<DocumentReference, int> user_favorites = {};
+  var favoritesReady;
   final TextEditingController _filter = new TextEditingController();
   String _searchText = ""; //search bar text
-  List<Ticket> names = []; //all tickets
-  List<Ticket> filteredNames = []; // tickets  filtered by search text
   Icon _searchIcon = new Icon(Icons.search);
   Widget _appBarTitle = new Text('Student Hub');
   bool search_tapped = false; // flag if the search on right top pressed
@@ -79,73 +78,19 @@ class _EventsPageState extends State<EventsPage> {
       }
     });
     tickets = getTickets();
-    this._getNames();
   }
+
 
   _EventsPageState() {
     _filter.addListener(() {
-      if (_filter.text.isEmpty) {
-        setState(() {
-          _searchText = "";
-        });
-      } else {
-        setState(() {
-          _searchText = _filter.text;
-          processSearch();
-        });
-      }
-    });
-  }
-
-  void _getNames() async {
-    List<Ticket> tempList = await getTickets();
-    setState(() {
-      names = tempList;
-      filteredNames = [];
+      setState(() {
+        tickets=getTickets();
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var filtered_column = Column(
-      children: [
-        Visibility(
-            maintainAnimation: true,
-            maintainState: true,
-            visible: _isVisible,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: getCategoryIcon(widget.category),
-            )),
-        getCategoryTitle(),
-        Expanded(
-            child: ListView(
-          children: (selected_filter_list!.length == 0 ||
-                  selected_filter_list == null)
-              ? names
-              : _searchText.isEmpty?filterList():processSearch(filterList: selected_filter_list),
-        ))
-      ],
-    );
-    var search_column = Column(
-      children: [
-        Visibility(
-            maintainAnimation: true,
-            maintainState: true,
-            visible: _isVisible,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: getCategoryIcon(widget.category),
-            )),
-        getCategoryTitle(),
-        Expanded(
-            child: ListView(
-          children: filteredNames,
-        ))
-      ],
-    );
     var mainCol = Column(
       children: [
         Visibility(
@@ -159,8 +104,8 @@ class _EventsPageState extends State<EventsPage> {
             )),
         getCategoryTitle(),
         Expanded(
-            child: FutureBuilder(
-                future: tickets,
+            child: StreamBuilder(
+                stream: tickets,
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -172,9 +117,105 @@ class _EventsPageState extends State<EventsPage> {
                         if (snapshot.hasError) {
                           return Center(child: Text("Error ${snapshot.error}"));
                         } else {
-                          return ListView(
-                            children: snapshot.data as List<Widget>,
-                            controller: _hideFapController,
+                          List list = (snapshot.data as QuerySnapshot).docs;
+                          list.removeWhere((element) {
+                            var now = Timestamp.now();
+                            var data = element.data();
+                            if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(hours: 1))) < 0) {
+                              deleteTicket(element);
+                              return true;
+                            }
+                            return false;
+                          });
+                          return FutureBuilder(
+                              future: favoritesReady,
+                              builder: (context, snapshot) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.waiting:
+                                    {
+                                      return const Center(child: Text("Loading"));
+                                    }
+                                  default:
+                                    {
+                                      if (snapshot.hasError) {
+                                        return Center(child: Text("Error ${snapshot.error}"));
+                                      } else {
+                                        list.removeWhere((element) {
+                                          var now = Timestamp.now();
+                                          var data = element.data();
+                                          if (DateFormat('d.M.yyyy , HH:mm').parse(data['Time']).compareTo(now.toDate().subtract(const Duration(minutes: 20))) < 0) {
+                                            deleteTicket(element);
+                                            return true;
+                                          }
+                                          return false;
+                                        });
+                                        return ListView.builder(
+                                          itemCount: list.length,
+
+                                          itemBuilder: (BuildContext context, int index) {
+                                            Ticket ticket = Ticket.fromJson(list[index], widget.category, user_favorites);
+                                            if (_searchText.isNotEmpty) {
+                                              if (ticket
+                                                  ._title
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ||ticket
+                                                  ._desc
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase())  || ticket
+                                                  ._owner
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) || ticket
+                                                  ._location
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) || ticket
+                                                  ._time
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ||( ticket
+                                                  .dest!= null && ticket
+                                                  .dest!
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) ) || ( ticket
+                                                  .course!= null && ticket
+                                                  .course!
+                                                  .toLowerCase()
+                                                  .contains(_searchText.toLowerCase()) )){
+                                                if(selected_filter_list!.isNotEmpty)
+                                                {
+                                                  if(selected_filter_list!.contains(ticket.type))
+                                                  {
+
+                                                    return ticket;
+
+                                                  }
+                                                  else return Container();
+                                                }
+                                                else return ticket;
+                                              }
+
+                                              else {
+                                                return Container();
+                                              }
+                                            }
+                                            else if(selected_filter_list!.isNotEmpty)
+                                            {
+
+                                              if(selected_filter_list!.contains(ticket.type))
+                                              {
+
+                                                return ticket;
+
+                                              }
+                                              else return Container();
+                                            }
+                                            return ticket;
+
+                                          },
+                                          controller: _hideFapController,
+                                        );
+                                      }
+                                    }
+                                }
+                              }
                           );
                         }
                       }
@@ -201,32 +242,23 @@ class _EventsPageState extends State<EventsPage> {
                       width: 70,
                       height: 70,
                       child: FittedBox(
-                        child: FloatingActionButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          NewPostScreen(widget.category)))
-                                  .then((value) {
-                                setState(() async {
-                                  tickets = getTickets();
-                                  names= await getTickets();
-                                });
-                              });
-                            },
-                            child: Tab(
-                              icon: Container(
-                                child: Image(
-                                  image: AssetImage(
-                                    GlobalStringText.ImagesAddTicket,
+                        child: (_isVisible && !search_tapped)
+                            ? FloatingActionButton(
+                                onPressed: addFloatingAction,
+                                child: Tab(
+                                  icon: Container(
+                                    child: Image(
+                                      image: AssetImage(
+                                        GlobalStringText.ImagesAddTicket,
+                                      ),
+                                      fit: BoxFit.contain,
+                                    ),
+                                    height: 60,
+                                    width: 60,
                                   ),
-                                  fit: BoxFit.contain,
                                 ),
-                                height: 60,
-                                width: 60,
-                              ),
-                            ),
-                            backgroundColor: GlobalStringText.whiteColor),
+                                backgroundColor: GlobalStringText.whiteColor)
+                            : null,
                       )),
                 ),
               ),
@@ -240,11 +272,13 @@ class _EventsPageState extends State<EventsPage> {
               child: AnimatedOpacity(
                 opacity: _isVisible ? 1 : 0,
                 duration: const Duration(milliseconds: 500),
-                child: Container(
-                  margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  padding: const EdgeInsets.only(left: 20),
-                  child: buildBottomNavigationBar(),
-                ),
+                child: (_isVisible && !search_tapped)
+                    ? Container(
+                        margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                        padding: const EdgeInsets.only(left: 20),
+                        child: buildBottomNavigationBar(),
+                      )
+                    : null,
               ),
             ),
           ],
@@ -259,7 +293,9 @@ class _EventsPageState extends State<EventsPage> {
                 icon: Image.asset("images/filter.png"),
                 onPressed: filterTap,
               ),
-              visible: (search_tapped || widget.category !="Entertainment") ? false : true,
+              visible: (search_tapped || widget.category != "Entertainment")
+                  ? false
+                  : true,
             ),
             Visibility(
               child: GestureDetector(
@@ -284,7 +320,7 @@ class _EventsPageState extends State<EventsPage> {
                   blurRadius: 3.0,
                 )
               ]),
-          child: selected_filter_list!.length==0?((_searchText.isNotEmpty) ? search_column : mainCol):filtered_column,
+          child: mainCol,
         ),
       ),
       decoration: BoxDecoration(
@@ -309,272 +345,139 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  void filterTap() async {
-    await FilterListDialog.display<String>(context,
-        listData: filter_list,
-        selectedTextBackgroundColor: Colors.deepPurpleAccent,
-        selectedListData: selected_filter_list,
-        applyButonTextBackgroundColor: Colors.deepPurpleAccent,
-        height: MediaQuery.of(context).size.height * 0.55,
-        width: MediaQuery.of(context).size.width * 0.75,
-        headlineText: "Select Types of Entertainment",
-        headerTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-        searchFieldHintText: "Search Here", choiceChipLabel: (item) {
-      return item;
-    }, validateSelectedItem: (list, val) {
-      return list!.contains(val);
-    }, onItemSearch: (list, text) {
-      if (list!.any(
-          (element) => element.toLowerCase().contains(text.toLowerCase()))) {
-        return list
-            .where(
-                (element) => element.toLowerCase().contains(text.toLowerCase()))
-            .toList();
-      } else {
-        return [];
-      }
-    }, onApplyButtonClick: (list) {
-      if (list != null) {
-        setState(() {
-          selected_filter_list = List.from(list);
-        });
-      }
-      Navigator.pop(context);
+  void addFloatingAction() {
+    Navigator.of(context)
+        .pushNamed('/Home/${widget.category}/Create')
+        .then((value) async {
+      setState(() {
+        tickets = getTickets();
+      });
     });
   }
 
-  List<Ticket> filterList() {
-    List<Ticket> filteredList = [];
+  void filterTap() async {
+    await FilterListDialog.display<String>(
+      context,
+      listData: filter_list,
+      selectedTextBackgroundColor: Colors.deepPurpleAccent,
+      selectedListData: selected_filter_list,
+      applyButonTextBackgroundColor: Colors.deepPurpleAccent,
+      height: MediaQuery.of(context).size.height * 0.55,
+      width: MediaQuery.of(context).size.width * 0.75,
+      headlineText: "Select Types of Entertainment",
+      headerTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+      searchFieldHintText: "Search Here",
+      choiceChipLabel: (item) {
+        return item;
+      },
+      validateSelectedItem: (list, val) {
+        return list!.contains(val);
+      },
+      onItemSearch: (list, text) {
+        if (list!.any(
+            (element) => element.toLowerCase().contains(text.toLowerCase()))) {
+          return list
+              .where((element) =>
+                  element.toLowerCase().contains(text.toLowerCase()))
+              .toList();
+        } else {
+          return [];
+        }
+      },
+      onApplyButtonClick: (list) {
+        setState(() {
+          tickets=getTickets();
+        });
+        if (list != null) {
+          setState(() {
+            selected_filter_list = List.from(list);
+          });
+        }
 
-
-    for (var i = 0; i < names.length; i++) {
-      if (selected_filter_list!.contains(names[i].type)) {
-        filteredList.add(names[i]);
-      }
-    }
-    return filteredList;
+        Navigator.pop(context);
+      },
+    );
   }
+
 
   void onSearchTapUp() {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
         search_tapped = true;
+
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
+          onChanged: (value) {
+            setState(() {
+              _searchText = value;
+            });
+          },
           controller: _filter,
           style: TextStyle(color: Colors.white),
           decoration: new InputDecoration(
               border: InputBorder.none,
-              prefixIcon: new Icon(Icons.search),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
               hintText: 'Search...'),
         );
       } else {
         search_tapped = false;
         this._searchIcon = new Icon(Icons.search);
         this._appBarTitle = new Text('Student Hub');
-
+        _searchText = "";
+        tickets=getTickets();
         _filter.clear();
       }
     });
   }
 
-  List<Ticket> processSearch({List<String>? filterList}) {
-    filteredNames = [];
 
-    if (_searchText.isNotEmpty) {
-      for (var i = 0; i < names.length; i++) {
-
-        if (names[i]._time.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]._title.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]._desc.toLowerCase().contains(_searchText.toLowerCase()) ||
-            names[i]
-                ._location
-                .toLowerCase()
-                .contains(_searchText.toLowerCase()) ||
-            (names[i].dest != null &&
-                names[i]
-                    .dest!
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase())) ||
-            (names[i].course != null &&
-                names[i]
-                    .course!
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase())) ||
-            (names[i]._owner != null &&
-                names[i]
-                    ._owner
-                    .toLowerCase()
-                    .contains(_searchText.toLowerCase()))) {
-          if(filterList!=null && filterList.length!=0 && names[i].type !=null && !filterList.contains(names[i].type))
-            continue;
-          filteredNames.add(names[i]);
-        }
-      }
-    }
-    return filteredNames;
-  }
-
-  Future<List<Ticket>> getTickets() async {
-    var tickets = <Ticket>[];
+  Stream getTickets() {
+    user_favorites.clear();
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
-    await _firestore
+    favoritesReady = _firestore
         .collection("users/${user?.uid}/favorites")
         .get()
         .then((value) => {
               value.docs.forEach((element) {
-                user_favorites.add(element.data()['ref']);
+                user_favorites[element.data()['ref']] = element.data()['id'];
               })
             });
-    final Color catColor = getCategoryColor();
     switch (widget.category) {
       case GlobalStringText.tagFood:
         {
-          await _firestore.collection("Food").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                type: data['Type'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+          return _firestore.collection("Food").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagEntertainment:
         {
-          await _firestore.collection("Entertainment").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                type: data['Type'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+          return _firestore.collection("Entertainment").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagCarPool:
         {
-          await _firestore.collection("CarPool").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                dest: data['Destination'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+          return _firestore.collection("CarPool").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagAcademicSupport:
         {
-          await _firestore
+          return _firestore
               .collection("AcademicSupport")
-              .get()
-              .then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+              .orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagStudyBuddy:
         {
-          await _firestore.collection("StudyBuddy").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+          return _firestore.collection("StudyBuddy").orderBy('Time').snapshots();
         }
-        break;
       case GlobalStringText.tagMaterial:
         {
-          await _firestore.collection("Material").get().then((collection) {
-            collection.docs.forEach((element) {
-              var data = element.data();
-              var ticket = Ticket(
-                data['groupId'],
-                data['ownerUid'],
-                data['Title'],
-                data['Description'],
-                data['Time'],
-                catColor,
-                data['Location'],
-                data['Owner'],
-                course: data['CourseNum'],
-                ref: element.reference,
-                isLoved: user_favorites.contains(element.reference),
-              );
-              tickets.add(ticket);
-            });
-          });
+          return _firestore.collection("Material").orderBy('Time').snapshots();
         }
-        break;
       default:
         {
+          return const Stream.empty();
         }
     }
-    return tickets;
   }
 
   Widget buildBottomNavigationBar() {
@@ -655,20 +558,14 @@ class _EventsPageState extends State<EventsPage> {
               onTabChange: (index) {
                 setState(() {
                   switch (index) {
-                    // just update the navigator i putted random navigation for the purpose of testing...
-                    // waiting for yousef to do the pages
-                    case 0:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => FavoritesPage()));
+                    case 0 :
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => route.isFirst);
                       break;
-                    case 1:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CategoryPageScreen()));
+                    case 1 :
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
                       break;
-
-                    case 2:
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => MaintaincePage()));
+                    case 2 :
+                      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                       break;
                   }
                 });
@@ -678,39 +575,6 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
-  }
-
-  Color getCategoryColor() {
-    switch (widget.category) {
-      case GlobalStringText.tagEntertainment:
-        {
-          return GlobalStringText.DeepPinkColorFirst;
-        }
-      case GlobalStringText.tagFood:
-        {
-          return GlobalStringText.LightBlueColorFirst;
-        }
-      case GlobalStringText.tagStudyBuddy:
-        {
-          return GlobalStringText.LightOarngeColorFirst;
-        }
-      case GlobalStringText.tagMaterial:
-        {
-          return GlobalStringText.LightRedColorFirst;
-        }
-      case GlobalStringText.tagCarPool:
-        {
-          return GlobalStringText.LightYellowColorFirst;
-        }
-      case GlobalStringText.tagAcademicSupport:
-        {
-          return GlobalStringText.LightGreenColorFirst;
-        }
-      default:
-        {
-          return Colors.white;
-        }
-    }
   }
 
   Widget getCategoryTitle() {
@@ -842,8 +706,8 @@ class Ticket extends StatefulWidget {
   final String _location;
   final Color _color;
   final String _owner;
-  final String _ownerId;
   final String _ticketId;
+  final String _userID;
   var ref;
   String? dest;
   String? type;
@@ -852,9 +716,10 @@ class Ticket extends StatefulWidget {
   bool? isLoved;
   Void2VoidFunc? update;
   String? category;
+  int? notif_id;
 
-  Ticket(this._ticketId, this._ownerId, this._title, this._desc, this._time, this._color, this._location,
-      this._owner,
+  Ticket(this._ticketId, this._userID, this._title, this._desc, this._time,
+      this._color, this._location, this._owner,
       {Key? key,
       this.dest,
       this.type,
@@ -863,8 +728,122 @@ class Ticket extends StatefulWidget {
       this.ref,
       this.isLoved,
       this.update,
-      this.category})
+      this.category,
+      this.notif_id})
       : super(key: key);
+
+  factory Ticket.fromJson(DocumentSnapshot<Map<String,dynamic>> e, String category, Map<DocumentReference<Object?>, int> userFavorites) {
+    final Color catColor = getCategoryColor(category);
+    Map<String,dynamic> data = e.data()!;
+    switch (category) {
+      case GlobalStringText.tagFood:
+        {
+          return Ticket(
+            data['groupId'],
+            data['uid'],
+            data['Title'],
+            data['Description'],
+            data['Time'],
+            catColor,
+            data['Location'],
+            data['Owner'],
+            type: data['Type'],
+            ref: e.reference,
+            isLoved: userFavorites.containsKey(e.reference),
+            notif_id: userFavorites[e.reference] ?? -1,
+          );
+        }
+      case GlobalStringText.tagEntertainment:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  type: data['Type'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagCarPool:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  dest: data['Destination'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagAcademicSupport:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagStudyBuddy:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      case GlobalStringText.tagMaterial:
+        {
+          return Ticket(
+                  data['groupId'],
+                  data['uid'],
+                  data['Title'],
+                  data['Description'],
+                  data['Time'],
+                  catColor,
+                  data['Location'],
+                  data['Owner'],
+                  course: data['CourseNum'],
+                  ref: e.reference,
+                  isLoved: userFavorites.containsKey(e.reference),
+                  notif_id: userFavorites[e.reference] ?? -1,
+                );
+        }
+      default:
+        {
+          return Ticket('_ticketId', '_userID', '_title', '_desc', '_time', Colors.white, '_location', '_owner');
+        }
+    }
+  }
 
   @override
   _TicketState createState() => _TicketState();
@@ -873,7 +852,6 @@ class Ticket extends StatefulWidget {
 class _TicketState extends State<Ticket> {
   bool _isSaved = false;
   bool _isExpanded = false;
-  int notif_id = -1;
 
   @override
   void initState() {
@@ -891,6 +869,8 @@ class _TicketState extends State<Ticket> {
             child: Text(
           widget._title,
           maxLines: 2,
+              overflow: TextOverflow.fade,
+              softWrap: true,
           style: GoogleFonts.montserrat(
               textStyle: TextStyle(
                   fontSize: 28,
@@ -917,9 +897,11 @@ class _TicketState extends State<Ticket> {
             child: Text(
           widget._title,
           maxLines: 2,
+              overflow: TextOverflow.fade,
+              softWrap: true,
           style: const TextStyle(fontSize: 25, color: Color(0xFF6769EC)),
         )),
-        Spacer(),
+        //Spacer(),
         IconButton(
           icon: Image.asset("images/edit.png"),
           onPressed: editOpened,
@@ -958,16 +940,28 @@ class _TicketState extends State<Ticket> {
                 height: 5,
               ),
               Text(widget._desc,
-                  style: const TextStyle(
-                      fontSize: 17, color: Colors.indigoAccent)),
-              SizedBox(
+                  overflow: TextOverflow.fade,
+                  maxLines: 5,
+                  softWrap: true,
+                  style: const TextStyle(fontSize: 18, color: Colors.black)),
+              const SizedBox(
                 height: 5,
               ),
               SizedBox(
                 height: 5,
               ),
               Text(
-                "At " + widget._time + ' ' + widget._location,
+                "At " + widget._time,
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                widget._location,
+                overflow: TextOverflow.fade,
+                maxLines: 2,
+                softWrap: true,
                 style: TextStyle(fontSize: 20),
               ),
               Align(
@@ -998,6 +992,9 @@ class _TicketState extends State<Ticket> {
                 Expanded(
                     child: Text(
                   widget._desc,
+                      overflow: TextOverflow.clip,
+                      maxLines: 6,
+                      softWrap: true,
                   style: TextStyle(fontSize: 17, color: Colors.black),
                 )),
               ],
@@ -1015,17 +1012,27 @@ class _TicketState extends State<Ticket> {
                           fontWeight: FontWeight.bold)),
                 ),
                 Expanded(
+                  child: InkWell(
                     child: Text(
-                  widget._owner,
-                  style: TextStyle(fontSize: 17, color: Colors.black),
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  softWrap: false,
-                ))
+                      widget._owner,
+                      style: const TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.fade,
+                      maxLines: 2,
+                      softWrap: true,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/Home/Profile', arguments: widget._userID);
+                    },
+                  ),
+                )
               ],
             ),
             SizedBox(height: 3),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Location : ",
@@ -1035,8 +1042,17 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(widget._location,
-                    style: TextStyle(fontSize: 17, color: Colors.black))
+                Expanded(child:
+                Text(
+                  widget._location,
+                  style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                     ),
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  softWrap: true,
+                ),)
               ],
             ),
             SizedBox(height: 3),
@@ -1050,11 +1066,15 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(widget._time,
+                Expanded(child:                 Text(widget._time,
+                    overflow: TextOverflow.fade,
+                    maxLines: 2,
+                    softWrap: true,
                     style: TextStyle(fontSize: 17, color: Colors.black))
+                )
               ],
             ),
-            SizedBox(height: 3),
+            SizedBox(height: 5),
             Row(
               children: [
                 Text(
@@ -1065,23 +1085,39 @@ class _TicketState extends State<Ticket> {
                           color: GlobalStringText.purpleColor,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(extra_info_data,
-                    style: TextStyle(fontSize: 17, color: Colors.black))
+                Expanded(child:  Text(
+                  extra_info_data,
+                  style: TextStyle(fontSize: 17, color: Colors.black),
+                  overflow: TextOverflow.fade,
+                  maxLines: 2,
+                  softWrap: true,
+                )
+                )
               ],
             ),
             SizedBox(height: 3),
             Row(
               children: [
-                IconButton(
+                Visibility(child: IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._ownerId, false, widget._owner)));
+                      Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+                        'uid' : widget._userID,
+                        'isGroup' : false,
+                        'name' : widget._owner
+                      });
                     },
-                    icon: Image.asset('images/icons8-sent.png')),
+                    icon: Image.asset('images/icons8-sent.png'))
+                  ,visible: widget._userID != Chat.user!.uid,),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChatScreen(widget._ticketId, true, '')));
+                      Chat.firestore.collection('users/${Chat.user!.uid}/groups').doc(widget._ticketId).get().then((value) {
+                        Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+                          'uid' : widget._ticketId,
+                          'isGroup' : true,
+                          'name' : widget._title,
+                          'mute' : value.data()?['mute'] ?? false
+                        });
+                      });
                     },
                     icon: Image.asset('images/icons8-messaging-96.png')),
               ],
@@ -1097,8 +1133,6 @@ class _TicketState extends State<Ticket> {
         childTicket = Container(
           margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
           padding: const EdgeInsets.all(16),
-          height: 164,
-          width: 384,
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Color(0xFF7A3E98)),
@@ -1181,22 +1215,26 @@ class _TicketState extends State<Ticket> {
           "you have event soon!",
           datetime.subtract(Duration(minutes: 10)),
           Ticket.id);
-      notif_id = Ticket.id;
+      widget.notif_id=Ticket.id;
+
       _firestore.collection("users/${user?.uid}/favorites").add({
         'ref': widget.ref,
         'id': Ticket.id++,
+
       });
     } else {
       _firestore
           .collection("users/${user?.uid}/favorites")
-          .where('id', isEqualTo: notif_id)
+          .where('id', isEqualTo: widget.notif_id)
           .get()
           .then((collection) => {
                 collection.docs.forEach((element) {
                   element.reference.delete();
                 })
               });
-      notifsPlugin.cancel(notif_id);
+      notifsPlugin.cancel(widget.notif_id!);
+
+
     }
     setState(() {
       _isSaved = !_isSaved;
@@ -1215,19 +1253,18 @@ class _TicketState extends State<Ticket> {
       'course': widget.course,
     };
 
-    Navigator.of(context)
-        .push(MaterialPageRoute(
-            builder: (context) => NewPostScreen(
-                  widget.category!,
-                  data: data,
-                )))
-        .then((value) {
+    Navigator.of(context).pushNamed('/Home/Opened/Edit', arguments: {
+      'category' : widget.category,
+      'data' : data,
+    }).then((value) {
       widget.update!();
     });
   }
 
   void deleteOpened() {
-    (widget.ref as DocumentReference).delete();
+    (widget.ref as DocumentReference<Map<String,dynamic>>).get().then((value) {
+      deleteTicket(value);
+    });
     widget.update!();
   }
 
@@ -1235,6 +1272,40 @@ class _TicketState extends State<Ticket> {
     setState(() {
       _isExpanded = !_isExpanded;
     });
+  }
+}
+
+
+Color getCategoryColor(String category) {
+  switch (category) {
+    case GlobalStringText.tagEntertainment:
+      {
+        return GlobalStringText.DeepPinkColorFirst;
+      }
+    case GlobalStringText.tagFood:
+      {
+        return GlobalStringText.LightBlueColorFirst;
+      }
+    case GlobalStringText.tagStudyBuddy:
+      {
+        return GlobalStringText.LightOarngeColorFirst;
+      }
+    case GlobalStringText.tagMaterial:
+      {
+        return GlobalStringText.LightRedColorFirst;
+      }
+    case GlobalStringText.tagCarPool:
+      {
+        return GlobalStringText.LightYellowColorFirst;
+      }
+    case GlobalStringText.tagAcademicSupport:
+      {
+        return GlobalStringText.LightGreenColorFirst;
+      }
+    default:
+      {
+        return Colors.white;
+      }
   }
 }
 
@@ -1269,4 +1340,20 @@ Widget getCategoryIcon(String category) {
         return Container();
       }
   }
+}
+
+void deleteTicket(DocumentSnapshot<Map<String, dynamic>> element) {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  _firestore.collection('chats').doc(element.data()!['groupId']).get().then((value) {
+    List<dynamic> subs = value.get('subs');
+    for (var sub in subs) {
+      _firestore.collection('users/${sub as String}/groups').doc(element.data()!['groupId']).delete();
+    }
+    _firestore.collection('chats').doc(element.data()!['groupId']).delete();
+  });
+  _firestore.collection('users/${element.data()!['uid']}/tickets').where('ref', isEqualTo: element.reference).get().then((value) {
+    for (var element in value.docs) {
+      element.reference.delete();
+    }});
+  element.reference.delete();
 }

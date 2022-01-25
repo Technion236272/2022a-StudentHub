@@ -11,6 +11,7 @@ import 'ScreenTags.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'chat_backend.dart';
+import 'main.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User? loggedInuser;
@@ -20,8 +21,9 @@ class ChatScreen extends StatefulWidget {
   String uid;
   bool isGroup;
   String name;
+  bool? mute;
 
-  ChatScreen(this.uid, this.isGroup, this.name, {Key? key}) : super(key: key);
+  ChatScreen(this.uid, this.isGroup, this.name, {Key? key, bool? this.mute}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -34,6 +36,8 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isKeyboardVisible = false;
   var messageText;
   late Stream messages;
+  late bool mute;
+
 
   @override
   void initState() {
@@ -45,15 +49,23 @@ class _ChatScreenState extends State<ChatScreen> {
       });
     });
     messages = widget.isGroup? Chat.getGroupMessages(widget.uid) : Chat.getMessages(widget.uid);
+    currentChatId = widget.uid;
+    if(widget.isGroup) {
+      mute = widget.mute!;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       backgroundColor: Colors.white,
       appBar: appBarComponent(context),
       body: body(context),
-    );
+    ), onWillPop: () {
+      currentChatId = null;
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst, arguments: widget.isGroup? {'group': widget.isGroup}: null);
+      return Future.value(false);
+    });
   }
 
   PreferredSizeWidget appBarComponent(context) {
@@ -76,37 +88,51 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: 90,
-              width: 90,
-              padding: EdgeInsets.only(top: 20, right: 100),
-              child: IconButton(
-                icon: Icon(Icons.arrow_back,
+            InkWell(
+              child: Container(
+                height: 90,
+                width: 90,
+                padding: EdgeInsets.only(top: 20, right: 100, left: 5),
+                child: Icon(Icons.arrow_back,
                     size: 28, color: GlobalStringText.purpleColor),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  },
               ),
+              onTap: () {
+                currentChatId = null;
+                Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst, arguments: widget.isGroup? {'group': widget.isGroup}: null);
+              },
             ),
             Padding(
-              padding: EdgeInsets.only(top: 25, right: 60),
+              padding: EdgeInsets.only(top: 25, right: 80),
               child: SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: Row(children:
-                [
-                  Icon(widget.isGroup? LineIcons.users : LineIcons.user),
-                  SizedBox(width: 5,),
-                  Text(
-                  widget.isGroup? 'Ticket thread' : widget.name,
-                  maxLines: 1,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18,
-                      color: GlobalStringText.purpleColor),
-                ),],)
+                width: MediaQuery.of(context).size.width / (widget.isGroup? 3:2),
+                child: Align(child: Row(
+                  children:
+                  [
+                    Icon(widget.isGroup? LineIcons.users : LineIcons.user),
+                    SizedBox(width: 2,),
+                    Align(child: Text(
+                      widget.isGroup? 'Group Chat' : widget.name,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: GlobalStringText.purpleColor),
+                    ),alignment: Alignment.center,),],), alignment: Alignment.center,)
               ),
             ),
+            if(widget.isGroup)...[
+              Padding(
+                padding: EdgeInsets.only(top: 25),
+                child: IconButton(onPressed: () async  {
+                  Chat.flipMute(widget.uid, !mute);
+                  setState(() {
+                    mute = !mute;
+                  });
+
+                }, icon: Icon(mute? Icons.volume_mute_rounded : Icons.volume_down_rounded, size: 25, color: Colors.deepPurpleAccent,)),
+              )
+            ]
           ],
         ),
       ),
@@ -189,20 +215,17 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Container(
             width: width,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                if (widget.isGroup && !sentByMe) ...[
-                  Text(
-                    message.senderName,
-                    style: TextStyle(color: Colors.grey[800]),
-                  ),
-                  Container(margin: EdgeInsets.only(top: 5))
-                ],
-                Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    if (widget.isGroup && !sentByMe) ...[
+                      Text(
+                        message.senderName,
+                        style: TextStyle(color: Colors.grey[800]),
+                      ),
+                      Container(margin: EdgeInsets.only(top: 5))
+                    ],
                     Text(
                       message.text,
                       style: TextStyle(
@@ -213,8 +236,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   ],
                 ),
-              ],
-            ),
           ),
         )
       ],
@@ -268,7 +289,7 @@ class _ChatScreenState extends State<ChatScreen> {
            Padding(child :  FloatingActionButton(
                onPressed: () {
                  widget.isGroup?
-                     Chat.sendGroup(messageController.text, widget.uid)
+                     Chat.sendGroup(messageController.text, widget.uid, widget.name)
                      : Chat.send(messageController.text, widget.uid, widget.name);
                  messageController.clear();
                },

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/painting.dart';
 import 'package:line_icons/line_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:studenthub/Auth.dart';
@@ -13,6 +14,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+import 'package:google_maps_place_picker_mb/providers/place_provider.dart';
+import 'package:google_maps_place_picker_mb/providers/search_provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 //---------------------------------------CLASSES--------------------------------------------------//
 class Food {
@@ -68,6 +73,7 @@ class NewPostScreen extends StatefulWidget {
   String category;
   Map? data;
 
+
   NewPostScreen(this.category, {Key? key,  this.data}) : super(key: key);
 
   @override
@@ -77,10 +83,14 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  
-  //var ReciveUserID="";
+
+  static final kInitialPosition = LatLng(-33.8567844, 151.213108);
+
 
   DateTime selected_time = DateTime.now();
+  late PickResult _selectedPlaceStart = PickResult();
+  late PickResult _selectedPlaceDest = PickResult();
+
   TextEditingController TitleController = TextEditingController();
   TextEditingController LocationController = TextEditingController();
   TextEditingController DestinationController = TextEditingController();
@@ -167,6 +177,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
       EventTypeController = TextEditingController(text: widget.data!['type'] ?? '');
       FoodTypeController = TextEditingController(text: widget.data!['type'] ?? '');
       CourseNumberController = TextEditingController(text: widget.data!['course'] ?? '');
+    } else if (widget.category == GlobalStringText.tagCarPool) {
+      DestinationController = TextEditingController(text: 'Please Pick Destination');
+      LocationController = TextEditingController(text: 'Please Pick Departure');
     }
   }
 
@@ -321,35 +334,54 @@ class _NewPostScreenState extends State<NewPostScreen> {
         alignment: Alignment.centerLeft,
       ),
       const SizedBox(height: 5.0),
-      TextFormField(
-        focusNode: myFocusNodeLocation,
-        controller: LocationController,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: GlobalStringText.textFieldPinkColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(
-              width: 0,
-              style: BorderStyle.solid,
-            ),
-          ),
-          hintText: 'Example : Haifa , Technion 28 ',
-          hintStyle: TextStyle(
-              fontSize: 12.0, color: GlobalStringText.textFieldGrayColor),
-          //helperText: 'Keep it short, this is just a demo.',
-          labelText: 'Pick city and street number',
-          labelStyle: TextStyle(
-              fontSize: 15.0,
-              color: GlobalStringText.textFieldGrayColor,
-              fontFamily: GlobalStringText.FontTextFormField,
-              fontWeight: FontWeight.w300),
-
-          prefixText: ' ',
-          //suffixStyle: const TextStyle(color: Colors.green)
+    InkWell(
+    onTap: ()  {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PlacePicker(
+              apiKey: "AIzaSyAfka9If5Jz-DslgoEWvm8pqfp_9Y2xoGs",
+              hintText: "Find a place ...",
+              searchingText: "Please wait ...",
+              selectText: "Select place",
+              outsideOfPickAreaText: "Place not in area",
+              initialPosition: kInitialPosition,
+              useCurrentLocation: true,
+              selectInitialPosition: true,
+              usePinPointingSearch: true,
+              usePlaceDetailSearch: true,
+              onPlacePicked: (result) {
+                _selectedPlaceStart = result;
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+            );
+          },
         ),
-      ),
+      );
+    },
+    child: Container(
+    child: Row(
+    children: [Padding(padding: EdgeInsets.all(5)),
+    Expanded(child: Text(
+      _selectedPlaceStart.formattedAddress ?? LocationController.text,
+      style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+    ))
+    ],
+    mainAxisAlignment: MainAxisAlignment.start,
+    ),
+    decoration: BoxDecoration(
+    color: Color(0xFFF0F4F8),
+    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    border: Border.all(color: Colors.black)),
+    height: 50,
+    ),
+    ),
 
+
+
+      SizedBox(height: 10,),
       ///////////////------------------------------------------------------------------/////////////////
       Align(
         child: Row(
@@ -368,8 +400,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
               showTitleActions: true,
               minTime: DateTime.now(),
               maxTime: (DateTime(2060, 12, 31, 23, 59)), onChanged: (date) {
-            print('change $date in time zone ' +
-                date.timeZoneOffset.inHours.toString());
           }, onConfirm: (date) {
             setState(() {
               selected_time = date;
@@ -393,7 +423,15 @@ class _NewPostScreenState extends State<NewPostScreen> {
           height: 50,
         ),
       ),
+      const SizedBox(height: 3.0),
+      Row( crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('*', style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 15),),
+          Expanded(
+            child: Text('please note that the ticket is automaticaly deleted after one hour of specified time'),
+          )
 
+        ],),
       /* TextFormField(
         focusNode: myFocusNodeTime,
         controller: TimeController,
@@ -587,34 +625,52 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 alignment: Alignment.centerLeft,
               ),
               const SizedBox(height: 5.0),
-              TextFormField(
-                focusNode: myFocusNodeCourse,
-                controller: DestinationController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: GlobalStringText.textFieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      width: 0,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  hintText: 'example Hamarganet st,Nesher',
-                  hintStyle: TextStyle(
-                      fontSize: 12.0,
-                      fontFamily: GlobalStringText.FontTextFormField,
-                      color: GlobalStringText.textFieldGrayColor),
-                  //helperText: 'Keep it short, this is just a demo.',
-                  labelText: 'Pick destination',
-                  labelStyle: TextStyle(
-                      fontSize: 15.0,
-                      color: GlobalStringText.textFieldGrayColor,
-                      fontFamily: GlobalStringText.FontTextFormField,
-                      fontWeight: FontWeight.w300),
+              InkWell(
 
-                  prefixText: ' ',
-                  //suffixStyle: const TextStyle(color: Colors.green)
+                onTap: ()  {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return PlacePicker(
+                          apiKey: "AIzaSyAfka9If5Jz-DslgoEWvm8pqfp_9Y2xoGs",
+                          hintText: "Find a place ...",
+                          searchingText: "Please wait ...",
+                          selectText: "Select place",
+                          outsideOfPickAreaText: "Place not in area",
+                          initialPosition: kInitialPosition,
+                          useCurrentLocation: true,
+                          selectInitialPosition: true,
+                          usePinPointingSearch: true,
+                          usePlaceDetailSearch: true,
+                          onPlacePicked: (result) {
+                            _selectedPlaceDest = result;
+                            Navigator.of(context).pop();
+                            setState(() {});
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  child: Row(
+                    children: [
+                      Padding(padding: EdgeInsets.all(5)),
+                      Expanded(
+                        child: Text(
+                          _selectedPlaceDest.formattedAddress ?? DestinationController.text,
+                          style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 16),
+                        ),
+                      )
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.start,
+                  ),
+                  decoration: BoxDecoration(
+                      color: Color(0xFFF0F4F8),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      border: Border.all(color: Colors.black)),
+                  height: 50,
                 ),
               ),
             ],
@@ -670,35 +726,39 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   Future<void> pushTicket() async {
+    if(emptyFieldExists()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill all fields')));
+      return Future.value(false);
+    }
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final User? user = Provider.of<AuthRepository>(context, listen: false).user;
     var doc_ref;
-
-String action = widget.data != null? 'edit' : widget.category;
+    String action = widget.data != null? 'edit' : widget.category;
     switch(action) {
     case 'edit': {
     String type = (widget.category == GlobalStringText.tagFood)? _selectedFood.getName() : _selectedEvent.getName();
     (widget.data!['ref'] as DocumentReference).update({
     'Title' : TitleController.text,
-    'Location' : LocationController.text,
+    'Location' : _selectedPlaceStart.formattedAddress ?? LocationController.text,
     'Time' : DateFormat('d.M.yyyy , HH:mm').format(selected_time),
     'Type' : type,
     'Description' : DescriptionController.text,
     'CourseNum' : CourseNumberController.text,
-    'Destination' : DestinationController.text,
+    'Destination' : _selectedPlaceDest.formattedAddress ?? DestinationController.text,
     });
     } break;
     case GlobalStringText.tagFood:
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Type': _selectedFood.getName(),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Food").add(data);
         }
@@ -707,13 +767,13 @@ String action = widget.data != null? 'edit' : widget.category;
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Type': _selectedEvent.getName(),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Entertainment").add(data);
         }
@@ -722,13 +782,13 @@ String action = widget.data != null? 'edit' : widget.category;
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
-            'Destination': DestinationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
+            'Destination': _selectedPlaceDest.formattedAddress,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("CarPool").add(data);
         }
@@ -737,13 +797,13 @@ String action = widget.data != null? 'edit' : widget.category;
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("AcademicSupport").add(data);
         }
@@ -752,13 +812,13 @@ String action = widget.data != null? 'edit' : widget.category;
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("StudyBuddy").add(data);
         }
@@ -767,13 +827,13 @@ String action = widget.data != null? 'edit' : widget.category;
         {
           Map<String, dynamic> data = {
             'Title': TitleController.text,
-            'Location': LocationController.text,
+            'Location': _selectedPlaceStart.formattedAddress,
             'CourseNum': CourseNumberController.text,
             'Time': DateFormat('d.M.yyyy , HH:mm').format(selected_time),
             'Description': DescriptionController.text,
             'Owner': user?.displayName,
-            'ownerUid' : user?.uid,
-            'groupId' : _firestore.collection('chats').doc().id
+            'uid' : user?.uid,
+            'groupId' : (await _firestore.collection('chats').add({ 'subs' : {user!.uid : false} })).id
           };
           doc_ref = await _firestore.collection("Material").add(data);
         }
@@ -787,5 +847,36 @@ String action = widget.data != null? 'edit' : widget.category;
       'category': widget.category,
     });
     Navigator.of(context).pop();
+  }
+
+  bool emptyFieldExists() {
+    switch(widget.category) {
+      case GlobalStringText.tagFood:
+        return (TitleController.text.isEmpty ||
+                _selectedPlaceStart.formattedAddress == null ||
+                _selectedFood.getName().isEmpty);
+      case GlobalStringText.tagEntertainment:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            _selectedEvent.getName().isEmpty);
+      case GlobalStringText.tagCarPool:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            _selectedPlaceDest.formattedAddress == null);
+      case GlobalStringText.tagAcademicSupport:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+
+      case GlobalStringText.tagStudyBuddy:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+      case GlobalStringText.tagMaterial:
+        return (TitleController.text.isEmpty ||
+            _selectedPlaceStart.formattedAddress == null ||
+            CourseNumberController.text.isEmpty);
+      default: return false;
+    }
   }
 }

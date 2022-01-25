@@ -52,7 +52,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                       children: <Widget>[
                         IconButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                             },
                             icon: Icon(
                               Icons.arrow_back,
@@ -62,8 +62,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                         IconButton(
                           onPressed: () async {
                             await user.signOut();
-                            Navigator.popUntil(context, (route) =>
-                            route.isFirst);
+                            Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
                           },
                           icon: Image.asset("images/logout.png"),
                           iconSize: 40,
@@ -216,7 +215,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                     data['groupId'],
-                    data['ownerUid'],
+                    data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -236,7 +235,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -256,7 +255,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -276,7 +275,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -296,7 +295,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],
@@ -316,7 +315,7 @@ class _OpenedTicketsPage extends State<OpenedTicketsPage> {
                 {
                   var ticket = Ticket(
                       data['groupId'],
-                      data['ownerUid'],
+                      data['uid'],
                     data['Title'],
                     data['Description'],
                     data['Time'],

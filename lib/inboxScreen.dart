@@ -26,6 +26,7 @@ class ChatModel {
   String currentMessage;
   bool isRead;
   String uid;
+  bool? mute;
 
   ChatModel({
     required this.name,
@@ -33,27 +34,39 @@ class ChatModel {
     required this.time,
     required this.currentMessage,
     required this.isRead,
-    required this.uid
+    required this.uid,
+    this.mute
   });
 
   factory ChatModel.fromJson(dynamic json) {
     var time = DateTime.fromMillisecondsSinceEpoch((json['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
-    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    var now = DateTime.now();
+    String timePrefix = '';
+    if(time.day < now.day) {
+      timePrefix = '${time.day.toString().padLeft(2,'0')}/${time.month.toString().padLeft(2,'0')} , ';
+    }
+    String timeFormat = '$timePrefix${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
         name: json['name'], isGroup: false, isRead: json['isRead'] ?? true, time: timeFormat, currentMessage: json['lastMessage'], uid: (json as DocumentSnapshot).id);
   }
 
   factory ChatModel.group(DocumentSnapshot snapshot) {
     var time = DateTime.fromMillisecondsSinceEpoch((snapshot['time'] as Timestamp).millisecondsSinceEpoch, isUtc: true).toLocal();
-    String timeFormat = '${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
+    var now = DateTime.now();
+    String timePrefix = '';
+    if(time.day < now.day) {
+      timePrefix = '${time.day.toString().padLeft(2,'0')}/${time.month.toString().padLeft(2,'0')} , ';
+    }
+    String timeFormat = '$timePrefix${time.hour.toString().padLeft(2,'0')}:${time.minute.toString().padLeft(2,'0')}';
     return ChatModel(
-        name: 'Ticket thread', isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
+        mute: snapshot['mute'], name: snapshot['title'], isGroup: true, isRead: snapshot['isRead'] ?? true, time: timeFormat, currentMessage: snapshot['lastMessage'], uid: snapshot.id);
   }
 }
 
 class inboxScreen extends StatefulWidget {
 
- // final ChatModel sourceChat;
+ bool? group;
+ inboxScreen({bool? this.group});
 
   @override
   _inboxScreen createState() => _inboxScreen();
@@ -66,24 +79,48 @@ class _inboxScreen extends State<inboxScreen>
   int selectedIndex = 2;
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  bool _isVisible = true;
+  ScrollController scrollController = ScrollController();
 
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 2, vsync: this, initialIndex: 0);
+    _controller = TabController(length: 2, vsync: this, initialIndex: widget.group == null? 0:1);
     Chat.init(context);
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
+        if (_isVisible == true) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      } else if (scrollController.position.maxScrollExtent != scrollController.position.pixels) {
+        if (_isVisible == false) {
+          setState(() {
+            _isVisible = true;
+          });
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return WillPopScope(child: Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
+
       appBar: appBarComponent(context),
       body: body(context),
-      bottomNavigationBar: buildBottomNavigationBar(),
+      floatingActionButton: Visibility(child: buildBottomNavigationBar(), visible: _isVisible,),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-    );
+    ), onWillPop: () {
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+      return Future.value(false);
+    },);
   }
 
   PreferredSizeWidget appBarComponent(context) {
@@ -99,7 +136,7 @@ class _inboxScreen extends State<inboxScreen>
                 children: <Widget>[
                   IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                       },
                       icon: const Icon(
                         Icons.arrow_back,
@@ -184,6 +221,10 @@ class _inboxScreen extends State<inboxScreen>
                          return Center(child: Text("Error: ${snapshot.error}"));
                        } else {
                          List list = (snapshot.data as QuerySnapshot).docs;
+                         list.removeWhere((element) {
+                           if ((element as DocumentSnapshot<Map<String,dynamic>>).data() == null) return true;
+                           return !((element as DocumentSnapshot<Map<String,dynamic>>).data()!.containsKey('isRead'));
+                         });
                          return ListView.builder(
                            itemCount: list.length,
                            reverse: false,
@@ -218,8 +259,12 @@ class _inboxScreen extends State<inboxScreen>
     final width = chat.currentMessage.length > mWidth / 7 ? mWidth / 1.3 : null;
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ChatScreen(chat.uid, chat.isGroup, chat.name)));
+        Navigator.of(context).pushNamed('/Home/Inbox/Chat', arguments: {
+          'uid' : chat.uid,
+          'isGroup' : chat.isGroup,
+          'name' : chat.name,
+          'mute' : chat.mute
+        });
       },
 
       child:
@@ -248,7 +293,7 @@ class _inboxScreen extends State<inboxScreen>
                 chat.currentMessage,
                 style: TextStyle(
                   fontWeight: chat.isRead? FontWeight.normal : FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: chat.isRead? 14 : 16,
                 ),
               ),
             ],
@@ -306,23 +351,6 @@ class _inboxScreen extends State<inboxScreen>
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -353,19 +381,13 @@ class _inboxScreen extends State<inboxScreen>
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
                   case 0 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => FavoritesPage()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Favorites', (route) => false);
                     break;
                   case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CategoryPageScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => route.isFirst);
                     break;
-
                   case 2 :
-
                     break;
                 }
               });

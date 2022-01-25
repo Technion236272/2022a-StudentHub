@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:studenthub/main.dart';
 import 'ScreenTags.dart';
@@ -26,101 +27,119 @@ class _FavoritesPage extends State<FavoritesPage> {
   int selectedIndex = 0;
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  ScrollController scrollController = ScrollController();
+  bool _isVisible = true;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     tickets = getFavoriteTickets(context);
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent == scrollController.position.pixels) {
+        if (_isVisible == true) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      } else if (scrollController.position.maxScrollExtent != scrollController.position.pixels) {
+        if (_isVisible == false) {
+          setState(() {
+            _isVisible = true;
+          });
+        }
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final user = Provider.of<AuthRepository>(context);
 
-    return Scaffold(
-
+    return WillPopScope(child: Scaffold(
+      backgroundColor: GlobalStringText.WhiteScreen,
       body: Column(
 
         children: <Widget>[
           SafeArea(
               child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.18,
-            color: Color(0xFF8C88F9),
-            child: Column(
-              children: <Widget>[
-                Row(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.18,
+                color: Color(0xFF8C88F9),
+                child: Column(
                   children: <Widget>[
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        )),
-                    new Spacer(),
-                    IconButton(
-                      onPressed: () async {
-                        await user.signOut();
-                        Navigator.popUntil(context, (route) => route.isFirst);
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            )),
+                        new Spacer(),
+                        IconButton(
+                          onPressed: () async {
+                            await user.signOut();
+                            Navigator.pushNamedAndRemoveUntil(context, '/Auth', (route) => false);
 
-                      },
-                      icon: Image.asset("images/logout.png"),
-                      iconSize: 40,
+                          },
+                          icon: Image.asset("images/logout.png"),
+                          iconSize: 40,
+                        )
+                      ],
+                    ),
+                    Container(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text("Hi ${user.getName()}",
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand-Bold.ttf',
+                                    color: Colors.white,
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                "Welcome Back! ",
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Quicksand-Bold.ttf',
+                                  color: Colors.white,
+                                ),
+                              ),
+                              new Image.asset(GlobalStringText.ImageWavingTest)
+                            ],
+                          )
+                        ],
+                      ),
+                      margin: EdgeInsets.only(left: 15),
                     )
                   ],
                 ),
-                Container(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text("Hi ${user.getName()}",
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand-Bold.ttf',
-                                color: Colors.white,
-                              )),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            "Welcome Back!",
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Quicksand-Bold.ttf',
-                              color: Colors.white,
-                            ),
-                          ),
-                          new Image.asset(GlobalStringText.ImageWavingTest)
-                        ],
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 15),
-                )
-              ],
-            ),
-          )),
+              )),
           Flexible(
             child: Container(
               height: MediaQuery.of(context).size.height * 0.8,
               width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
+              decoration:  BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(20.0),
                     topLeft: Radius.circular(20.0)),
-                color: Colors.white,
+                color: GlobalStringText.WhiteScreen,
                 boxShadow: [
                   BoxShadow(
-                      color: Color(0xFF8C88F9),
-                      spreadRadius: 12,
-                      blurRadius: 10)
+                    color: Color(0xFF8C88F9),
+                    spreadRadius: 12,
+                    blurRadius: 10,
+                    offset: Offset(0, -2),
+                  )
                 ],
               ),
               child: Container(
@@ -160,11 +179,12 @@ class _FavoritesPage extends State<FavoritesPage> {
                                 } else {
                                   local_tickets = snapshot.data as List<favoriteTicket>;
                                   return ListView.separated(
+                                    controller: scrollController,
                                     itemBuilder: (context, i) {
                                       return local_tickets[i];
                                     },
                                     itemCount: local_tickets.length,
-                                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                    separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 5,),
                                   );
                                 }
                               }
@@ -180,19 +200,25 @@ class _FavoritesPage extends State<FavoritesPage> {
           )
         ],
       ),
+      floatingActionButton: Visibility(child:buildBottomNavigationBar(), visible: _isVisible,) ,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
 
-    );
+    ), onWillPop: () {
+      Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
+      return Future.value(false);
+    });
   }
 
   Widget buildBottomNavigationBar() {
     return Container(
+      color: Colors.transparent,
       child: SafeArea(
       top: true,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: GlobalStringText.WhiteScreen,
           borderRadius: BorderRadius.all(Radius.circular(50)),
           boxShadow: [
             BoxShadow(
@@ -217,23 +243,6 @@ class _FavoritesPage extends State<FavoritesPage> {
                 iconSize: 24,
                 padding: padding,
                 icon: LineIcons.heart,
-                leading: selectedIndex == 1 || badge == 0
-                    ? null
-                    : Badge(
-                  badgeColor: Colors.red.shade100,
-                  elevation: 0,
-                  position: BadgePosition.topEnd(top: -12, end: -12),
-                  badgeContent: Text(
-                    badge.toString(),
-                    style: TextStyle(color: Colors.red.shade900),
-                  ),
-                  child: Icon(
-                    LineIcons.heart,
-                    color: selectedIndex == 1
-                        ? Colors.pink
-                        : Colors.black,
-                  ),
-                ),
                 text: 'Favorite tickets',
               ),
               GButton(
@@ -264,19 +273,13 @@ class _FavoritesPage extends State<FavoritesPage> {
             onTabChange: (index) {
               setState(() {
                 switch (index) {
-                // just update the navigator i putted random navigation for the purpose of testing...
-                // waiting for yousef to do the pages
                   case 0 :
-
                     break;
                   case 1 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CategoryPageScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home', (route) => false);
                     break;
-
                   case 2 :
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => inboxScreen()));
+                    Navigator.of(context).pushNamedAndRemoveUntil('/Home/Inbox', (route) => route.isFirst);
                     break;
                 }
               });
