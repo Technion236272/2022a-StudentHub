@@ -1,7 +1,7 @@
 # StudentHub
 
-An application whose goal is to provide specialised services for students that can help them academically and financially, and find several activities.
-
+An application whose goal is to provide essential services for the Technion students that can help them academically and financially, And most importantly
+improve and ease their life at campus.
 
 <a href='https://play.google.com/store/apps/details?id=com.technion.android.studenthub.studenthub&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="250" height="100"/></a>
 
