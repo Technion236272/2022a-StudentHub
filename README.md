@@ -9,8 +9,6 @@ improve and ease their life at campus.
 <img src="docs/1.png" width="180"> <img src="docs/2.png" width="180"> <img src="docs/3.png" width="180"> <img src="docs/4.png" width="180"> <img src="docs/5.png" width="180"> <img src="docs/6.png" width="180">
 
 
-
-
 ### Motivation
 
 Many students have difficulty finding a study partner, academic help, a group to hang out with, or a ride to and from campus.
